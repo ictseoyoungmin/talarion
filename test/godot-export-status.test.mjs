@@ -26,3 +26,14 @@ test("unrelated stderr does not automatically fail Web export", () => {
   });
   assert.equal(result.ok, true);
 });
+
+
+test("Android export configuration errors fail even if Godot exits zero", () => {
+  const result = classifyGodotExport({
+    ok: true,
+    stdout: "",
+    stderr: 'ERROR: Cannot export project with preset "Android" due to configuration errors:\nERROR: Project export for preset "Android" failed.'
+  });
+  assert.equal(result.ok, false);
+  assert.equal(result.fatalDiagnostics.length, 2);
+});

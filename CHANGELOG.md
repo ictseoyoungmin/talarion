@@ -21,3 +21,4 @@
 - Playwright Web runtime runner
 - ADB Android runtime runner
 - `talarion test web|android` orchestration
+- Godot Web runtime CI harness with uploaded runtime evidence

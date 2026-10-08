@@ -1,49 +1,55 @@
-# Next Implementation Slice — TL00-R1 Runtime Validation
+# Next Implementation Slice — TL00-R2 Visual Parity
 
 ## Objective
 
-Validate the implemented Web and Android runtime runners against real exported builds and compare the authoritative state streams produced by the same canonical replay.
+Capture the same named visual checkpoints from exported Web and Android runtimes, normalize target-specific framebuffer differences, and produce reproducible visual similarity evidence.
 
-## Implemented R1 infrastructure
+## R1 baseline
 
-- [x] Godot `TalarionBridge` autoload
-- [x] replay v1 parser inside the runtime bridge
-- [x] fixed-tick action queue
-- [x] semantic action dispatch
-- [x] named capture-checkpoint events
-- [x] authoritative state log protocol
-- [x] canonical replay staging into exported Godot resources
-- [x] byte-identity test between canonical and staged replay
-- [x] runtime bridge structural contract checks
-- [x] shared runtime evidence parser
-- [x] Playwright Web runner implementation
-- [x] ADB Android runner implementation
-- [x] `talarion test web|android` orchestration
+The runtime state gate is complete:
 
-## Remaining R1 validation gates
+- [x] canonical 600-tick replay staged without mutation
+- [x] Web replay executes to tick 600
+- [x] Android emulator replay executes to tick 600
+- [x] Web state evidence collected
+- [x] Android state evidence collected
+- [x] CI downloads both runtime evidence artifacts
+- [x] 15/15 snapshots matched
+- [x] state parity = 100.00%
 
-- [ ] export the sample Web build with the target Godot version
-- [ ] complete a real Playwright replay run
-- [ ] collect Web state evidence through replay finish
-- [ ] export/install the sample Android build
-- [ ] complete a real ADB replay run on an authorized device or emulator
-- [ ] collect Android state evidence through replay finish
-- [ ] compare the two real-runtime state streams
-- [ ] pass configured position/state tolerances
+## R2 deliverables
+
+- [x] Web named checkpoint screenshot capture
+- [x] Android checkpoint screenshot implementation
+- [ ] Android screenshot capture validated in CI
+- [ ] screenshot metadata records source dimensions and normalization
+- [ ] target-independent normalization policy
+- [ ] per-checkpoint visual similarity metric
+- [ ] generated visual diff images
+- [ ] visual thresholds configurable in `talarion.config.json`
+- [ ] visual results included in the parity report
+- [ ] visual parity CI gate
+
+## Checkpoints
+
+The canonical replay currently defines:
+
+- `after-jump`
+- `interaction`
+- `attack`
+
+Both runtimes must emit one screenshot for every declared checkpoint.
 
 ## Gate
 
-A checked-in 10-second replay must:
+R2 closes only when:
 
-1. be staged without mutation into both target builds;
-2. execute through the same `TalarionBridge` semantic action contract;
-3. move the sample player through the same authored path;
-4. produce state JSONL from both targets;
-5. pass configured position/state tolerances.
+1. Web and Android produce the same checkpoint set;
+2. screenshots are normalized deterministically;
+3. every checkpoint is compared using a declared metric and threshold;
+4. diff images are emitted for inspection;
+5. the visual result is machine-readable and included in the CI parity evidence.
 
-## Follow-on slices
+## Follow-on
 
-- **TL00-R2** — screenshot parity hardening
-- **TL00-R3** — performance telemetry and physical-device quality gate
-
-TL00 closes only after R1–R3 satisfy the closure criteria in `tl00.md`.
+**TL00-R3** adds performance telemetry and physical-device validation before TL00 can close.

@@ -22,3 +22,42 @@ jobs:
           node-version: ${{ matrix.node }}
       - run: npm test
       - run: npm run verify
+
+  web-runtime:
+    name: Godot Web runtime parity harness
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install Node dependencies
+        run: npm install
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Setup Godot
+        uses: chickensoft-games/setup-godot@v2
+        with:
+          version: 4.7.2
+          use-dotnet: false
+          include-templates: true
+
+      - name: Verify Godot
+        run: godot --version
+
+      - name: Run Web target
+        run: node bin/talarion.mjs test web --json
+
+      - name: Upload Web evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: talarion-web-evidence
+          path: |
+            artifacts/run/web
+            artifacts/build/web
+          if-no-files-found: warn

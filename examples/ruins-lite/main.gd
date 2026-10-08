@@ -67,7 +67,7 @@ func _on_tick(tick: int) -> void:
     if jump_started_tick >= 0:
         var elapsed := tick - jump_started_tick
         if elapsed <= JUMP_TICKS:
-            var phase := clamp(float(elapsed) / float(JUMP_TICKS), 0.0, 1.0)
+            var phase: float = clampf(float(elapsed) / float(JUMP_TICKS), 0.0, 1.0)
             player.position.y = 0.8 + sin(phase * PI) * 0.75
             state = "JUMP"
         else:

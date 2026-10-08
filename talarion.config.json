@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "project": {
+    "name": "ruins-lite",
+    "engine": "godot",
+    "path": "examples/ruins-lite"
+  },
+  "toolchain": {
+    "godot": "auto",
+    "recommendedVersion": "4.7.2"
+  },
+  "targets": {
+    "web": {
+      "preset": "Web",
+      "output": "artifacts/build/web/index.html",
+      "profile": "web-qa"
+    },
+    "android": {
+      "preset": "Android",
+      "output": "artifacts/build/android/ruins-lite.apk",
+      "profile": "android-low"
+    }
+  },
+  "profiles": {
+    "web-qa": {
+      "textureMax": 4096,
+      "targetFps": 60,
+      "debugEvidence": true
+    },
+    "android-low": {
+      "textureMax": 2048,
+      "targetFps": 30,
+      "drawCallBudget": 400,
+      "debugEvidence": true
+    }
+  },
+  "parity": {
+    "positionTolerance": 0.1,
+    "scalarTolerance": 0.001,
+    "requireEventOrder": true
+  }
+}

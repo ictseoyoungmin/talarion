@@ -1,0 +1,4 @@
+{"tick": 0, "entity": "player", "state": "IDLE", "position": [0, 0, 0], "rotation": [0, 0, 0], "health": 100}
+{"tick": 60, "entity": "player", "state": "RUN", "position": [1.0, 0, 0.2], "rotation": [0, 0.1, 0], "health": 100}
+{"tick": 120, "entity": "player", "state": "JUMP", "position": [2.0, 0.8, 0.4], "rotation": [0, 0.1, 0], "health": 100}
+{"tick": 180, "entity": "enemy_guard_02", "state": "CHASE", "position": [4.12, 0, 8.41], "rotation": [0, 1.4, 0], "health": 80}

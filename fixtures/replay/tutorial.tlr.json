@@ -1,0 +1,42 @@
+{
+  "schema": "talarion.replay/v1",
+  "tickRate": 60,
+  "seed": 20261009,
+  "events": [
+    {
+      "tick": 0,
+      "type": "session.start"
+    },
+    {
+      "tick": 10,
+      "type": "move",
+      "value": [
+        0.71,
+        0.13
+      ]
+    },
+    {
+      "tick": 85,
+      "type": "camera",
+      "value": [
+        -0.17,
+        0.04
+      ]
+    },
+    {
+      "tick": 126,
+      "type": "jump",
+      "pressed": true
+    },
+    {
+      "tick": 157,
+      "type": "interact",
+      "entity": "chest_04"
+    },
+    {
+      "tick": 246,
+      "type": "attack",
+      "kind": "light"
+    }
+  ]
+}

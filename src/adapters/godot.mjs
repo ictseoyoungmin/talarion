@@ -12,6 +12,8 @@ const CANDIDATES = process.platform === "win32"
 const FATAL_EXPORT_PATTERNS = [
   /SCRIPT ERROR:/,
   /ERROR:\s+Failed to load script/,
+  /ERROR:\s+Cannot export project/,
+  /ERROR:\s+Project export .* failed/,
   /Parse Error:/
 ];
 

@@ -32,6 +32,35 @@ async function requireDevice(adb) {
   return devices;
 }
 
+async function captureAndroidPng(adb, file) {
+  await fs.mkdir(path.dirname(file), { recursive: true });
+
+  return new Promise((resolve, reject) => {
+    const child = spawn(adb, ["exec-out", "screencap", "-p"], {
+      env: process.env,
+      stdio: ["ignore", "pipe", "pipe"]
+    });
+    const chunks = [];
+    let stderr = "";
+
+    child.stdout.on("data", chunk => chunks.push(Buffer.from(chunk)));
+    child.stderr.on("data", chunk => stderr += chunk.toString("utf8"));
+    child.on("error", reject);
+    child.on("close", async code => {
+      if (code !== 0) {
+        reject(new Error(stderr.trim() || `adb screencap failed with exit code ${code}`));
+        return;
+      }
+      try {
+        await fs.writeFile(file, Buffer.concat(chunks));
+        resolve(file);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  });
+}
+
 export async function runAndroid(config, options = {}) {
   const timeoutMs = Number(options.timeoutMs ?? 45000);
   const adb = await resolveAdb(config);
@@ -53,8 +82,9 @@ export async function runAndroid(config, options = {}) {
   await run(adb, ["shell", "am", "force-stop", packageName]);
 
   const states = [];
-  const captures = [];
+  const screenshots = [];
   const runtimeErrors = [];
+  let captureQueue = Promise.resolve();
 
   let resolveFinished;
   let rejectFinished;
@@ -81,9 +111,20 @@ export async function runAndroid(config, options = {}) {
       if (parsed.kind === "state" && parsed.value && typeof parsed.value === "object") {
         states.push(parsed.value);
       }
+
       if (parsed.kind === "capture" && parsed.value && typeof parsed.value === "object") {
-        captures.push(parsed.value);
+        const name = String(parsed.value.name ?? `tick-${parsed.value.tick ?? "unknown"}`);
+        const file = path.join(artifactDir, `${name}.png`);
+        captureQueue = captureQueue.then(async () => {
+          try {
+            await captureAndroidPng(adb, file);
+            screenshots.push({ checkpoint: name, file });
+          } catch (error) {
+            runtimeErrors.push(`Screenshot ${name} failed: ${error?.message ?? error}`);
+          }
+        });
       }
+
       if (parsed.kind === "finished") resolveFinished(parsed.value);
     }
   };
@@ -108,6 +149,7 @@ export async function runAndroid(config, options = {}) {
 
     const finishedTick = await finished;
     if (buffer) consume("\n");
+    await captureQueue;
 
     const stateFile = path.join(artifactDir, "state.jsonl");
     await writeJsonl(stateFile, states);
@@ -117,13 +159,10 @@ export async function runAndroid(config, options = {}) {
       build: apk,
       replay: resolveFromRoot(config, config.replay.default),
       stateFile,
-      screenshots: [],
+      screenshots,
       performance: null,
-      warnings: [
-        ...runtimeErrors.filter(Boolean),
-        ...(captures.length ? [`${captures.length} capture checkpoint(s) observed; screenshot capture is TL00-R2.`] : [])
-      ],
-      ok: states.length > 0
+      warnings: runtimeErrors.filter(Boolean),
+      ok: states.length > 0 && runtimeErrors.length === 0
     });
     result.finishedTick = finishedTick;
     result.devices = devices;

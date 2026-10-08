@@ -13,3 +13,7 @@
 - runtime runner result contract
 - minimal Godot sample project
 - Node 20/22/24 verification workflow
+- canonical replay staging for exported runtimes
+- Godot `TalarionBridge` fixed-tick semantic replay
+- named capture checkpoint signals
+- runtime contract and replay staging tests

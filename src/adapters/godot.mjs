@@ -3,6 +3,7 @@ import fs from "node:fs/promises";
 import { run } from "../core/process.mjs";
 import { exists } from "../core/io.mjs";
 import { resolveFromRoot } from "../core/config.mjs";
+import { stageReplay, cleanupStagedReplay } from "../runtime/replay-stage.mjs";
 
 const CANDIDATES = process.platform === "win32"
   ? ["godot.exe", "godot4.exe", "godot", "godot4"]
@@ -38,6 +39,7 @@ export async function inspectGodotProject(config) {
 export async function exportGodot(config, target) {
   const targetConfig = config.targets?.[target];
   if (!targetConfig) throw new Error(`Unknown target: ${target}`);
+
   const godot = await resolveGodot(config);
   if (!godot.ok) throw new Error(godot.reason);
 
@@ -45,22 +47,28 @@ export async function exportGodot(config, target) {
   const output = resolveFromRoot(config, targetConfig.output);
   await fs.mkdir(path.dirname(output), { recursive: true });
 
-  const args = [
-    "--headless",
-    "--path", projectDir,
-    "--export-debug", targetConfig.preset,
-    output
-  ];
-  const result = await run(godot.bin, args);
-  return {
-    ok: result.ok,
-    engine: "godot",
-    target,
-    preset: targetConfig.preset,
-    output,
-    command: [godot.bin, ...args],
-    version: godot.version,
-    stdout: result.stdout,
-    stderr: result.stderr
-  };
+  const stagedReplay = await stageReplay(config);
+  try {
+    const args = [
+      "--headless",
+      "--path", projectDir,
+      "--export-debug", targetConfig.preset,
+      output
+    ];
+    const result = await run(godot.bin, args);
+    return {
+      ok: result.ok,
+      engine: "godot",
+      target,
+      preset: targetConfig.preset,
+      output,
+      stagedReplay,
+      command: [godot.bin, ...args],
+      version: godot.version,
+      stdout: result.stdout,
+      stderr: result.stderr
+    };
+  } finally {
+    await cleanupStagedReplay(config);
+  }
 }

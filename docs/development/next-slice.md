@@ -1,26 +1,37 @@
-# Next Implementation Slice — TL00-R1 Replay Bridge
+# Next Implementation Slice — TL00-R1 Runtime Execution
 
 ## Objective
 
-Deliver the same semantic action stream into exported Web and Android runtimes and collect authoritative state from both.
+Execute the checked-in semantic replay in exported Web and Android runtimes and collect authoritative state from both.
 
-## Deliverables
+## Implemented bridge foundation
 
-- Godot `TalarionBridge` autoload
-- replay v1 parser inside the runtime bridge
-- fixed-tick action queue
-- semantic action dispatch
-- authoritative state emitter
-- named capture-checkpoint events
-- Web runner consuming the bridge
-- Android runner consuming the same bridge
+- [x] Godot `TalarionBridge` autoload
+- [x] replay v1 parser inside the runtime bridge
+- [x] fixed-tick action queue
+- [x] semantic action dispatch
+- [x] named capture-checkpoint events
+- [x] authoritative state log protocol
+- [x] canonical replay staging into exported Godot resources
+- [x] byte-identity test between canonical and staged replay
+- [x] runtime bridge structural contract checks
+
+## Remaining R1 deliverables
+
+- [ ] Web runner launches the exported build
+- [ ] Web runner captures `TALARION_STATE` output
+- [ ] Android runner installs and launches the exported APK through ADB
+- [ ] Android runner captures the same state protocol
+- [ ] `talarion test web`
+- [ ] `talarion test android`
+- [ ] Web ↔ Android real-runtime state comparison
 
 ## Gate
 
 A checked-in 10-second replay must:
 
-1. launch against the Web build;
-2. launch against an Android build;
+1. be staged without mutation into both target builds;
+2. execute through the same `TalarionBridge` semantic action contract;
 3. move the sample player through the same authored path;
 4. produce state JSONL from both targets;
 5. pass configured position/state tolerances.

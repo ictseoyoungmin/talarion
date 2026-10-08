@@ -1,37 +1,104 @@
 extends Node3D
 
-# TL00 sample state emitter.
-# The real Web/Android runners will inject replay events through a dedicated bridge.
-# For now this scene provides deterministic fixed-tick state output for contract work.
-
 const SPEED := 2.0
-var tick := 0
+const JUMP_TICKS := 36
+const ACTION_TICKS := 20
+
+var move_vector := Vector2.ZERO
 var state := "IDLE"
+var jump_started_tick := -1
+var transient_state_until := -1
+
 @onready var player: MeshInstance3D = $Player
+@onready var camera: Camera3D = $Camera3D
 
 func _ready() -> void:
-    Engine.physics_ticks_per_second = 60
-    _emit_state()
+    TalarionBridge.action_dispatched.connect(_on_action)
+    TalarionBridge.tick_advanced.connect(_on_tick)
+    TalarionBridge.capture_checkpoint.connect(_on_capture_checkpoint)
+    TalarionBridge.replay_finished.connect(_on_replay_finished)
+    _emit_state(0, "start")
 
-func _physics_process(delta: float) -> void:
-    tick += 1
-    var input_vec := Input.get_vector("move_left", "move_right", "move_forward", "move_back")
-    if input_vec.length() > 0.0:
-        state = "RUN"
-        player.position += Vector3(input_vec.x, 0.0, input_vec.y) * SPEED * delta
-    else:
-        state = "IDLE"
+func _on_action(action: Dictionary) -> void:
+    var action_type := String(action.get("type", ""))
 
-    if tick % 60 == 0:
-        _emit_state()
+    match action_type:
+        "session.start":
+            move_vector = Vector2.ZERO
+            state = "IDLE"
+        "session.end":
+            move_vector = Vector2.ZERO
+        "move":
+            var value = action.get("value", [0.0, 0.0])
+            if value is Array and value.size() >= 2:
+                move_vector = Vector2(float(value[0]), float(value[1]))
+        "camera":
+            var value = action.get("value", [0.0, 0.0])
+            if value is Array and value.size() >= 2:
+                camera.rotation.y += float(value[0])
+                camera.rotation.x += float(value[1])
+        "jump":
+            if bool(action.get("pressed", true)):
+                jump_started_tick = TalarionBridge.current_tick
+                state = "JUMP"
+        "interact":
+            state = "INTERACT"
+            transient_state_until = TalarionBridge.current_tick + ACTION_TICKS
+            print("TALARION_EVENT " + JSON.stringify({
+                "tick": TalarionBridge.current_tick,
+                "type": "interact",
+                "entity": action.get("entity", "")
+            }))
+        "attack":
+            state = "ATTACK"
+            transient_state_until = TalarionBridge.current_tick + ACTION_TICKS
+            print("TALARION_EVENT " + JSON.stringify({
+                "tick": TalarionBridge.current_tick,
+                "type": "attack",
+                "kind": action.get("kind", "")
+            }))
 
-func _emit_state() -> void:
+func _on_tick(tick: int) -> void:
+    var delta := 1.0 / float(TalarionBridge.tick_rate)
+
+    if move_vector.length() > 0.0:
+        player.position += Vector3(move_vector.x, 0.0, move_vector.y) * SPEED * delta
+
+    if jump_started_tick >= 0:
+        var elapsed := tick - jump_started_tick
+        if elapsed <= JUMP_TICKS:
+            var phase := clamp(float(elapsed) / float(JUMP_TICKS), 0.0, 1.0)
+            player.position.y = 0.8 + sin(phase * PI) * 0.75
+            state = "JUMP"
+        else:
+            player.position.y = 0.8
+            jump_started_tick = -1
+
+    if jump_started_tick < 0 and tick > transient_state_until:
+        state = "RUN" if move_vector.length() > 0.0 else "IDLE"
+
+    if tick % TalarionBridge.tick_rate == 0:
+        _emit_state(tick, "interval")
+
+func _on_capture_checkpoint(name: String, tick: int) -> void:
+    _emit_state(tick, name)
+    print("TALARION_CAPTURE " + JSON.stringify({
+        "tick": tick,
+        "name": name
+    }))
+
+func _on_replay_finished(tick: int) -> void:
+    _emit_state(tick, "end")
+
+func _emit_state(tick: int, checkpoint: String) -> void:
     var payload := {
         "tick": tick,
         "entity": "player",
         "state": state,
+        "checkpoint": checkpoint,
         "position": [player.position.x, player.position.y, player.position.z],
         "rotation": [player.rotation.x, player.rotation.y, player.rotation.z],
+        "cameraRotation": [camera.rotation.x, camera.rotation.y, camera.rotation.z],
         "health": 100.0
     }
     print("TALARION_STATE " + JSON.stringify(payload))

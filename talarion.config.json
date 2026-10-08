@@ -9,6 +9,11 @@
     "godot": "auto",
     "recommendedVersion": "4.7.2"
   },
+  "replay": {
+    "default": "fixtures/replay/tutorial.tlr.json",
+    "stagedResource": ".talarion/runtime/replay.json",
+    "minimumDurationSeconds": 10
+  },
   "targets": {
     "web": {
       "preset": "Web",

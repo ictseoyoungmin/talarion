@@ -10,9 +10,10 @@
   "scripts": {
     "doctor": "node bin/talarion.mjs doctor",
     "plan": "node bin/talarion.mjs plan",
+    "test": "node --test",
     "verify": "node bin/talarion.mjs verify",
     "report": "node bin/talarion.mjs report fixtures/state/web.jsonl fixtures/state/android.jsonl artifacts/parity-report.html",
-    "self-check": "node bin/talarion.mjs verify"
+    "self-check": "npm test && npm run verify"
   },
   "engines": {
     "node": ">=20"

@@ -20,36 +20,47 @@ Talarion connects those workflows around three capabilities:
 
 Talarion is in early development. The first implementation target is **Godot + Web + Android**.
 
-Available today in the repository:
+Available in the repository:
 
 - project and target configuration
 - Godot executable/project discovery
 - Web/Android export orchestration
+- canonical replay staging into target builds
+- Godot fixed-tick `TalarionBridge`
 - baseline portability checks
 - replay schema validation
 - JSONL state snapshot format
 - tolerance-based state comparison
 - HTML parity reports
+- Playwright Web runner implementation
+- ADB Android runner implementation
 - machine-readable `--json` output
 - a minimal Godot 3D sample project
 
-The full runtime parity gate is still in development. Automated Web replay, Android device replay, screenshot parity, and device performance capture are not yet complete.
+The physical cross-runtime parity gate is still open. The runner implementations require a working local Godot toolchain and, for Android, an authorized device or emulator.
 
 ## Quick start
 
 Requirements:
 
 - Node.js 20+
-- Godot for build commands
-- Godot export templates for Web/Android exports
-- Android SDK/JDK for Android builds
+- Godot with Web/Android export templates
+- Android SDK/JDK and ADB for Android builds
+- Chromium installed through Playwright for automated Web runs
 
-Clone the repository and run the self-check:
+Clone and install:
 
 ```bash
 git clone https://github.com/ictseoyoungmin/talarion.git
 cd talarion
-npm run verify
+npm install
+npx playwright install chromium
+```
+
+Run repository checks:
+
+```bash
+npm run self-check
 ```
 
 Inspect the project:
@@ -82,23 +93,35 @@ node bin/talarion.mjs report \
   artifacts/parity-report.html
 ```
 
-With Godot and export templates configured:
+Build target exports:
 
 ```bash
 node bin/talarion.mjs build web
 node bin/talarion.mjs build android
 ```
 
-All major commands can return structured output:
+Run an exported target through its runtime runner:
+
+```bash
+node bin/talarion.mjs test web
+node bin/talarion.mjs test android
+```
+
+The Web runner serves the exported game locally, opens it in headless Chromium, and collects the Talarion state protocol from the browser console.
+
+The Android runner installs the APK with ADB, launches the app, and collects the same protocol from logcat.
+
+All major commands support structured output where applicable:
 
 ```bash
 node bin/talarion.mjs doctor --json
 node bin/talarion.mjs verify --json
+node bin/talarion.mjs test web --json
 ```
 
 ## Configuration
 
-`talarion.config.json` defines the engine project, target export presets, quality profiles, and parity tolerances.
+`talarion.config.json` defines the engine project, canonical replay, target export presets, target quality profiles, Android package, and parity tolerances.
 
 ```json
 {
@@ -106,9 +129,19 @@ node bin/talarion.mjs verify --json
     "engine": "godot",
     "path": "examples/ruins-lite"
   },
+  "replay": {
+    "default": "fixtures/replay/tutorial.tlr.json"
+  },
   "targets": {
-    "web": { "preset": "Web", "profile": "web-qa" },
-    "android": { "preset": "Android", "profile": "android-low" }
+    "web": {
+      "preset": "Web",
+      "profile": "web-qa"
+    },
+    "android": {
+      "preset": "Android",
+      "profile": "android-low",
+      "package": "dev.talarion.ruinslite"
+    }
   },
   "parity": {
     "positionTolerance": 0.1,
@@ -120,21 +153,23 @@ node bin/talarion.mjs verify --json
 ## Repository layout
 
 ```text
-bin/                    CLI entrypoint
+bin/                       CLI entrypoint
 src/
-  adapters/             engine integration
-  commands/             CLI commands
-  core/                 configuration and process utilities
-  parity/               state comparison
-  runners/              runtime-runner contracts
-examples/ruins-lite/    minimal Godot 3D sample
-fixtures/                replay and state fixtures
-docs/development/       architecture and implementation documentation
+  adapters/                engine integration
+  commands/                CLI commands
+  core/                    configuration and process utilities
+  parity/                  state comparison
+  runners/                 Web/Android runtime runners
+  runtime/                 replay staging and evidence protocol
+examples/ruins-lite/       minimal Godot 3D sample
+fixtures/                  replay and state fixtures
+test/                      Node contract tests
+docs/development/          architecture and implementation documentation
 ```
 
 ## Development documentation
 
-Architecture, contracts, implementation gates, and roadmap are maintained under [`docs/development/`](docs/development/README.md).
+Architecture, contracts, runtime gates, and roadmap are maintained under [`docs/development/`](docs/development/README.md).
 
 ## License
 

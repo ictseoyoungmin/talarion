@@ -17,3 +17,7 @@
 - Godot `TalarionBridge` fixed-tick semantic replay
 - named capture checkpoint signals
 - runtime contract and replay staging tests
+- shared Web/Android runtime evidence protocol parser
+- Playwright Web runtime runner
+- ADB Android runtime runner
+- `talarion test web|android` orchestration

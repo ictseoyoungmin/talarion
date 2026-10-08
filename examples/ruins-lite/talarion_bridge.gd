@@ -5,7 +5,7 @@ signal tick_advanced(tick: int)
 signal capture_checkpoint(name: String, tick: int)
 signal replay_finished(tick: int)
 
-const REPLAY_PATH := "res://.talarion/runtime/replay.json"
+const REPLAY_PATH := "res://talarion_runtime/replay.json"
 
 var tick_rate: int = 60
 var replay_seed: int = 0

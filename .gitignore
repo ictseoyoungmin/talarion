@@ -5,3 +5,4 @@ node_modules/
 *.jks
 artifacts/*
 !artifacts/.gitkeep
+examples/ruins-lite/talarion_runtime/

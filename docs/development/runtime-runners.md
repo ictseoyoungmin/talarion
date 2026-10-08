@@ -1,6 +1,6 @@
 # Runtime Runner Contract
 
-Runtime runners convert a target build plus replay into comparable evidence.
+Runtime runners convert a target build plus canonical replay into comparable evidence.
 
 ## Inputs
 
@@ -9,7 +9,7 @@ Every runner receives:
 ```text
 target
 build artifact
-replay artifact
+canonical replay artifact
 capture checkpoints
 target profile
 ```
@@ -26,13 +26,12 @@ target profile
   "evidence": {
     "stateFile": "artifacts/run/web/state.jsonl",
     "screenshots": [
-      { "checkpoint": "start", "file": "artifacts/run/web/start.png" },
-      { "checkpoint": "interaction", "file": "artifacts/run/web/interaction.png" }
+      {
+        "checkpoint": "interaction",
+        "file": "artifacts/run/web/interaction.png"
+      }
     ],
-    "performance": {
-      "fpsMedian": 60,
-      "frameMsP95": 18.1
-    }
+    "performance": null
   },
   "warnings": []
 }
@@ -40,44 +39,64 @@ target profile
 
 A successful process exit without evidence is not a successful runner result.
 
+## Shared runtime protocol
+
+The Godot runtime emits plain-text markers that both runner implementations parse:
+
+```text
+TALARION_REPLAY_READY {...}
+TALARION_STATE {...}
+TALARION_EVENT {...}
+TALARION_CAPTURE {...}
+TALARION_REPLAY_FINISHED 600
+```
+
+`src/runtime/evidence.mjs` is the shared parser. Browser console and Android logcat therefore feed the same evidence path.
+
 ## Web runner
 
-Planned backend: Playwright.
+Implementation: `src/runners/web.mjs`.
+
+Backend: Playwright + Chromium.
 
 Responsibilities:
 
-1. serve/open the exported Web build;
-2. establish the Talarion replay bridge;
-3. inject semantic actions on deterministic ticks;
-4. collect the Talarion state stream;
-5. capture named screenshots;
-6. collect browser timing metrics;
-7. emit `talarion.runner-result/v1`.
+1. serve the exported Web build from a local HTTP server;
+2. launch it in headless Chromium;
+3. collect the Talarion protocol from browser console output;
+4. write authoritative state JSONL;
+5. capture named screenshot checkpoints;
+6. emit `talarion.runner-result/v1`.
+
+The implementation exists, but TL00 requires a real exported Godot build to pass the runtime gate before the runner is considered validated.
 
 ## Android runner
 
-Planned backend: ADB plus an in-game Talarion bridge.
+Implementation: `src/runners/android.mjs`.
+
+Backend: ADB + Godot runtime protocol.
 
 Responsibilities:
 
-1. discover/select a device;
+1. discover an authorized device or emulator;
 2. install the exported APK;
-3. launch with replay/session configuration;
-4. collect the state stream;
-5. capture named screenshots;
-6. collect frame/memory/device telemetry;
-7. emit `talarion.runner-result/v1`.
+3. clear logcat and launch the package;
+4. collect the Talarion protocol from logcat;
+5. write authoritative state JSONL;
+6. emit `talarion.runner-result/v1`.
+
+Android screenshot capture and performance telemetry remain follow-on gates.
 
 ## Shared semantics
 
-The Web and Android runners must not implement different gameplay semantics.
+Web and Android runners do not implement different gameplay semantics.
 
 ```text
-Replay action
-     ↓
-Talarion runtime bridge
-   /             \
- Web           Android
+Canonical replay
+      ↓
+TalarionBridge
+   /       \
+ Web     Android
 ```
 
-Target-specific input emulation is tested separately from authoritative gameplay replay.
+Raw keyboard, pointer, touch, and controller emulation belong to a separate end-to-end device-input layer. They do not define authoritative gameplay parity.

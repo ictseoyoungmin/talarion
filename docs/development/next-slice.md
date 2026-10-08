@@ -1,10 +1,10 @@
-# Next Implementation Slice — TL00-R1 Runtime Execution
+# Next Implementation Slice — TL00-R1 Runtime Validation
 
 ## Objective
 
-Execute the checked-in semantic replay in exported Web and Android runtimes and collect authoritative state from both.
+Validate the implemented Web and Android runtime runners against real exported builds and compare the authoritative state streams produced by the same canonical replay.
 
-## Implemented bridge foundation
+## Implemented R1 infrastructure
 
 - [x] Godot `TalarionBridge` autoload
 - [x] replay v1 parser inside the runtime bridge
@@ -15,16 +15,21 @@ Execute the checked-in semantic replay in exported Web and Android runtimes and 
 - [x] canonical replay staging into exported Godot resources
 - [x] byte-identity test between canonical and staged replay
 - [x] runtime bridge structural contract checks
+- [x] shared runtime evidence parser
+- [x] Playwright Web runner implementation
+- [x] ADB Android runner implementation
+- [x] `talarion test web|android` orchestration
 
-## Remaining R1 deliverables
+## Remaining R1 validation gates
 
-- [ ] Web runner launches the exported build
-- [ ] Web runner captures `TALARION_STATE` output
-- [ ] Android runner installs and launches the exported APK through ADB
-- [ ] Android runner captures the same state protocol
-- [ ] `talarion test web`
-- [ ] `talarion test android`
-- [ ] Web ↔ Android real-runtime state comparison
+- [ ] export the sample Web build with the target Godot version
+- [ ] complete a real Playwright replay run
+- [ ] collect Web state evidence through replay finish
+- [ ] export/install the sample Android build
+- [ ] complete a real ADB replay run on an authorized device or emulator
+- [ ] collect Android state evidence through replay finish
+- [ ] compare the two real-runtime state streams
+- [ ] pass configured position/state tolerances
 
 ## Gate
 
@@ -38,7 +43,7 @@ A checked-in 10-second replay must:
 
 ## Follow-on slices
 
-- **TL00-R2** — screenshot checkpoints and visual parity
+- **TL00-R2** — screenshot parity hardening
 - **TL00-R3** — performance telemetry and physical-device quality gate
 
 TL00 closes only after R1–R3 satisfy the closure criteria in `tl00.md`.

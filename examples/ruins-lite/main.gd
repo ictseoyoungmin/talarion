@@ -77,7 +77,7 @@ func _on_tick(tick: int) -> void:
     if jump_started_tick < 0 and tick > transient_state_until:
         state = "RUN" if move_vector.length() > 0.0 else "IDLE"
 
-    if tick % TalarionBridge.tick_rate == 0:
+    if tick > 0 and tick % TalarionBridge.tick_rate == 0:
         _emit_state(tick, "interval")
 
 func _on_capture_checkpoint(name: String, tick: int) -> void:

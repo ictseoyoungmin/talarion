@@ -15,6 +15,9 @@
     "report": "node bin/talarion.mjs report fixtures/state/web.jsonl fixtures/state/android.jsonl artifacts/parity-report.html",
     "self-check": "npm test && npm run verify"
   },
+  "devDependencies": {
+    "playwright": "1.64.0"
+  },
   "engines": {
     "node": ">=20"
   },

@@ -8,6 +8,7 @@ import { validateReplayCommand } from "../src/commands/replay.mjs";
 import { compareCommand } from "../src/commands/compare.mjs";
 import { reportCommand } from "../src/commands/report.mjs";
 import { verifyCommand } from "../src/commands/verify.mjs";
+import { testTargetCommand } from "../src/commands/test-target.mjs";
 
 const argv = process.argv.slice(2);
 const jsonMode = argv.includes("--json");
@@ -21,6 +22,7 @@ Usage:
   talarion doctor [--json]
   talarion plan [--json]
   talarion build <web|android> [--json]
+  talarion test <web|android> [--json]
   talarion replay validate <file> [--json]
   talarion compare <left.jsonl> <right.jsonl> [--json]
   talarion report <left.jsonl> <right.jsonl> <out.html> [--json]
@@ -39,6 +41,9 @@ try {
       break;
     case "build":
       result = await build(config, args[1]);
+      break;
+    case "test":
+      result = await testTargetCommand(config, args[1]);
       break;
     case "replay":
       if (args[1] !== "validate" || !args[2]) fail("Usage: talarion replay validate <file>");

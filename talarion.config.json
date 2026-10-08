@@ -7,11 +7,12 @@
   },
   "toolchain": {
     "godot": "auto",
+    "adb": "adb",
     "recommendedVersion": "4.7.2"
   },
   "replay": {
     "default": "fixtures/replay/tutorial.tlr.json",
-    "stagedResource": ".talarion/runtime/replay.json",
+    "stagedResource": "talarion_runtime/replay.json",
     "minimumDurationSeconds": 10
   },
   "targets": {
@@ -23,7 +24,8 @@
     "android": {
       "preset": "Android",
       "output": "artifacts/build/android/ruins-lite.apk",
-      "profile": "android-low"
+      "profile": "android-low",
+      "package": "dev.talarion.ruinslite"
     }
   },
   "profiles": {

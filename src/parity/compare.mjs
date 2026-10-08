@@ -11,43 +11,84 @@ function scalarDelta(a, b) {
   return Math.abs(a - b);
 }
 
+function snapshotKey(row) {
+  const checkpoint = row.checkpoint == null ? "" : String(row.checkpoint);
+  return `${row.tick}:${row.entity}:${checkpoint}`;
+}
+
+function indexSnapshots(rows, side) {
+  const map = new Map();
+  const duplicates = [];
+
+  for (const row of rows) {
+    const key = snapshotKey(row);
+    if (map.has(key)) {
+      duplicates.push({
+        key,
+        kind: "duplicate",
+        side,
+        pass: false,
+        first: map.get(key),
+        duplicate: row
+      });
+      continue;
+    }
+    map.set(key, row);
+  }
+
+  return { map, duplicates };
+}
+
+function compareVectorField(detail, field, a, b, tolerance) {
+  const delta = vecDistance(a?.[field], b?.[field]);
+  if (delta === null) return true;
+  detail[`${field}Delta`] = delta;
+  return delta <= tolerance;
+}
+
 export function compareSnapshots(left, right, options) {
-  const byKey = rows => new Map(rows.map(x => [`${x.tick}:${x.entity}`, x]));
-  const L = byKey(left), R = byKey(right);
-  const keys = [...new Set([...L.keys(), ...R.keys()])].sort();
-  const differences = [];
+  const L = indexSnapshots(left, "left");
+  const R = indexSnapshots(right, "right");
+  const keys = [...new Set([...L.map.keys(), ...R.map.keys()])].sort();
+  const differences = [...L.duplicates, ...R.duplicates];
   let matched = 0;
 
+  const positionTolerance = Number(options?.positionTolerance ?? 0);
+  const rotationTolerance = Number(options?.rotationTolerance ?? positionTolerance);
+  const scalarTolerance = Number(options?.scalarTolerance ?? 0);
+
   for (const key of keys) {
-    const a = L.get(key), b = R.get(key);
+    const a = L.map.get(key), b = R.map.get(key);
     if (!a || !b) {
       differences.push({ key, kind: "missing", left: !!a, right: !!b, pass: false });
       continue;
     }
+
     let pass = true;
     const detail = {};
-    if (a.state !== b.state) { pass = false; detail.state = { left: a.state, right: b.state }; }
-    const pd = vecDistance(a.position, b.position);
-    if (pd !== null) {
-      detail.positionDelta = pd;
-      if (pd > options.positionTolerance) pass = false;
+
+    if (a.state !== b.state) {
+      pass = false;
+      detail.state = { left: a.state, right: b.state };
     }
-    const rd = vecDistance(a.rotation, b.rotation);
-    if (rd !== null) {
-      detail.rotationDelta = rd;
-      if (rd > options.positionTolerance) pass = false;
+
+    if (!compareVectorField(detail, "position", a, b, positionTolerance)) pass = false;
+    if (!compareVectorField(detail, "rotation", a, b, rotationTolerance)) pass = false;
+    if (!compareVectorField(detail, "cameraRotation", a, b, rotationTolerance)) pass = false;
+
+    const healthDelta = scalarDelta(a.health, b.health);
+    if (healthDelta !== null) {
+      detail.healthDelta = healthDelta;
+      if (healthDelta > scalarTolerance) pass = false;
     }
-    const sd = scalarDelta(a.health, b.health);
-    if (sd !== null) {
-      detail.healthDelta = sd;
-      if (sd > options.scalarTolerance) pass = false;
-    }
+
     if (pass) matched++;
     else differences.push({ key, kind: "divergence", pass, detail, left: a, right: b });
   }
 
-  const total = keys.length;
+  const total = keys.length + L.duplicates.length + R.duplicates.length;
   const parity = total ? matched / total : 1;
+
   return {
     ok: differences.length === 0,
     total,

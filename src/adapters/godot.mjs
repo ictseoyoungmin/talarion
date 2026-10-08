@@ -9,6 +9,24 @@ const CANDIDATES = process.platform === "win32"
   ? ["godot.exe", "godot4.exe", "godot", "godot4"]
   : ["godot", "godot4"];
 
+const FATAL_EXPORT_PATTERNS = [
+  /SCRIPT ERROR:/,
+  /ERROR:\s+Failed to load script/,
+  /Parse Error:/
+];
+
+export function classifyGodotExport(result) {
+  const diagnostics = [result.stdout ?? "", result.stderr ?? ""].join("\n");
+  const fatalDiagnostics = diagnostics
+    .split(/\r?\n/)
+    .filter(line => FATAL_EXPORT_PATTERNS.some(pattern => pattern.test(line)));
+
+  return {
+    ok: result.ok && fatalDiagnostics.length === 0,
+    fatalDiagnostics
+  };
+}
+
 export async function resolveGodot(config) {
   const wanted = config.toolchain?.godot;
   if (wanted && wanted !== "auto") {
@@ -56,8 +74,10 @@ export async function exportGodot(config, target) {
       output
     ];
     const result = await run(godot.bin, args);
+    const classified = classifyGodotExport(result);
+
     return {
-      ok: result.ok,
+      ok: classified.ok,
       engine: "godot",
       target,
       preset: targetConfig.preset,
@@ -66,7 +86,8 @@ export async function exportGodot(config, target) {
       command: [godot.bin, ...args],
       version: godot.version,
       stdout: result.stdout,
-      stderr: result.stderr
+      stderr: result.stderr,
+      fatalDiagnostics: classified.fatalDiagnostics
     };
   } finally {
     await cleanupStagedReplay(config);

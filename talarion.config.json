@@ -45,6 +45,12 @@
     "positionTolerance": 0.1,
     "scalarTolerance": 0.001,
     "requireEventOrder": true,
-    "rotationTolerance": 0.001
+    "rotationTolerance": 0.001,
+    "visual": {
+      "width": 320,
+      "height": 180,
+      "minSimilarity": 0.8,
+      "minLumaStdDev": 0.012
+    }
   }
 }

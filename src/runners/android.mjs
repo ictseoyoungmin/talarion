@@ -114,11 +114,12 @@ export async function runAndroid(config, options = {}) {
 
       if (parsed.kind === "capture" && parsed.value && typeof parsed.value === "object") {
         const name = String(parsed.value.name ?? `tick-${parsed.value.tick ?? "unknown"}`);
+        const tick = parsed.value.tick;
         const file = path.join(artifactDir, `${name}.png`);
         captureQueue = captureQueue.then(async () => {
           try {
             await captureAndroidPng(adb, file);
-            screenshots.push({ checkpoint: name, file });
+            screenshots.push({ checkpoint: name, tick, file });
           } catch (error) {
             runtimeErrors.push(`Screenshot ${name} failed: ${error?.message ?? error}`);
           }

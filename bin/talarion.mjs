@@ -9,6 +9,7 @@ import { compareCommand } from "../src/commands/compare.mjs";
 import { reportCommand } from "../src/commands/report.mjs";
 import { verifyCommand } from "../src/commands/verify.mjs";
 import { testTargetCommand } from "../src/commands/test-target.mjs";
+import { visualCommand } from "../src/commands/visual.mjs";
 
 const argv = process.argv.slice(2);
 const jsonMode = argv.includes("--json");
@@ -25,7 +26,8 @@ Usage:
   talarion test <web|android> [--json]
   talarion replay validate <file> [--json]
   talarion compare <left.jsonl> <right.jsonl> [--json]
-  talarion report <left.jsonl> <right.jsonl> <out.html> [--json]
+  talarion visual compare <web-dir> <android-dir> <out-dir> [--json]
+  talarion report <left.jsonl> <right.jsonl> <out.html> [visual-result.json] [--json]
   talarion verify [--json]
 `;
 
@@ -53,9 +55,12 @@ try {
       if (!args[1] || !args[2]) fail("Usage: talarion compare <left.jsonl> <right.jsonl>");
       result = await compareCommand(config, args[1], args[2]);
       break;
+    case "visual":
+      result = await visualCommand(config, args[1], args[2], args[3], args[4]);
+      break;
     case "report":
       if (!args[1] || !args[2] || !args[3]) fail("Usage: talarion report <left> <right> <out.html>");
-      result = await reportCommand(config, args[1], args[2], args[3]);
+      result = await reportCommand(config, args[1], args[2], args[3], args[4]);
       break;
     case "verify":
       result = await verifyCommand(config);

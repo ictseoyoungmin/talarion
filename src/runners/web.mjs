@@ -107,12 +107,13 @@ export async function runWeb(config, options = {}) {
 
       if (parsed.kind === "capture" && parsed.value && typeof parsed.value === "object") {
         const name = String(parsed.value.name ?? `tick-${parsed.value.tick ?? "unknown"}`);
+        const tick = parsed.value.tick;
         const file = path.join(artifactDir, `${name}.png`);
         // Wait for the canvas compositor to draw the finalized checkpoint frame.
         const capture = page.evaluate(() => new Promise(resolve => {
           requestAnimationFrame(() => requestAnimationFrame(resolve));
         })).then(() => page.screenshot({ path: file })).then(() => {
-          screenshots.push({ checkpoint: name, file });
+          screenshots.push({ checkpoint: name, tick, file });
         });
         pendingCaptures.push(capture);
       }

@@ -7,6 +7,8 @@ import { resolveFromRoot } from "../core/config.mjs";
 import { parseProtocolLine, writeJsonl, writeJson } from "../runtime/evidence.mjs";
 import { runnerResult } from "./contract.mjs";
 import { summarizePerformance } from "../runtime/performance.mjs";
+import { parseAndroidDeviceInfo } from "../runtime/device.mjs";
+import { sha256File } from "../runtime/provenance.mjs";
 
 async function resolveAdb(config) {
   const adb = config.toolchain?.adb || "adb";
@@ -79,6 +81,12 @@ export async function runAndroid(config, options = {}) {
 
   if (!packageName) throw new Error("targets.android.package is required for the Android runner.");
   if (!(await exists(apk))) throw new Error(`Android build not found: ${apk}`);
+
+  const [deviceProps, displayProps] = await Promise.all([
+    run(adb, ["shell", "getprop"]),
+    run(adb, ["shell", "dumpsys", "SurfaceFlinger"])
+  ]);
+  const device = parseAndroidDeviceInfo(deviceProps.stdout, displayProps.stdout);
 
   const artifactDir = resolveFromRoot(config, "artifacts/run/android");
   await fs.rm(artifactDir, { recursive: true, force: true });
@@ -186,7 +194,13 @@ export async function runAndroid(config, options = {}) {
       ok: states.length > 0 && performance.ok && runtimeErrors.length === 0
     });
     result.finishedTick = finishedTick;
-    result.devices = devices;
+    result.devices = devices.map(() => "(redacted)");
+    result.device = device;
+    result.provenance = {
+      apkSha256: await sha256File(apk),
+      replaySha256: await sha256File(resolveFromRoot(config, config.replay.default))
+    };
+    await writeJson(path.join(artifactDir, "device.json"), device);
 
     const resultFile = path.join(artifactDir, "runner-result.json");
     await writeJson(resultFile, result);

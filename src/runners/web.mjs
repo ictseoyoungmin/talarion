@@ -6,6 +6,7 @@ import { resolveFromRoot } from "../core/config.mjs";
 import { parseProtocolLine, writeJsonl, writeJson } from "../runtime/evidence.mjs";
 import { runnerResult } from "./contract.mjs";
 import { summarizePerformance } from "../runtime/performance.mjs";
+import { sha256File } from "../runtime/provenance.mjs";
 
 const MIME = new Map([
   [".html", "text/html; charset=utf-8"],
@@ -151,6 +152,10 @@ export async function runWeb(config, options = {}) {
       ok: states.length > 0 && performance.ok && runtimeErrors.length === 0
     });
     result.finishedTick = finishedTick;
+    result.provenance = {
+      replaySha256: await sha256File(resolveFromRoot(config, config.replay.default))
+    };
+    result.browser = "playwright-chromium-headless";
 
     const resultFile = path.join(artifactDir, "runner-result.json");
     await writeJson(resultFile, result);

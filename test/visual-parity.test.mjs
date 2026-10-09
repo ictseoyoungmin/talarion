@@ -58,7 +58,8 @@ test("visual evidence rejects missing, wrong-tick and blank checkpoints", async 
     ]);
     const manifest = (target, shots) => ({
       schema: "talarion.runner-result/v1", target, ok: true, finishedTick: 12,
-      evidence: { screenshots: shots }
+      evidence: { screenshots: shots },
+      provenance: { replaySha256: "same-replay-hash" }
     });
     const shot = { checkpoint: "demo", tick: 5, file: "/original-run/demo.png" };
     const save = (dir, target, shots) => fs.writeFile(
@@ -125,4 +126,33 @@ test("localized actor mismatch triggers tile gate despite high global similarity
   assert.ok(result.similarity > 0.99);
   assert.ok(result.maxTileError > 0.02);
   assert.deepEqual(result.tileGrid, { columns: 16, rows: 9 });
+});
+
+test("cross-runtime replay provenance must be identical", async () => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), "talarion-provenance-"));
+  try {
+    await fs.mkdir(path.join(root, "web"));
+    await fs.mkdir(path.join(root, "android"));
+    await fs.writeFile(path.join(root, "replay.json"), JSON.stringify({
+      events: [{ type: "capture", name: "capture", tick: 10 }]
+    }));
+    const make = (target, hash) => ({
+      schema: "talarion.runner-result/v1", ok: true, target, finishedTick: 10,
+      evidence: { screenshots: [{ checkpoint: "capture", tick: 10, file: "/path/capture.png" }] },
+      provenance: { replaySha256: hash }
+    });
+    for (const [target, hash] of [["web", "A"], ["android", "B"]]) {
+      const dir = path.join(root, target);
+      await fs.writeFile(path.join(dir, "runner-result.json"), JSON.stringify(make(target, hash)));
+      await fs.writeFile(path.join(dir, "capture.png"), encodePng(image()));
+    }
+    const result = await compareVisualRuns({
+      root, replay: { default: "replay.json" },
+      parity: { visual: { width: 16, height: 9, minLumaStdDev: 0.01 } }
+    }, path.join(root, "web"), path.join(root, "android"), path.join(root, "out"));
+    assert.equal(result.ok, false);
+    assert.ok(result.failures.some(x => x.includes("replay SHA-256 identity")));
+  } finally {
+    await fs.rm(root, { recursive: true, force: true });
+  }
 });

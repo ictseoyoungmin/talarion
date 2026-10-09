@@ -134,6 +134,10 @@ export async function compareVisualRuns(config, webDir, androidDir, outDir) {
       loadManifest(path.resolve(webDir), "web"),
       loadManifest(path.resolve(androidDir), "android")
     ]);
+    if (!web.provenance?.replaySha256 ||
+        web.provenance.replaySha256 !== android.provenance?.replaySha256) {
+      failures.push("Web and Android replay SHA-256 identity is missing or different");
+    }
     const finish = Math.max(...replay.events.map(e => e.tick));
     if (web.finishedTick !== finish || android.finishedTick !== finish) {
       failures.push("Runner completion tick differs from canonical replay");

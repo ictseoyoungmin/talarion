@@ -45,6 +45,9 @@ export function compareNormalizedImages(a, b) {
     throw new Error("Normalized screenshot dimensions differ");
   }
   let error = 0, lumSumA = 0, lumSqA = 0, lumSumB = 0, lumSqB = 0;
+  const tileColumns = 16, tileRows = 9;
+  const tileError = Array(tileColumns * tileRows).fill(0);
+  const tileCount = Array(tileColumns * tileRows).fill(0);
   const total = a.width * a.height;
   const diff = new Uint8Array(total * 4);
   for (let p = 0; p < total; p++) {
@@ -53,16 +56,28 @@ export function compareNormalizedImages(a, b) {
     const lumB = (0.2126 * b.data[i] + 0.7152 * b.data[i + 1] + 0.0722 * b.data[i + 2]) / 255;
     lumSumA += lumA; lumSqA += lumA * lumA;
     lumSumB += lumB; lumSqB += lumB * lumB;
+    const pixelX = p % a.width, pixelY = Math.floor(p / a.width);
+    const tileX = Math.min(tileColumns - 1, Math.floor(pixelX * tileColumns / a.width));
+    const tileY = Math.min(tileRows - 1, Math.floor(pixelY * tileRows / a.height));
+    const tileIndex = tileY * tileColumns + tileX;
     for (let c = 0; c < 3; c++) {
       const delta = Math.abs(a.data[i + c] - b.data[i + c]);
       error += delta;
+      tileError[tileIndex] += delta;
       diff[i + c] = Math.min(255, delta * 4);
     }
+    tileCount[tileIndex] += 1;
     diff[i + 3] = 255;
   }
   const meanAbsoluteError = error / (total * 3 * 255);
+  const tiles = tileError.map((sum, i) =>
+    tileCount[i] ? sum / (tileCount[i] * 3 * 255) : 0);
+  const maxTileError = Math.max(...tiles);
   return {
     similarity: 1 - meanAbsoluteError,
+    maxTileError,
+    worstTile: tiles.indexOf(maxTileError),
+    tileGrid: { columns: tileColumns, rows: tileRows },
     meanAbsoluteError,
     lumaStdDev: {
       web: Math.sqrt(Math.max(0, lumSqA / total - (lumSumA / total) ** 2)),
@@ -100,8 +115,10 @@ export async function compareVisualRuns(config, webDir, androidDir, outDir) {
   const width = options.width ?? 320, height = options.height ?? 180;
   const minSimilarity = options.minSimilarity ?? 0.8;
   const minLumaStdDev = options.minLumaStdDev ?? 0.012;
+  const maxTileError = options.maxTileError ?? 0.02;
   if (!Number.isFinite(minSimilarity) || minSimilarity < 0 || minSimilarity > 1 ||
-      !Number.isFinite(minLumaStdDev) || minLumaStdDev < 0 || minLumaStdDev > 1) {
+      !Number.isFinite(minLumaStdDev) || minLumaStdDev < 0 || minLumaStdDev > 1 ||
+      !Number.isFinite(maxTileError) || maxTileError < 0 || maxTileError > 1) {
     throw new Error("Invalid visual parity thresholds");
   }
   const names = checkpoints.map(c => c.name);
@@ -150,10 +167,12 @@ export async function compareVisualRuns(config, webDir, androidDir, outDir) {
         ]);
         const ok = metrics.similarity >= minSimilarity &&
           metrics.lumaStdDev.web >= minLumaStdDev &&
-          metrics.lumaStdDev.android >= minLumaStdDev;
+          metrics.lumaStdDev.android >= minLumaStdDev &&
+          metrics.maxTileError <= maxTileError;
         const item = {
           checkpoint: name, tick: checkpoint.tick, ok,
           similarity: metrics.similarity, meanAbsoluteError: metrics.meanAbsoluteError,
+          maxTileError: metrics.maxTileError, worstTile: metrics.worstTile, tileGrid: metrics.tileGrid,
           lumaStdDev: metrics.lumaStdDev,
           source: { web: left.source, android: right.source },
           crop: { web: left.crop, android: right.crop },
@@ -177,7 +196,7 @@ export async function compareVisualRuns(config, webDir, androidDir, outDir) {
     passedCheckpoints: results.filter(r => r.ok).length,
     averageSimilarity: valid.length ? valid.reduce((n, r) => n + r.similarity, 0) / valid.length : null,
     normalization: { policy: "center-crop-nearest-rgb-v1", width, height },
-    thresholds: { minSimilarity, minLumaStdDev },
+    thresholds: { minSimilarity, minLumaStdDev, maxTileError },
     results, failures
   };
   const manifest = path.join(output, "result.json");

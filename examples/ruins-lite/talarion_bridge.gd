@@ -7,7 +7,7 @@ signal replay_finished(tick: int)
 
 const REPLAY_PATH := "res://talarion_runtime/replay.json"
 # Allow external screenshot runners to capture the same stable rendered checkpoint.
-const CAPTURE_HOLD_TICKS := 90
+const CAPTURE_HOLD_TICKS := 300
 
 var tick_rate: int = 60
 var replay_seed: int = 0

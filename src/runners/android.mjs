@@ -71,7 +71,7 @@ async function captureAndroidPng(adb, file, packageName) {
 }
 
 export async function runAndroid(config, options = {}) {
-  const timeoutMs = Number(options.timeoutMs ?? 45000);
+  const timeoutMs = Number(options.timeoutMs ?? 90000);
   const adb = await resolveAdb(config);
   const devices = await requireDevice(adb);
   const apk = resolveFromRoot(config, config.targets.android.output);

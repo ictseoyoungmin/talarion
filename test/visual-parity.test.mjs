@@ -109,3 +109,20 @@ test("TL00 live action captures occur before transient states expire", async () 
   assert.ok(captures.get("attack") > actions.get("attack"));
   assert.ok(captures.get("attack") < actions.get("attack") + 20);
 });
+
+test("localized actor mismatch triggers tile gate despite high global similarity", () => {
+  const left = normalizeImage(image(320, 180), 320, 180);
+  const right = normalizeImage(image(320, 180), 320, 180);
+  for (let y = 60; y < 75; y++) {
+    for (let x = 120; x < 130; x++) {
+      const i = (y * 320 + x) * 4;
+      right.data[i] = 0;
+      right.data[i + 1] = 0;
+      right.data[i + 2] = 0;
+    }
+  }
+  const result = compareNormalizedImages(left, right);
+  assert.ok(result.similarity > 0.99);
+  assert.ok(result.maxTileError > 0.02);
+  assert.deepEqual(result.tileGrid, { columns: 16, rows: 9 });
+});

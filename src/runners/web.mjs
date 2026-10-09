@@ -65,7 +65,7 @@ function createStaticServer(rootDir) {
 }
 
 export async function runWeb(config, options = {}) {
-  const timeoutMs = Number(options.timeoutMs ?? 30000);
+  const timeoutMs = Number(options.timeoutMs ?? 90000);
   const entry = resolveFromRoot(config, config.targets.web.output);
   if (!(await exists(entry))) throw new Error(`Web build not found: ${entry}`);
 

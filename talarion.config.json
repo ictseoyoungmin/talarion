@@ -50,7 +50,8 @@
       "width": 320,
       "height": 180,
       "minSimilarity": 0.8,
-      "minLumaStdDev": 0.012
+      "minLumaStdDev": 0.012,
+      "maxTileError": 0.02
     }
   }
 }

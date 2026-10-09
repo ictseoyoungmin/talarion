@@ -17,8 +17,8 @@ Extend the already verified TL00 Web ↔ Android state and visual parity workflo
 - [x] Sample validation rejects absent, duplicate or malformed telemetry.
 - [x] Summaries record median and P10 FPS, P95 process and physics timing, and peak static memory.
 - [x] Target FPS is included as a declared budget, not falsely declared compliant.
-- [ ] Performance HTML report validated across both runtimes in CI.
-- [ ] Android hardware fingerprint, API/renderer/GPU metadata captured and bound to evidence.
+- [x] Performance HTML report validated across both runtimes in CI (#37958027824).
+- [x] Android fingerprint, API/renderer/GPU metadata, emulator flag and APK/replay SHA-256 captured.
 - [ ] Physical Android device QA: exported APK installed, same replay and screenshots verified.
 - [ ] Hardware-specific FPS, memory, thermal and lifecycle gates validated.
 - [ ] Report and reproducible verification artifacts reviewed before TL00 closure.

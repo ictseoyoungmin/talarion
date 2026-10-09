@@ -111,3 +111,9 @@ Godot emits `TALARION_PERF` once per replay second, including tick, FPS, process
 Both runners save `performance.jsonl` and expose `evidence.performance` with schema `talarion.performance/v1`. The summary records sample count, P10/median FPS, P95 process/physics time, peak memory and target-FPS metadata. Invalid or absent samples fail the instrumentation smoke gate. The performance target value itself does **not** mean the measured run meets that target.
 
 Physical-device measurements, runtime/GPU identity, thermal pressure, dropped frames and lifecycle behavior are still required for TL00-R3 closure. CI headless emulators use virtualized graphics and must not be used to assert mobile performance.
+
+## Hardware provenance
+
+The Android runner saves `device.json` and `talarion.android-device/v1` metadata: model, manufacturer, API, build fingerprint, hardware, GLES renderer and emulator detection. Raw ADB serial numbers and personal Android identifiers are not included in public artifacts. Both Web and Android include the canonical replay SHA-256, and parity rejects missing/mismatched hashes; Android additionally records the APK SHA-256.
+
+The API 30 AOSP / ANGLE SwiftShader runner is an emulator (`isEmulator=true`). Hardware performance certification remains an external physical-device QA requirement.

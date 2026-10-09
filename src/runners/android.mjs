@@ -6,6 +6,7 @@ import { exists } from "../core/io.mjs";
 import { resolveFromRoot } from "../core/config.mjs";
 import { parseProtocolLine, writeJsonl, writeJson } from "../runtime/evidence.mjs";
 import { runnerResult } from "./contract.mjs";
+import { summarizePerformance } from "../runtime/performance.mjs";
 
 async function resolveAdb(config) {
   const adb = config.toolchain?.adb || "adb";
@@ -90,6 +91,7 @@ export async function runAndroid(config, options = {}) {
   await run(adb, ["shell", "am", "force-stop", packageName]);
 
   const states = [];
+  const performanceSamples = [];
   const screenshots = [];
   const runtimeErrors = [];
   let captureQueue = Promise.resolve();
@@ -119,6 +121,8 @@ export async function runAndroid(config, options = {}) {
       if (parsed.kind === "state" && parsed.value && typeof parsed.value === "object") {
         states.push(parsed.value);
       }
+
+      if (parsed.kind === "performance") performanceSamples.push(parsed.value);
 
       if (parsed.kind === "capture" && parsed.value && typeof parsed.value === "object") {
         const name = String(parsed.value.name ?? `tick-${parsed.value.tick ?? "unknown"}`);
@@ -161,7 +165,15 @@ export async function runAndroid(config, options = {}) {
     await captureQueue;
 
     const stateFile = path.join(artifactDir, "state.jsonl");
-    await writeJsonl(stateFile, states);
+    const performanceFile = path.join(artifactDir, "performance.jsonl");
+    await Promise.all([
+      writeJsonl(stateFile, states),
+      writeJsonl(performanceFile, performanceSamples)
+    ]);
+    const performance = summarizePerformance(performanceSamples, {
+      target: "android", targetFps: config.profiles?.[config.targets.android.profile]?.targetFps,
+      sampleFile: performanceFile
+    });
 
     const result = runnerResult({
       target: "android",
@@ -169,9 +181,9 @@ export async function runAndroid(config, options = {}) {
       replay: resolveFromRoot(config, config.replay.default),
       stateFile,
       screenshots,
-      performance: null,
+      performance,
       warnings: runtimeErrors.filter(Boolean),
-      ok: states.length > 0 && runtimeErrors.length === 0
+      ok: states.length > 0 && performance.ok && runtimeErrors.length === 0
     });
     result.finishedTick = finishedTick;
     result.devices = devices;

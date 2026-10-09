@@ -6,7 +6,8 @@ const MARKERS = [
   ["TALARION_CAPTURE ", "capture"],
   ["TALARION_REPLAY_READY ", "ready"],
   ["TALARION_REPLAY_FINISHED ", "finished"],
-  ["TALARION_EVENT ", "event"]
+  ["TALARION_EVENT ", "event"],
+  ["TALARION_PERF ", "performance"]
 ];
 
 export function parseProtocolLine(line) {

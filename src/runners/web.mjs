@@ -5,6 +5,7 @@ import { exists } from "../core/io.mjs";
 import { resolveFromRoot } from "../core/config.mjs";
 import { parseProtocolLine, writeJsonl, writeJson } from "../runtime/evidence.mjs";
 import { runnerResult } from "./contract.mjs";
+import { summarizePerformance } from "../runtime/performance.mjs";
 
 const MIME = new Map([
   [".html", "text/html; charset=utf-8"],
@@ -77,6 +78,7 @@ export async function runWeb(config, options = {}) {
   const browser = await playwright.chromium.launch({ headless: true });
 
   const states = [];
+  const performanceSamples = [];
   const screenshots = [];
   const runtimeErrors = [];
   const pendingCaptures = [];
@@ -105,6 +107,8 @@ export async function runWeb(config, options = {}) {
         states.push(parsed.value);
       }
 
+      if (parsed.kind === "performance") performanceSamples.push(parsed.value);
+
       if (parsed.kind === "capture" && parsed.value && typeof parsed.value === "object") {
         const name = String(parsed.value.name ?? `tick-${parsed.value.tick ?? "unknown"}`);
         const tick = parsed.value.tick;
@@ -126,7 +130,15 @@ export async function runWeb(config, options = {}) {
     await Promise.all(pendingCaptures);
 
     const stateFile = path.join(artifactDir, "state.jsonl");
-    await writeJsonl(stateFile, states);
+    const performanceFile = path.join(artifactDir, "performance.jsonl");
+    await Promise.all([
+      writeJsonl(stateFile, states),
+      writeJsonl(performanceFile, performanceSamples)
+    ]);
+    const performance = summarizePerformance(performanceSamples, {
+      target: "web", targetFps: config.profiles?.[config.targets.web.profile]?.targetFps,
+      sampleFile: performanceFile
+    });
 
     const result = runnerResult({
       target: "web",
@@ -134,9 +146,9 @@ export async function runWeb(config, options = {}) {
       replay: resolveFromRoot(config, config.replay.default),
       stateFile,
       screenshots,
-      performance: null,
+      performance,
       warnings: runtimeErrors,
-      ok: states.length > 0 && runtimeErrors.length === 0
+      ok: states.length > 0 && performance.ok && runtimeErrors.length === 0
     });
     result.finishedTick = finishedTick;
 

@@ -19,3 +19,10 @@ test("parses scalar replay-finished payload", () => {
   assert.equal(parsed.kind, "finished");
   assert.equal(parsed.value, 600);
 });
+
+test("parses observed runtime performance separately from gameplay state", () => {
+  const p = parseProtocolLine('Godot: TALARION_PERF {"tick":60,"fps":57,"processMs":8.5,"physicsMs":2.1,"memoryBytes":102400}');
+  assert.equal(p.kind, "performance");
+  assert.equal(p.value.tick, 60);
+  assert.equal(p.value.fps, 57);
+});

@@ -97,6 +97,15 @@ func _on_tick(tick: int) -> void:
 
     if tick > 0 and tick % TalarionBridge.tick_rate == 0:
         _emit_state(tick, "interval")
+        # Observed renderer/process counters, not authoritative replay state.
+        # Keep performance evidence separate from the deterministic state gate.
+        print("TALARION_PERF " + JSON.stringify({
+            "tick": tick,
+            "fps": Engine.get_frames_per_second(),
+            "processMs": 1000.0 * Performance.get_monitor(Performance.TIME_PROCESS),
+            "physicsMs": 1000.0 * Performance.get_monitor(Performance.TIME_PHYSICS_PROCESS),
+            "memoryBytes": int(Performance.get_monitor(Performance.MEMORY_STATIC))
+        }))
 
 func _on_capture_checkpoint(name: String, tick: int) -> void:
     _emit_state(tick, name)

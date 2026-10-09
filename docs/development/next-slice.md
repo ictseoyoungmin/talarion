@@ -44,7 +44,7 @@ Both runtimes must emit one screenshot for every declared checkpoint.
 
 Each named checkpoint requires exactly one PNG from each runner, with its authoritative replay tick. Both screenshots are center-cropped to the configured aspect ratio and sampled at fixed pixel centers (default 320 × 180); the crop offsets and original dimensions are retained. Pixel RGB mean absolute error is converted into a similarity score. Low-contrast/blank screenshots fail independently of similarity, and missing/invalid images fail closed. The three normalized PNG files (Web, Android, absolute-difference heatmap) and `result.json` are uploaded with the HTML parity report.
 
-This policy is intentionally simple. Center cropping can hide edge framing errors; it is only the first visual contract, not a proof of full-screen visual equivalence or device UI parity. The threshold is a declared project setting, not an adaptive value chosen to force PASS.
+The first real visual CI identified a Pixel Launcher 'not responding' system dialog covering the Android game. State parity still matched 15/15. Android capture now checks the foreground window and CI uses an AOSP (non-Google) emulator system image to avoid that launcher; do not relax similarity thresholds to mask the failure.\n\nThis policy is intentionally simple. Center cropping can hide edge framing errors; it is only the first visual contract, not a proof of full-screen visual equivalence or device UI parity. The threshold is a declared project setting, not an adaptive value chosen to force PASS.
 
 ## Gate
 

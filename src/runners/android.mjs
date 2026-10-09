@@ -32,7 +32,15 @@ async function requireDevice(adb) {
   return devices;
 }
 
-async function captureAndroidPng(adb, file) {
+async function captureAndroidPng(adb, file, packageName) {
+  // A passing game-state replay is not proof the game is actually visible.
+  // Abort instead of recording OS dialogs or a crashed launcher as game images.
+  const focus = await run(adb, ["shell", "dumpsys", "window"]);
+  if (!focus.ok) throw new Error("Cannot inspect foreground Android window: " + focus.stderr);
+  const line = focus.stdout.split(/\r?\n/).find(text => /mCurrentFocus\s*=/.test(text));
+  if (!line || !line.includes(packageName)) {
+    throw new Error("Game is not foreground during capture; Android focus: " + (line?.trim() ?? "unknown"));
+  }
   await fs.mkdir(path.dirname(file), { recursive: true });
 
   return new Promise((resolve, reject) => {
@@ -118,7 +126,7 @@ export async function runAndroid(config, options = {}) {
         const file = path.join(artifactDir, `${name}.png`);
         captureQueue = captureQueue.then(async () => {
           try {
-            await captureAndroidPng(adb, file);
+            await captureAndroidPng(adb, file, packageName);
             screenshots.push({ checkpoint: name, tick, file });
           } catch (error) {
             runtimeErrors.push(`Screenshot ${name} failed: ${error?.message ?? error}`);

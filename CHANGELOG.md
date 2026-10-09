@@ -4,6 +4,17 @@
 
 ### Added
 
+- TL00-R2 center-crop screenshot normalization and pixel-based visual comparison
+- per-checkpoint Web/Android/diff PNG evidence and JSON manifest
+- HTML visual QA board and CI visual parity gate
+- regression tests for missing, stale, and blank visual checkpoints
+
+### Fixed
+
+- screenshot checkpoint capture now uses a finalized replay tick and stable hold
+- asymmetric missing state vectors or health no longer silently pass parity
+
+
 - initial CLI and configuration contract
 - Godot Web/Android build adapter
 - baseline portability doctor

@@ -22,13 +22,13 @@ The runtime state gate is complete:
 - [x] Web named checkpoint screenshot capture
 - [x] Android checkpoint screenshot implementation
 - [ ] Android screenshot capture validated in CI
-- [ ] screenshot metadata records source dimensions and normalization
-- [ ] target-independent normalization policy
-- [ ] per-checkpoint visual similarity metric
-- [ ] generated visual diff images
-- [ ] visual thresholds configurable in `talarion.config.json`
-- [ ] visual results included in the parity report
-- [ ] visual parity CI gate
+- [x] screenshot metadata records source dimensions and normalization
+- [x] target-independent normalization policy (center-crop-nearest-rgb-v1)
+- [x] per-checkpoint visual similarity metric (normalized mean absolute RGB difference)
+- [x] generated visual diff images
+- [x] visual thresholds configurable in `talarion.config.json`
+- [x] visual results included in the parity report
+- [x] visual parity CI gate implemented (runtime PASS pending)
 
 ## Checkpoints
 
@@ -39,6 +39,12 @@ The canonical replay currently defines:
 - `attack`
 
 Both runtimes must emit one screenshot for every declared checkpoint.
+
+## Normalization and evidence contract
+
+Each named checkpoint requires exactly one PNG from each runner, with its authoritative replay tick. Both screenshots are center-cropped to the configured aspect ratio and sampled at fixed pixel centers (default 320 × 180); the crop offsets and original dimensions are retained. Pixel RGB mean absolute error is converted into a similarity score. Low-contrast/blank screenshots fail independently of similarity, and missing/invalid images fail closed. The three normalized PNG files (Web, Android, absolute-difference heatmap) and `result.json` are uploaded with the HTML parity report.
+
+This policy is intentionally simple. Center cropping can hide edge framing errors; it is only the first visual contract, not a proof of full-screen visual equivalence or device UI parity. The threshold is a declared project setting, not an adaptive value chosen to force PASS.
 
 ## Gate
 

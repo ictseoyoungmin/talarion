@@ -31,7 +31,7 @@ Available in the repository:
 - replay schema validation
 - JSONL state snapshot format
 - tolerance-based state comparison
-- HTML parity reports
+- HTML parity reports, checkpoint difference images and visual parity metrics
 - Playwright Web runner implementation
 - ADB Android runner implementation
 - machine-readable `--json` output
@@ -84,14 +84,24 @@ node bin/talarion.mjs compare \
   fixtures/state/android.jsonl
 ```
 
+Compare checkpoint image evidence from runtime runner outputs:
+
+```bash
+node bin/talarion.mjs visual compare \
+  artifacts/run/web artifacts/run/android artifacts/parity/visual
+```
+
 Generate an HTML parity report:
 
 ```bash
 node bin/talarion.mjs report \
   fixtures/state/web.jsonl \
   fixtures/state/android.jsonl \
-  artifacts/parity-report.html
+  artifacts/parity-report.html \
+  artifacts/parity/visual/result.json
 ```
+
+The optional final argument adds screenshot comparison cards to the HTML report. The visual command requires actual Web and Android runtime evidence; fixture-only tests do not prove visual parity.
 
 Build target exports:
 

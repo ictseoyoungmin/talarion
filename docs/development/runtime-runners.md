@@ -28,6 +28,7 @@ target profile
     "screenshots": [
       {
         "checkpoint": "interaction",
+        "tick": 420,
         "file": "artifacts/run/web/interaction.png"
       }
     ],
@@ -68,7 +69,7 @@ Responsibilities:
 5. capture named screenshot checkpoints;
 6. emit `talarion.runner-result/v1`.
 
-The implementation exists, but TL00 requires a real exported Godot build to pass the runtime gate before the runner is considered validated.
+The exported Web runner passed TL00-R1 runtime state parity. TL00-R2 additionally requires real checkpoint image parity.
 
 ## Android runner
 
@@ -85,7 +86,7 @@ Responsibilities:
 5. write authoritative state JSONL;
 6. emit `talarion.runner-result/v1`.
 
-Android screenshot capture and performance telemetry remain follow-on gates.
+Android checkpoint screenshot capture is implemented; the visual CI gate validates it during TL00-R2. Performance telemetry and physical-device testing remain TL00-R3.
 
 ## Shared semantics
 
@@ -98,5 +99,7 @@ TalarionBridge
    /       \
  Web     Android
 ```
+
+The Godot bridge holds replay ticks after each checkpoint so capture can observe a stable game state, and the Web runner waits for the compositor. The visual report rejects missing images, incorrect ticks and blank screens. This does not guarantee pixel-exact cross-GPU rendering.
 
 Raw keyboard, pointer, touch, and controller emulation belong to a separate end-to-end device-input layer. They do not define authoritative gameplay parity.

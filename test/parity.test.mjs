@@ -56,3 +56,22 @@ test("duplicate snapshot identity fails instead of silently overwriting", () => 
   assert.equal(result.ok, false);
   assert.equal(result.differences[0].kind, "duplicate");
 });
+
+test("missing or malformed authoritative vector cannot silently pass", () => {
+  const left = [{ tick: 60, entity: "player", state: "RUN", position: [1,0,0] }];
+  const missing = [{ tick: 60, entity: "player", state: "RUN" }];
+  const malformed = [{ tick: 60, entity: "player", state: "RUN", position: ["bad",0,0] }];
+  for (const right of [missing, malformed]) {
+    const result = compareSnapshots(left, right, { positionTolerance: 0.1 });
+    assert.equal(result.ok, false);
+    assert.equal(result.differences[0].detail.position.error, "missing or invalid vector");
+  }
+});
+
+test("missing health evidence cannot be considered equal", () => {
+  const left = [{ tick: 60, entity: "player", state: "RUN", health: 90 }];
+  const right = [{ tick: 60, entity: "player", state: "RUN" }];
+  const result = compareSnapshots(left, right, {});
+  assert.equal(result.ok, false);
+  assert.equal(result.differences[0].detail.health.error, "missing or invalid scalar");
+});

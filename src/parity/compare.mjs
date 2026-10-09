@@ -41,7 +41,11 @@ function indexSnapshots(rows, side) {
 
 function compareVectorField(detail, field, a, b, tolerance) {
   const delta = vecDistance(a?.[field], b?.[field]);
-  if (delta === null) return true;
+  if (a?.[field] == null && b?.[field] == null) return true;
+  if (delta === null) {
+    detail[field] = { left: a?.[field] ?? null, right: b?.[field] ?? null, error: "missing or invalid vector" };
+    return false;
+  }
   detail[`${field}Delta`] = delta;
   return delta <= tolerance;
 }
@@ -77,9 +81,14 @@ export function compareSnapshots(left, right, options) {
     if (!compareVectorField(detail, "cameraRotation", a, b, rotationTolerance)) pass = false;
 
     const healthDelta = scalarDelta(a.health, b.health);
-    if (healthDelta !== null) {
+    if (a.health != null || b.health != null) {
+      if (healthDelta === null) {
+        detail.health = { left: a.health ?? null, right: b.health ?? null, error: "missing or invalid scalar" };
+        pass = false;
+      } else {
       detail.healthDelta = healthDelta;
       if (healthDelta > scalarTolerance) pass = false;
+      }
     }
 
     if (pass) matched++;

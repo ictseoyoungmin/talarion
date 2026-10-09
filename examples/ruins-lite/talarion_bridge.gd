@@ -6,6 +6,8 @@ signal capture_checkpoint(name: String, tick: int)
 signal replay_finished(tick: int)
 
 const REPLAY_PATH := "res://talarion_runtime/replay.json"
+# Allow external screenshot runners to capture the same stable rendered checkpoint.
+const CAPTURE_HOLD_TICKS := 90
 
 var tick_rate: int = 60
 var replay_seed: int = 0
@@ -14,6 +16,7 @@ var current_tick: int = 0
 var _events: Array = []
 var _event_index: int = 0
 var _active := false
+var _capture_hold_remaining: int = 0
 
 func _ready() -> void:
     if load_replay(REPLAY_PATH):
@@ -73,11 +76,16 @@ func start_replay() -> void:
     current_tick = 0
     _event_index = 0
     _active = true
+    _capture_hold_remaining = 0
 
 func _physics_process(_delta: float) -> void:
     if not _active:
         return
+    if _capture_hold_remaining > 0:
+        _capture_hold_remaining -= 1
+        return
 
+    var pending_captures: Array[String] = []
     while _event_index < _events.size():
         var event: Dictionary = _events[_event_index]
         var event_tick := int(event.get("tick", -1))
@@ -90,13 +98,19 @@ func _physics_process(_delta: float) -> void:
 
         var event_type := String(event.get("type", ""))
         if event_type == "capture":
-            capture_checkpoint.emit(String(event.get("name", "checkpoint")), current_tick)
+            pending_captures.append(String(event.get("name", "checkpoint")))
         else:
             action_dispatched.emit(event)
 
         _event_index += 1
 
+    # Finalize this tick before emitting capture markers. Hold authoritative
+    # replay time while the browser / ADB screenshot is collected.
     tick_advanced.emit(current_tick)
+    for checkpoint_name in pending_captures:
+        capture_checkpoint.emit(checkpoint_name, current_tick)
+    if not pending_captures.is_empty():
+        _capture_hold_remaining = CAPTURE_HOLD_TICKS
 
     if _event_index >= _events.size():
         _active = false

@@ -164,13 +164,19 @@ jobs:
         run: |
           node bin/talarion.mjs compare             .evidence/web/state.jsonl             .evidence/android/state.jsonl             --json
 
-      - name: Generate parity report
+      - name: Compare visual checkpoints
         run: |
-          node bin/talarion.mjs report             .evidence/web/state.jsonl             .evidence/android/state.jsonl             artifacts/parity/runtime-parity.html
+          node bin/talarion.mjs visual compare .evidence/web .evidence/android artifacts/parity/visual --json
+
+      - name: Generate parity report
+        if: always()
+        run: |
+          node bin/talarion.mjs report             .evidence/web/state.jsonl             .evidence/android/state.jsonl             artifacts/parity/runtime-parity.html             artifacts/parity/visual/result.json
 
       - name: Upload parity report
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: talarion-runtime-parity
-          path: artifacts/parity/runtime-parity.html
+          path: artifacts/parity/
           if-no-files-found: error

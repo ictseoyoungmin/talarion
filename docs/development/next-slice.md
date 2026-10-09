@@ -59,3 +59,7 @@ R2 closes only when:
 ## Follow-on
 
 **TL00-R3** adds performance telemetry and physical-device validation before TL00 can close.
+
+## Emulator matrix follow-up
+
+The Android 35 `google_apis` Pixel Launcher and Android 35 AOSP Launcher both produced an ANR dialog under the GitHub-hosted emulator, obscuring the actual game. The runtime capture foreground guard correctly rejects those images. The active R2 smoke runner now tests an Android 11 / API 30 AOSP image while the Android 35 system-UI instability remains a separate unresolved environment limitation. Do not treat API 30 CI as evidence that Android 35 was validated.

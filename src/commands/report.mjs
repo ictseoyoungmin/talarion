@@ -18,6 +18,8 @@ function visualSection(visual, visualFile, output) {
       ' · <span class="' + (item.ok ? "ok" : "bad") + '">' + (item.ok ? "PASS" : "FAIL") +
       '</span></h3><p><small>Similarity: ' +
       (Number.isFinite(item.similarity) ? item.similarity.toFixed(4) : "N/A") +
+      " · Worst spatial tile error: " +
+      (Number.isFinite(item.maxTileError) ? (item.maxTileError * 100).toFixed(2) + "%" : "N/A") +
       " " + esc(item.error || "") + '</small></p><div class="images">' + images + "</div></section>";
   }).join("");
   const errors = visual.failures.length ? '<p class="bad">' + esc(visual.failures.join("; ")) + "</p>" : "";
@@ -25,11 +27,34 @@ function visualSection(visual, visualFile, output) {
     (visual.ok ? "ok" : "bad") + '">' + (visual.ok ? "PASS" : "FAIL") +
     "</b> · " + visual.passedCheckpoints + "/" + visual.expectedCheckpoints +
     " checkpoints · " + esc(visual.normalization.policy) +
-    " · min similarity " + esc(visual.thresholds.minSimilarity) + "</p>" + errors +
+    " · min similarity " + esc(visual.thresholds.minSimilarity) +
+    " · max tile error " + esc(visual.thresholds.maxTileError ?? "not enforced") + "</p>" + errors +
     "</section>" + cards;
 }
 
-export async function reportCommand(config, left, right, out, visualFile = null) {
+
+function performanceSection(webRun, androidRun) {
+  if (!webRun || !androidRun) return "";
+  const values = [webRun, androidRun].map(run => run?.evidence?.performance);
+  if (values.some(p => !p || p.schema !== "talarion.performance/v1")) {
+    throw new Error("Runner manifests must include valid performance evidence");
+  }
+  const cells = ["Web", "Android"].map((name, i) => {
+    const p = values[i];
+    const num = value => Number.isFinite(value) ? value.toFixed(1) : "N/A";
+    return '<tr><td>' + name + '</td><td>' + p.sampleCount + '</td><td>' +
+      num(p.fpsMedian) + '</td><td>' + num(p.fpsP10) + '</td><td>' +
+      num(p.processMsP95) + '</td><td>' +
+      (Number.isFinite(p.peakMemoryBytes) ? (p.peakMemoryBytes / 1048576).toFixed(1) : "N/A") +
+      '</td><td>' + num(p.targetFps) + '</td></tr>';
+  }).join("");
+  return '<section class="card"><h2>Observed runtime performance</h2>' +
+    '<p><small>CI software/emulator measurements only; not physical-device certification or frame-rate compliance.</small></p>' +
+    '<table><thead><tr><th>Runtime</th><th>Samples</th><th>Median FPS</th><th>P10 FPS</th><th>P95 process ms</th><th>Peak MiB</th><th>Budget FPS</th></tr></thead><tbody>' +
+    cells + '</tbody></table></section>';
+}
+
+export async function reportCommand(config, left, right, out, visualFile = null, webRunnerFile = null, androidRunnerFile = null) {
   const state = await compareCommand(config, left, right);
   const output = path.resolve(out);
   await ensureDirFor(output);
@@ -38,6 +63,11 @@ export async function reportCommand(config, left, right, out, visualFile = null)
   if (visual && visual.schema !== "talarion.visual-parity/v1") {
     throw new Error("Invalid visual manifest schema");
   }
+  const webRun = webRunnerFile ? JSON.parse(await fs.readFile(path.resolve(webRunnerFile), "utf8")) : null;
+  const androidRun = androidRunnerFile ? JSON.parse(await fs.readFile(path.resolve(androidRunnerFile), "utf8")) : null;
+  if (!!webRun !== !!androidRun) throw new Error("Both runner manifests are required for performance reporting");
+  if (webRun && (webRun.target !== "web" || androidRun.target !== "android" ||
+      !webRun.ok || !androidRun.ok)) throw new Error("Invalid runtime runner evidence for report");
   const ok = state.ok && (!visual || visual.ok);
   const rows = state.differences.slice(0, 100).map(d =>
     "<tr><td>" + esc(d.key) + "</td><td>" + esc(d.kind) +
@@ -73,6 +103,7 @@ export async function reportCommand(config, left, right, out, visualFile = null)
     '</div><br><small>ANDROID</small><div>' + esc(state.rightPath) + '</div></div>' +
     '<div class="card"><h2>State divergences</h2>' + table + "</div>" +
     visualSection(visual, visualFile, output) +
+    performanceSection(webRun, androidRun) +
     "</main></body></html>";
   await fs.writeFile(output, html, "utf8");
   return { ...state, ok, visual, output, text: state.text +

@@ -27,7 +27,7 @@ Usage:
   talarion replay validate <file> [--json]
   talarion compare <left.jsonl> <right.jsonl> [--json]
   talarion visual compare <web-dir> <android-dir> <out-dir> [--json]
-  talarion report <left.jsonl> <right.jsonl> <out.html> [visual-result.json] [--json]
+  talarion report <left.jsonl> <right.jsonl> <out.html> [visual-result.json] [web-runner.json] [android-runner.json] [--json]
   talarion verify [--json]
 `;
 
@@ -60,7 +60,7 @@ try {
       break;
     case "report":
       if (!args[1] || !args[2] || !args[3]) fail("Usage: talarion report <left> <right> <out.html>");
-      result = await reportCommand(config, args[1], args[2], args[3], args[4]);
+      result = await reportCommand(config, args[1], args[2], args[3], args[4], args[5], args[6]);
       break;
     case "verify":
       result = await verifyCommand(config);

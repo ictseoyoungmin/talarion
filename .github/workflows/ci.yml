@@ -171,7 +171,7 @@ jobs:
       - name: Generate parity report
         if: always()
         run: |
-          node bin/talarion.mjs report             .evidence/web/state.jsonl             .evidence/android/state.jsonl             artifacts/parity/runtime-parity.html             artifacts/parity/visual/result.json
+          node bin/talarion.mjs report             .evidence/web/state.jsonl             .evidence/android/state.jsonl             artifacts/parity/runtime-parity.html             artifacts/parity/visual/result.json             .evidence/web/runner-result.json             .evidence/android/runner-result.json
 
       - name: Upload parity report
         if: always()

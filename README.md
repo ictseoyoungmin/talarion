@@ -184,3 +184,7 @@ Architecture, contracts, runtime gates, and roadmap are maintained under [`docs/
 ## License
 
 MIT License. See [LICENSE](LICENSE).
+
+## Runtime telemetry
+
+Web and Android runners emit `performance.jsonl` and a `talarion.performance/v1` summary in `runner-result.json`. These are observational CI diagnostics, not physical-device performance certification.

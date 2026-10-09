@@ -103,3 +103,11 @@ TalarionBridge
 The Godot bridge holds replay ticks after each checkpoint so capture can observe a stable game state, and the Web runner waits for the compositor. The visual report rejects missing images, incorrect ticks and blank screens. This does not guarantee pixel-exact cross-GPU rendering.
 
 Raw keyboard, pointer, touch, and controller emulation belong to a separate end-to-end device-input layer. They do not define authoritative gameplay parity.
+
+## TL00-R3 observational performance evidence
+
+Godot emits `TALARION_PERF` once per replay second, including tick, FPS, process milliseconds, physics milliseconds, and static memory bytes. These samples **do not participate in state parity** and must not be treated as deterministic simulation values.
+
+Both runners save `performance.jsonl` and expose `evidence.performance` with schema `talarion.performance/v1`. The summary records sample count, P10/median FPS, P95 process/physics time, peak memory and target-FPS metadata. Invalid or absent samples fail the instrumentation smoke gate. The performance target value itself does **not** mean the measured run meets that target.
+
+Physical-device measurements, runtime/GPU identity, thermal pressure, dropped frames and lifecycle behavior are still required for TL00-R3 closure. CI headless emulators use virtualized graphics and must not be used to assert mobile performance.

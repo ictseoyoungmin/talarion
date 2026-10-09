@@ -4,6 +4,11 @@
 
 ### Added
 
+- TL00-R2 real Android/Web spatial visual parity closed: 16×9 regional tile gate, stabilized screenshots and action-state evidence
+- TL00-R3 observational FPS/frame-time/memory telemetry in both runtime runners and machine-readable evidence summaries
+- Observed performance in the optional HTML parity report (not a physical-device pass)
+
+
 - TL00-R2 center-crop screenshot normalization and pixel-based visual comparison
 - per-checkpoint Web/Android/diff PNG evidence and JSON manifest
 - HTML visual QA board and CI visual parity gate

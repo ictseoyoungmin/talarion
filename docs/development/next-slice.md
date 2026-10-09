@@ -1,65 +1,40 @@
-# Next Implementation Slice — TL00-R2 Visual Parity
+# Next Implementation Slice — TL00-R3 Device Performance & Physical Android QA
 
 ## Objective
 
-Capture the same named visual checkpoints from exported Web and Android runtimes, normalize target-specific framebuffer differences, and produce reproducible visual similarity evidence.
+Extend the already verified TL00 Web ↔ Android state and visual parity workflow with observed performance evidence, then require a reproducible physical-device gate before closing TL00.
 
-## R1 baseline
+## Baseline
 
-The runtime state gate is complete:
+- TL00-R1 CLOSED: 600-tick replay, 15/15 state snapshots matched.
+- TL00-R2 CLOSED: [CI run #37957078215](https://github.com/ictseoyoungmin/talarion/actions/runs/37957078215); 3/3 checkpoints, 99.9759% mean global similarity; 16×9 spatial tile error at most 1.151% (<2% configured bound).
+- Emulator: Android 11 / API 30 AOSP, ANGLE-backed SwiftShader (`-gpu swangle`). This is **emulated**, not physical-device QA.
 
-- [x] canonical 600-tick replay staged without mutation
-- [x] Web replay executes to tick 600
-- [x] Android emulator replay executes to tick 600
-- [x] Web state evidence collected
-- [x] Android state evidence collected
-- [x] CI downloads both runtime evidence artifacts
-- [x] 15/15 snapshots matched
-- [x] state parity = 100.00%
+## R3 current implementation
 
-## R2 deliverables
+- [x] Godot emits `TALARION_PERF` at fixed replay intervals separately from state events.
+- [x] Web and Android runners collect `performance.jsonl` and `talarion.performance/v1` summaries.
+- [x] Sample validation rejects absent, duplicate or malformed telemetry.
+- [x] Summaries record median and P10 FPS, P95 process and physics timing, and peak static memory.
+- [x] Target FPS is included as a declared budget, not falsely declared compliant.
+- [ ] Performance HTML report validated across both runtimes in CI.
+- [ ] Android hardware fingerprint, API/renderer/GPU metadata captured and bound to evidence.
+- [ ] Physical Android device QA: exported APK installed, same replay and screenshots verified.
+- [ ] Hardware-specific FPS, memory, thermal and lifecycle gates validated.
+- [ ] Report and reproducible verification artifacts reviewed before TL00 closure.
 
-- [x] Web named checkpoint screenshot capture
-- [x] Android checkpoint screenshot implementation
-- [ ] Android screenshot capture validated in CI
-- [x] screenshot metadata records source dimensions and normalization
-- [x] target-independent normalization policy (center-crop-nearest-rgb-v1)
-- [x] per-checkpoint visual similarity metric (normalized mean absolute RGB difference)
-- [x] generated visual diff images
-- [x] visual thresholds configurable in `talarion.config.json`
-- [x] visual results included in the parity report
-- [x] visual parity CI gate implemented (runtime PASS pending)
+## Evidence policy
 
-## Checkpoints
+Emulator performance data is **observational only**. The shared CI virtual GPU can be drastically slower than physical hardware; neither an emulator PASS nor target FPS configuration proves mobile performance. Do not silently remove, relax or conflate state, visual or performance failures.
 
-The canonical replay currently defines:
+## Physical device procedure
 
-- `after-jump`
-- `interaction`
-- `attack`
+1. Connect a real Android device with Developer Options and USB debugging enabled, authorize ADB, and select it with `ANDROID_SERIAL` if needed.
+2. Run `node bin/talarion.mjs test android --json` using the same checked-in replay.
+3. Run the Web target and `node bin/talarion.mjs compare ...`, followed by `visual compare` and `report`.
+4. Preserve APK/source commit hash, ADB device ID and build fingerprint, screenshots, performance JSONL, summary, and comparison artifacts.
+5. Review performance thresholds per actual device class. Do not close TL00 without this physical evidence.
 
-Both runtimes must emit one screenshot for every declared checkpoint.
+## R3 closure
 
-## Normalization and evidence contract
-
-Each named checkpoint requires exactly one PNG from each runner, with its authoritative replay tick. Both screenshots are center-cropped to the configured aspect ratio and sampled at fixed pixel centers (default 320 × 180); the crop offsets and original dimensions are retained. Pixel RGB mean absolute error is converted into a similarity score. Low-contrast/blank screenshots fail independently of similarity, and missing/invalid images fail closed. The three normalized PNG files (Web, Android, absolute-difference heatmap) and `result.json` are uploaded with the HTML parity report.
-
-The first real visual CI identified a Pixel Launcher 'not responding' system dialog covering the Android game. State parity still matched 15/15. Android capture now checks the foreground window and CI uses an AOSP (non-Google) emulator system image to avoid that launcher; do not relax similarity thresholds to mask the failure.\n\nThis policy is intentionally simple. Center cropping can hide edge framing errors; it is only the first visual contract, not a proof of full-screen visual equivalence or device UI parity. The threshold is a declared project setting, not an adaptive value chosen to force PASS.
-
-## Gate
-
-R2 closes only when:
-
-1. Web and Android produce the same checkpoint set;
-2. screenshots are normalized deterministically;
-3. every checkpoint is compared using a declared metric and threshold;
-4. diff images are emitted for inspection;
-5. the visual result is machine-readable and included in the CI parity evidence.
-
-## Follow-on
-
-**TL00-R3** adds performance telemetry and physical-device validation before TL00 can close.
-
-## Emulator matrix follow-up
-
-The Android 35 `google_apis` Pixel Launcher and Android 35 AOSP Launcher both produced an ANR dialog under the GitHub-hosted emulator, obscuring the actual game. The runtime capture foreground guard correctly rejects those images. The active R2 smoke runner now tests an Android 11 / API 30 AOSP image while the Android 35 system-UI instability remains a separate unresolved environment limitation. Do not treat API 30 CI as evidence that Android 35 was validated.
+A physical Android build must pass gameplay state, named screenshots and visual parity. Performance must be independently measured and evaluated against a recorded device-specific budget; Web/Android emulator CI remains a prerequisite, not a substitute. Device metadata and evidence artifacts must be sufficient for an external maintainer to reproduce results.

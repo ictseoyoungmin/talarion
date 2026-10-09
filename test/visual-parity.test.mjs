@@ -95,3 +95,17 @@ test("visual evidence rejects missing, wrong-tick and blank checkpoints", async 
     await fs.rm(root, { recursive: true, force: true });
   }
 });
+
+test("TL00 live action captures occur before transient states expire", async () => {
+  const replay = JSON.parse(await fs.readFile(
+    path.join(process.cwd(), "fixtures/replay/tutorial.tlr.json"), "utf8"
+  ));
+  const actions = new Map(replay.events.filter(e => ["interact", "attack"].includes(e.type))
+    .map(e => [e.type, e.tick]));
+  const captures = new Map(replay.events.filter(e => e.type === "capture")
+    .map(e => [e.name, e.tick]));
+  assert.ok(captures.get("interaction") > actions.get("interact"));
+  assert.ok(captures.get("interaction") < actions.get("interact") + 20);
+  assert.ok(captures.get("attack") > actions.get("attack"));
+  assert.ok(captures.get("attack") < actions.get("attack") + 20);
+});

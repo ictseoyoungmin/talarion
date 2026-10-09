@@ -12,7 +12,16 @@ var transient_state_until := -1
 @onready var player: MeshInstance3D = $Player
 @onready var camera: Camera3D = $Camera3D
 
+var _idle_material: Material
+var _interact_material: StandardMaterial3D
+var _attack_material: StandardMaterial3D
+
 func _ready() -> void:
+    _idle_material = player.material_override
+    _interact_material = StandardMaterial3D.new()
+    _interact_material.albedo_color = Color(0.16, 0.83, 0.75, 1.0)
+    _attack_material = StandardMaterial3D.new()
+    _attack_material.albedo_color = Color(0.97, 0.31, 0.18, 1.0)
     TalarionBridge.action_dispatched.connect(_on_action)
     TalarionBridge.tick_advanced.connect(_on_tick)
     TalarionBridge.capture_checkpoint.connect(_on_capture_checkpoint)
@@ -76,6 +85,15 @@ func _on_tick(tick: int) -> void:
 
     if jump_started_tick < 0 and tick > transient_state_until:
         state = "RUN" if move_vector.length() > 0.0 else "IDLE"
+
+    # TL00 sample: the visual gate must inspect the actual interaction and
+    # attack states, not two indistinguishable idle frames.
+    if state == "INTERACT":
+        player.material_override = _interact_material
+    elif state == "ATTACK":
+        player.material_override = _attack_material
+    else:
+        player.material_override = _idle_material
 
     if tick > 0 and tick % TalarionBridge.tick_rate == 0:
         _emit_state(tick, "interval")

@@ -12,9 +12,9 @@
     { "tick": 220, "type": "move", "value": [-0.30, 0.60] },
     { "tick": 360, "type": "move", "value": [0.0, 0.0] },
     { "tick": 400, "type": "interact", "entity": "chest_04" },
-    { "tick": 420, "type": "capture", "name": "interaction" },
+    { "tick": 410, "type": "capture", "name": "interaction" },
     { "tick": 480, "type": "attack", "kind": "light" },
-    { "tick": 500, "type": "capture", "name": "attack" },
+    { "tick": 490, "type": "capture", "name": "attack" },
     { "tick": 590, "type": "move", "value": [0.0, 0.0] },
     { "tick": 600, "type": "session.end" }
   ]

@@ -1,0 +1,33 @@
+{
+  "name": "talarion",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Web-first 3D game portability and cross-runtime QA infrastructure.",
+  "type": "module",
+  "bin": {
+    "talarion": "./bin/talarion.mjs"
+  },
+  "scripts": {
+    "doctor": "node bin/talarion.mjs doctor",
+    "plan": "node bin/talarion.mjs plan",
+    "test": "node --test",
+    "verify": "node bin/talarion.mjs verify",
+    "report": "node bin/talarion.mjs report fixtures/state/web.jsonl fixtures/state/android.jsonl artifacts/parity-report.html",
+    "self-check": "npm test && npm run verify"
+  },
+  "devDependencies": {
+    "playwright": "1.64.0"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ictseoyoungmin/talarion.git"
+  },
+  "homepage": "https://github.com/ictseoyoungmin/talarion#readme",
+  "bugs": {
+    "url": "https://github.com/ictseoyoungmin/talarion/issues"
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "project": {
+    "name": "ruins-lite",
+    "engine": "godot",
+    "path": "examples/ruins-lite"
+  },
+  "toolchain": {
+    "godot": "auto",
+    "adb": "adb",
+    "recommendedVersion": "4.7.2"
+  },
+  "replay": {
+    "default": "fixtures/replay/tutorial.tlr.json",
+    "stagedResource": "talarion_runtime/replay.json",
+    "minimumDurationSeconds": 10
+  },
+  "targets": {
+    "web": {
+      "preset": "Web",
+      "output": "artifacts/build/web/index.html",
+      "profile": "web-qa"
+    },
+    "android": {
+      "preset": "Android",
+      "output": "artifacts/build/android/ruins-lite.apk",
+      "profile": "android-low",
+      "package": "dev.talarion.ruinslite"
+    }
+  },
+  "profiles": {
+    "web-qa": {
+      "textureMax": 4096,
+      "targetFps": 60,
+      "debugEvidence": true
+    },
+    "android-low": {
+      "textureMax": 2048,
+      "targetFps": 30,
+      "drawCallBudget": 400,
+      "debugEvidence": true
+    }
+  },
+  "parity": {
+    "positionTolerance": 0.1,
+    "scalarTolerance": 0.001,
+    "requireEventOrder": true,
+    "rotationTolerance": 0.001,
+    "visual": {
+      "width": 320,
+      "height": 180,
+      "minSimilarity": 0.8,
+      "minLumaStdDev": 0.012,
+      "maxTileError": 0.02
+    }
+  }
+}

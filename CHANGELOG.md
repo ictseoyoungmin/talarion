@@ -12,6 +12,10 @@
 
 ### Added
 
+- TL02-P1 fixed metric units and target profile checks: FPS, process P95 milliseconds, peak process memory bytes and unobserved draw-call counts, with optional validated explicit `performanceUnits`.
+- `talarion.budget-coverage/v1` per-target coverage, `PA07` / `PA08` validation and fail-closed incorrect/missing profile handling. No automatic FPS/device performance PASS; evidence comparability is not compliance.
+- Regression tests and exported-runner CI assertions for unobserved metrics, invalid units and always-ungraded budgets.
+
 - TL02-P0 runtime performance evidence authority: recompute raw Web/Android engine JSONL telemetry, compare runner summaries and replay/APK provenance, and distinguish headless Web, Android emulator and unreviewed physical hardware classes.
 - `talarion budget authority <web-dir> <android-dir> <out.json>` exports versioned machine-readable checks and preserves a `not-evaluated` budget decision and `hardwareCertified: false` evidence scope.
 - CI recomputes the performance authority result from downloaded actual runtime artifacts after TL00 parity acceptance; tests reject mismatched summaries, tampered replays and incomplete data.

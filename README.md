@@ -154,7 +154,7 @@ node bin/talarion.mjs budget authority \
   artifacts/run/web artifacts/run/android artifacts/parity/performance-authority.json --json
 ```
 
-The output reports observed sample metrics and declared goals separately. It deliberately sets the budget decision to `not-evaluated`: the emulator cannot certify target FPS, physical-device performance, draw calls or thermals. See the [TL02-P0 evidence contract](docs/development/tl02-p0.md).
+The output reports observed sample metrics and declared goals separately. It deliberately sets the budget decision to `not-evaluated`: the emulator cannot certify target FPS, physical-device performance, draw calls or thermals. TL02-P1 also validates the source metric units and coverage of optional `processMsP95Budget` / `peakMemoryBytesBudget` targets, with draw calls explicitly unobserved. See the [TL02-P0 evidence contract](docs/development/tl02-p0.md) and [TL02-P1 metric contract](docs/development/tl02-p1.md).
 
 ## TL00 automated acceptance
 

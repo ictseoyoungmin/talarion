@@ -1,4 +1,4 @@
-# Next Slice — Google Play Release AAB Preflight (WF03)
+# Next Slice — WF03-P2 Google Play Submission Preflight
 
 ## Accepted baseline
 
@@ -29,11 +29,11 @@
 - **WF02-P1 CLOSED (reference game/emulator):** `web-native android smoke` reinstalls the existing SHA-256 verified Debug APK; 3 real ADB taps change authoritative game positions [-3,-3] → [-2,-3] → [-1,-3] → [-1,-2], collecting beacon 1; HOME triggers Activity.pause and WebView visibility hidden, then resume without reload retains source state. Five raw Android captures, 21 passed check instances and provenance are recorded. [WF02-P1 QA contract](wf02-p1.md). PR #29 exact-head CI [#38303167847](https://github.com/ictseoyoungmin/talarion/actions/runs/38303167847) **8/8 PASS**, original P0 Replay and legacy Godot gates unchanged.
 - **P1 exit satisfied for constrained reference/emulator:** the original actual Android game preserved gameplay state through HOME/resume. Not proven: orientation-change recovery, Android process death/persistence, real physical-device performance, all Android OEM skins or app-store release readiness.
 
-### WF03 — Google Play Release AAB preflight (P0 CLOSED; P1 implementation candidate)
+### WF03 — Google Play Release AAB preflight (P0/P1 CLOSED; P2 NEXT)
 
 - **WF03-P0 CLOSED:** PR #30 merged main da721c34518c4772b23315964beb22b12dc8e9b2 with exact-head CI #38310730950 and main CI #38311126082 **9/9 SUCCESS**. The original Three.js source builds an isolated API36 signed AAB, independently validated with pinned bundletool/JAR cert, manifest, ABI applicability and source SHA-256. [Contract](wf03-p0.md).
-- **WF03-P1 IN REVIEW:** Extract *that actual signed AAB* into APK, verify matching signer and API36 package, run real emulator WebView replay plus three trusted touch inputs, HOME/resume with raw PNGs, and independently compare browser↔Release gameplay/HUD. Do not reuse a Debug APK result as a Release result. [Implementation and acceptance](wf03-p1.md).
-- Real Release APK runtime is an independent gate; Play Console submission, upload-key custody, package ownership, distribution policies, physical-device QA and publication belong to later WF03-P2/release certification.
+- **WF03-P1 CLOSED (reference game/emulator):** PR #31 merged `9fa9a107a16aa17527eda1e9576743c02ab7473f` after [exact-head CI #38313382405](https://github.com/ictseoyoungmin/talarion/actions/runs/38313382405) and [post-merge main CI #38313902291](https://github.com/ictseoyoungmin/talarion/actions/runs/38313902291), both **9/9 SUCCESS**. Actual signed AAB → independently verified Release APK → real emulator run: 10 original state snapshots, 3 replay PNG, three trusted touch inputs and five raw lifecycle screenshots, HOME/resume state retained. Independent original-browser↔Release WP001–007 PASS. [Proof contract](wf03-p1.md). No physical-device/store approval.
+- **WF03-P2 NEXT (not implemented):** [Google Play submission readiness boundary](wf03-p2.md), including user-controlled production upload-signing custody, Play App Signing enrollment, controlled package/version strategy, current policy and compliance checks, and actual Play Console acceptance separate from local CI. Physical-device QA remains an independent release-certification gate.
 - Prefer current official policy at gate execution; version the policy snapshot. No embedded keys, no auto-publishing, no inferred Play approval.
 - **Exit:** independently inspectable signed release AAB and a release-preflight report distinct from build/runtime pass; publication unverified until Play confirms.
 

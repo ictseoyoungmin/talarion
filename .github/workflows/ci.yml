@@ -25,6 +25,20 @@ jobs:
       - name: Export deterministic Doctor report
         run: node bin/talarion.mjs doctor report artifacts/doctor --json
 
+      - name: TL03-P0 iOS preflight (Linux cannot export or certify iOS)
+        if: matrix.node == 24
+        run: |
+          node bin/talarion.mjs ios preflight artifacts/ios/ios-preflight.json --json
+          node --input-type=module -e 'import fs from "node:fs";const r=JSON.parse(fs.readFileSync("artifacts/ios/ios-preflight.json"));if(r.schema!=="talarion.ios-preflight/v1"||r.status!=="blocked"||r.exportReady||r.exportAttempted||r.appSigned||r.simulatorRuntimeObserved||r.physicalDeviceRuntimeObserved||r.simulatorCertified||r.physicalDeviceCertified||r.parityCertified)process.exit(1);'
+
+      - name: Upload iOS preflight report
+        if: matrix.node == 24
+        uses: actions/upload-artifact@v4
+        with:
+          name: talarion-ios-preflight
+          path: artifacts/ios/ios-preflight.json
+          if-no-files-found: error
+
       - name: Upload Doctor report
         if: matrix.node == 24
         uses: actions/upload-artifact@v4

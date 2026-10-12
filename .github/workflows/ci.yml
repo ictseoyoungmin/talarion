@@ -231,3 +231,72 @@ jobs:
           name: talarion-web-native-evidence
           path: artifacts/run/web-native/
           if-no-files-found: error
+
+  android-webview-runtime:
+    name: Web-native Android WebView APK replay and parity
+    needs: [web-native-runtime]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - name: Install pinned Web game dependencies
+        run: npm install
+      - name: Configure Android SDK for Debug APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          ANDROID_SDK="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-/usr/local/lib/android/sdk}}"
+          echo "ANDROID_HOME=${ANDROID_SDK}" >> "$GITHUB_ENV"
+          echo "ANDROID_SDK_ROOT=${ANDROID_SDK}" >> "$GITHUB_ENV"
+          SDKMANAGER="${ANDROID_SDK}/cmdline-tools/latest/bin/sdkmanager"
+          if [ ! -x "$SDKMANAGER" ]; then
+            SDKMANAGER="$(find "${ANDROID_SDK}/cmdline-tools" -type f -name sdkmanager | sort -V | tail -1)"
+          fi
+          test -x "$SDKMANAGER"
+          yes | "$SDKMANAGER" --licenses >/dev/null || true
+          "$SDKMANAGER" "platform-tools" "build-tools;35.0.1" "platforms;android-35"
+      - name: Download verified original Web-native evidence
+        uses: actions/download-artifact@v4
+        with:
+          name: talarion-web-native-evidence
+          path: .evidence/wf01-browser
+      - name: WebView packaging plan (source only)
+        run: node bin/talarion.mjs web-native android plan examples/web-native --json
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Install and replay Android WebView Debug APK
+        uses: reactivecircus/android-emulator-runner@v2.38.0
+        with:
+          api-level: 30
+          target: default
+          arch: x86_64
+          profile: pixel_5
+          emulator-options: -no-snapshot-save -no-window -gpu swangle -noaudio -no-boot-anim -camera-back none -camera-front none
+          disable-animations: true
+          script: |
+            adb shell settings put secure immersive_mode_confirmations confirmed || true
+            adb shell wm dismiss-keyguard || true
+            sh -c 'ready=0; for attempt in $(seq 1 45); do if adb shell am get-current-user >/dev/null 2>&1 && adb shell pm path android >/dev/null 2>&1; then ready=1; break; fi; sleep 2; done; if [ "$ready" -ne 1 ]; then echo "Android services never became ready" >&2; exit 1; fi'
+            node bin/talarion.mjs web-native android test examples/web-native --json
+      - name: Compare independently recorded browser and WebView game state
+        run: |
+          node --input-type=module -e 'import {compareWebAndWebView} from "./src/android-webview/parity.mjs"; const r=await compareWebAndWebView(".evidence/wf01-browser","artifacts/run/android-webview","artifacts/parity/wf02/webview-parity.json");console.log(r.text);if(!r.ok)process.exit(1)'
+      - name: Upload real WebView Android APK, screenshots and parity evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: talarion-webview-debug-apk-and-evidence
+          path: |
+            artifacts/build/android-webview/
+            artifacts/run/android-webview/
+            artifacts/parity/wf02/
+          if-no-files-found: error

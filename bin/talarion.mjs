@@ -20,6 +20,7 @@ import { inspectAdapterCommand } from "../src/adapters/manifest.mjs";
 import { validateCandidateAdapter } from "../src/adapters/candidate.mjs";
 import { inspectProjectAdoption } from "../src/commands/project-inspect.mjs";
 import { inspectWebNative, devWebNative, testWebNative, defaultWebNativeProject } from "../src/web-native/runtime.mjs";
+import { planWebView, buildWebView, testWebView } from "../src/android-webview/runtime.mjs";
 
 const argv = process.argv.slice(2);
 const jsonMode = argv.includes("--json");
@@ -37,6 +38,7 @@ Usage:
   talarion web-native inspect [project-directory] [--json]
   talarion web-native dev [project-directory] [--json]
   talarion web-native test [project-directory] [--json]
+  talarion web-native android <plan|build|test> [project-directory] [--json]
   talarion adapter inspect [web|android|ios] [--json]
   talarion adapter validate <candidate.json> [target] [--json]
   talarion build <web|android> [--json]
@@ -83,6 +85,15 @@ try {
       }
       break;
     case "web-native": {
+      if (args[1] === "android") {
+        if (!["plan","build","test"].includes(args[2]) || args[4])
+          fail("Usage: talarion web-native android <plan|build|test> [project-directory] [--json]");
+        const gameRoot = args[3] ?? defaultWebNativeProject();
+        if (args[2] === "plan") result = await planWebView(gameRoot);
+        if (args[2] === "build") result = await buildWebView(gameRoot);
+        if (args[2] === "test") result = await testWebView(gameRoot);
+        break;
+      }
       if (!["inspect","dev","test"].includes(args[1]) || args[3]) {
         fail("Usage: talarion web-native <inspect|dev|test> [project-directory] [--json]");
       }

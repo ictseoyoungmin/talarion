@@ -27,6 +27,7 @@ This directory contains the engineering specification for Talarion.
 - [TL04-P2](tl04-p2.md) — read-only candidate manifest verification, negative fixtures and contributor guidance; TL04 P0–P2 completed.
 - [TL05-P0](tl05-p0.md) — independent Godot project integration prerequisite inspection, sample-coupling audit and readiness boundaries.
 - [WF01-P0](wf01-p0.md) — original Three.js game, interactive Web loop, read-only project inspection and Chromium replay evidence.
-- [Next Slice](next-slice.md) — WF01 browser-native slice first; WF02 Android Debug APK, WF03 release AAB; TL05-P1/P2 backlog.
+- [WF02-P0](wf02-p0.md) — runtime-preserving Android WebView Debug APK, source hashes, Android replay and independent browser parity gates.
+- [Next Slice](next-slice.md) — WF01 completed; WF02 Android Debug APK, WF03 release AAB; TL05-P1/P2 backlog.
 - [Roadmap](roadmap.md) — retained TL00–TL05 history and gated Web-first delivery milestones.
 - [OSS Strategy](oss-strategy.md) — repository positioning, local-first requirements, and contributor-facing product constraints.

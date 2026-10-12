@@ -1,11 +1,24 @@
-import { exportGodot } from "../adapters/godot.mjs";
+import { resolveAdapterExecution } from "../adapters/dispatch.mjs";
 
 export async function build(config, target) {
   if (!target) throw new Error("Usage: talarion build <web|android>");
-  if (config.project.engine !== "godot") throw new Error("TL00 starter currently supports only Godot.");
-  const r = await exportGodot(config, target);
+
+  const dispatch = await resolveAdapterExecution(config, target);
+  if (!dispatch.report.ok) {
+    return {
+      ok: false, target, status: "blocked", adapter: dispatch.report,
+      text: [
+        `TALARION BUILD — ${target}`,
+        "ADAPTER BLOCKED",
+        ...dispatch.report.checks.filter(c => !c.ok).map(c => `FAIL ${c.id}: ${c.detail}`)
+      ].join("\n")
+    };
+  }
+
+  const r = await dispatch.handlers.exportProject(config, target);
   return {
     ...r,
+    adapter: dispatch.report,
     text: [
       `TALARION BUILD — ${target}`,
       `Godot: ${r.version}`,

@@ -136,7 +136,7 @@ node bin/talarion.mjs adapter inspect --json
 node bin/talarion.mjs adapter inspect web --json
 ```
 
-The Godot adapter manifest declares engine/target identity and six explicitly supported, unsupported or unknown capabilities. This is a **static interface and source-entrypoint audit**, not evidence that an exported game ran or that hardware is compatible. `adapter inspect ios` intentionally fails because iOS support is deferred. `verify` includes this source-only check; actual Web/Android evidence remains the independent runtime gate. See [TL04-P0](docs/development/tl04-p0.md).
+The Godot adapter manifest declares engine/target identity and six explicitly supported, unsupported or unknown capabilities. This is a **static interface and source-entrypoint audit**, not evidence that an exported game ran or that hardware is compatible. Web/Android build and test commands bind those declarations to the existing reviewed Godot implementations; arbitrary manifest paths are never dynamically imported. `adapter inspect ios` intentionally fails because iOS support is deferred. `verify` includes this source-only check; actual Web/Android evidence remains the independent runtime gate. See [TL04-P0](docs/development/tl04-p0.md).
 
 ## Portability Doctor
 

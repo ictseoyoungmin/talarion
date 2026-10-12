@@ -1,11 +1,8 @@
 import { build } from "./build.mjs";
-import { runWeb } from "../runners/web.mjs";
-import { runAndroid } from "../runners/android.mjs";
+import { resolveAdapterExecution } from "../adapters/dispatch.mjs";
 
 export async function testTargetCommand(config, target) {
-  if (!["web", "android"].includes(target)) {
-    throw new Error("Usage: talarion test <web|android>");
-  }
+  if (!target) throw new Error("Usage: talarion test <web|android>");
 
   const buildResult = await build(config, target);
   if (!buildResult.ok) {
@@ -17,15 +14,26 @@ export async function testTargetCommand(config, target) {
     };
   }
 
-  const runtime = target === "web"
-    ? await runWeb(config)
-    : await runAndroid(config);
+  // Reconfirm the allowlisted binding before executing a target runner.
+  const dispatch = await resolveAdapterExecution(config, target);
+  if (!dispatch.report.ok) {
+    return {
+      ok: false,
+      target,
+      status: "blocked",
+      build: buildResult,
+      adapter: dispatch.report,
+      text: `TALARION TEST — ${target}\nADAPTER BLOCKED`
+    };
+  }
+  const runtime = await dispatch.handlers.runTarget(config);
 
   return {
     ok: runtime.ok,
     target,
     build: buildResult,
     runtime,
+    adapter: dispatch.report,
     text: [
       `TALARION TEST — ${target}`,
       "build: PASS",

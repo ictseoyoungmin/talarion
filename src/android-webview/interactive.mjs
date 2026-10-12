@@ -133,7 +133,16 @@ export async function smokeInteractiveWebView(project){
     const first=await capture(path.join(dir,"01-start.png"));captures.push(first);
     assert("WI008",first.width>first.height,
       "Android game must be displayed in physical landscape orientation");
-    const xRight=first.width-51,y=first.height-50;
+    // Android screencap is in physical pixels; CSS touch buttons are defined
+    // in dp/CSS pixels. On Pixel 5 this ratio is 440/160 = 2.75.
+    const densityOutput=await adb("shell","wm","density");
+    const dpi=Number(/Override density:\s*(\d+)/.exec(densityOutput)?.[1]||
+      /Physical density:\s*(\d+)/.exec(densityOutput)?.[1]);
+    assert("WI016",Number.isFinite(dpi)&&dpi>=120&&dpi<=1000,
+      "Actual Android display density must be observed before input coordinates");
+    const ratio=dpi/160;
+    const xRight=first.width-Math.round(51*ratio);
+    const y=first.height-Math.round(50*ratio);
     const steps=[
       {x:xRight,y,direction:[1,0],position:[-2,0,-3],moves:1,collected:0},
       {x:xRight,y,direction:[1,0],position:[-1,0,-3],moves:2,collected:1}
@@ -160,7 +169,7 @@ export async function smokeInteractiveWebView(project){
     await until("Android game resumed",p=>p.filter(e=>e.kind==="LIFECYCLE"&&e.value?.phase==="resume").length>=2);
     await pause(500);
     captures.push(await capture(path.join(dir,"04-resumed.png")));
-    const xDown=first.width-109;
+    const xDown=first.width-Math.round(109*ratio);
     await adb("shell","input","tap",String(xDown),String(y));
     const after=await until("post-resume trusted tap",p=>
       p.filter(e=>e.kind==="TOUCH").find(e=>e.value?.state?.moves===3));

@@ -19,6 +19,7 @@ import { iosExportCommand } from "../src/ios/export.mjs";
 import { inspectAdapterCommand } from "../src/adapters/manifest.mjs";
 import { validateCandidateAdapter } from "../src/adapters/candidate.mjs";
 import { inspectProjectAdoption } from "../src/commands/project-inspect.mjs";
+import { inspectWebNative, devWebNative, testWebNative, defaultWebNativeProject } from "../src/web-native/runtime.mjs";
 
 const argv = process.argv.slice(2);
 const jsonMode = argv.includes("--json");
@@ -33,6 +34,9 @@ Usage:
   talarion doctor report <output-dir> [--json]
   talarion plan [--json]
   talarion project inspect [--json]
+  talarion web-native inspect [project-directory] [--json]
+  talarion web-native dev [project-directory] [--json]
+  talarion web-native test [project-directory] [--json]
   talarion adapter inspect [web|android|ios] [--json]
   talarion adapter validate <candidate.json> [target] [--json]
   talarion build <web|android> [--json]
@@ -78,6 +82,19 @@ try {
         fail("Usage: talarion adapter inspect [target] | adapter validate <candidate.json> [target]");
       }
       break;
+    case "web-native": {
+      if (!["inspect","dev","test"].includes(args[1]) || args[3]) {
+        fail("Usage: talarion web-native <inspect|dev|test> [project-directory] [--json]");
+      }
+      const projectRoot = args[2] ?? defaultWebNativeProject();
+      if (args[1] === "inspect") result = await inspectWebNative(projectRoot);
+      if (args[1] === "dev") result = await devWebNative(projectRoot);
+      if (args[1] === "test") result = await testWebNative(projectRoot);
+      if (args[1] === "dev") result = {
+        ...result,server:undefined
+      };
+      break;
+    }
     case "project":
       if (args[1] !== "inspect" || args[2]) {
         fail("Usage: talarion project inspect [--json]");

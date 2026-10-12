@@ -29,5 +29,8 @@
   "homepage": "https://github.com/ictseoyoungmin/talarion#readme",
   "bugs": {
     "url": "https://github.com/ictseoyoungmin/talarion/issues"
+  },
+  "dependencies": {
+    "three": "0.180.0"
   }
 }

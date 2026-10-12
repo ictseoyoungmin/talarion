@@ -13,6 +13,7 @@ This directory contains the engineering specification for Talarion.
 - [Release Certification](release-certification.md) — optional separate physical-device hardware/compatibility gate.
 - [TL01-P0](tl01-p0.md) — Portability Doctor rule classes, findings and fixture contract.
 - [TL01-P1](tl01-p1.md) — direct target APIs, lifecycle/input event signatures and adapter ownership checks.
+- [TL01-P2](tl01-p2.md) — static image metadata, texture limits and unknowns.
 - [Next Slice](next-slice.md) — immediate implementation target.
 - [Roadmap](roadmap.md) — TL00 through adapter ecosystem milestones.
 - [OSS Strategy](oss-strategy.md) — repository positioning, local-first requirements, and contributor-facing product constraints.

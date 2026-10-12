@@ -12,6 +12,9 @@
 
 ### Added
 
+- TL01-P2 deterministic PNG/JPEG/WebP header inspection and per-target static textureMax checks; unsupported/corrupt source observations are explicit UNKNOWN or diagnostic warnings.
+- Source-only assetBudget output separates declared FPS/drawcalls from measured hardware results; profile correctness is a distinct validation gate.
+
 - TL01-P1 static diagnostics for Web/Android-native bridges, browser storage, audio, lifecycle events, keyboard events, Godot subprocesses and physical-key polling.
 - Optional target adapter declaration verification with safe repository-relative paths, target ownership and wrong-target API auditing; general action-map advice is not mistaken for a missing adapter.
 - Positive/negative tests for direct platform APIs, literal event names and invalid/missing adapter files.

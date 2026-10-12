@@ -9,7 +9,7 @@ export async function plan(config) {
     output: resolveFromRoot(config, t.output)
   }));
   const text = [
-    "TALARION BUILD GRAPH",
+    "TALARION BUILD TARGET PLAN",
     `project: ${config.project.name}`,
     `engine: ${config.project.engine}`,
     "",

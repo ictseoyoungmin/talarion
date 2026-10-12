@@ -145,6 +145,17 @@ The command writes `artifacts/doctor/doctor-report.json` and `doctor-report.html
 node bin/talarion.mjs doctor --json
 ```
 
+## Performance evidence authority (TL02)
+
+Talarion distinguishes configured FPS/draw-call goals from engine-observed performance evidence. The authority check recomputes the runner's engine telemetry from raw JSONL and verifies replay/device provenance:
+
+```bash
+node bin/talarion.mjs budget authority \
+  artifacts/run/web artifacts/run/android artifacts/parity/performance-authority.json --json
+```
+
+The output reports observed sample metrics and declared goals separately. It deliberately sets the budget decision to `not-evaluated`: the emulator cannot certify target FPS, physical-device performance, draw calls or thermals. See the [TL02-P0 evidence contract](docs/development/tl02-p0.md).
+
 ## TL00 automated acceptance
 
 The CI baseline requires real exported Web/Android replay, state and visual parity, valid engine telemetry and source fingerprints. It does **not** grade emulator FPS against physical-device targets. Reproduce the final acceptance result after capturing both runtimes:

@@ -1,31 +1,24 @@
-# Next Implementation Slice — TL01 Portability Doctor
+# Next Implementation Slice — TL02 Performance Budget
 
-## Completed foundational slice
+## Completed
 
-- TL00-R1: exported Web ↔ Android deterministic state replay, 15/15 snapshots.
-- TL00-R2: three cross-runtime visual checkpoints, global RGB + spatial tile gates, PNG/HTML diff evidence.
-- TL00-R3: Web/Android engine-observed FPS/processing/memory, hardware metadata, replay/APK provenance and machine-readable acceptance.
-- TL00 acceptance is bound to the entire GitHub CI, not just the fixture-only `npm run verify` output.
-- **Separate release gate:** real-device compatibility/performance/thermal/lifecycle claims are tracked by [Release Certification](release-certification.md), not by TL00.
+- **TL00 — CLOSED:** exported Godot Web ↔ Android parity, 15/15 replay snapshots, 3/3 spatial checkpoints and 9/9 evidence acceptance.
+- **TL01 — CLOSED:** P0 diagnostic catalog (PR #3), P1 platform boundaries (PR #5), P2 source asset budgets (PR #6), P3 reproducible JSON/HTML Doctor reports (PR #7).
+- Android physical-device certification is a separate optional release gate, not a development prerequisite.
 
-## TL01 objective
+## TL02 scope
 
-Extend static and project-level portability checks without inventing target-specific gameplay forks. Preserve the single canonical game source and headless reproducibility.
+Distinguish declared goals from engine-measured Web/Android telemetry with reproducible evidence authority, then implement target-specific budgets and statistically defensible regressions. Do not grade emulator observations as certified real-device performance.
 
-### Candidate vertical-slice order
+### Vertical-slice plan
 
-1. **TL01-P0 — CLOSED:** portable API classes, severity, deterministic locations and positive/negative fixtures, accepted in PR #3. See [P0 contract](tl01-p0.md).
-2. **TL01-P1 — CLOSED:** target-only APIs, lifecycle/input assumptions and adapter boundaries, merged in PR #5. [P1 contract](tl01-p1.md).
-3. **TL01-P2 — CLOSED:** inspected source PNG/JPEG/WebP headers, profiles and explicit unknowns in PR #6. [P2 contract](tl01-p2.md).
-4. **TL01-P3 — candidate:** deterministic, actionable JSON/HTML Doctor reports, stable source-rule finding IDs, CLI export and CI artifacts. [P3 contract](tl01-p3.md). Close only after exact-head CI and merge.
+1. **TL02-P0 — ACTIVE:** evidence provenance, raw sample recomputation, target identity classification and explicit unknown performance metrics. [Contract](tl02-p0.md).
+2. **TL02-P1:** validate per-target metric units and budget profile coverage, refuse unsupported comparisons and make unobserved metrics explicit.
+3. **TL02-P2:** stable replay measurement windows, performance distributions, warm-up exclusion and noise-sensitive regression policy with negative controls.
+4. **TL02-P3:** reproducible CI decisions and reports, with observational emulator outcomes clearly separated from physical-device Release Certification.
 
-## After TL01
+## Invariants
 
-TL02 Performance Budget is the next engineering milestone, with separate measured versus declared performance evidence. Keep physical-device Release Certification independent; retain visual capture race QA issue #4 as OPEN until root-caused.
-
-## Quality gates
-
-- No fixtures or stubbed evidence can be misreported as exported runtime proof.
-- The existing TL00 replay, visual and performance evidence gates must remain green.
-- No real-device benchmark claim based on emulator measurements.
-- Any major refactor of cross-runtime evidence invalidates previous TL00 closure until rerun.
+- Preserve TL00 exported runtime 15/15, 3/3 and 9/9 acceptance gates and TL01 source-only diagnostics.
+- No physical-device FPS, GPU residency or draw-call claims from emulator-only telemetry.
+- The [QA screenshot capture issue #4](https://github.com/ictseoyoungmin/talarion/issues/4) stays OPEN until evidence-based correction without relaxing the visual gate.

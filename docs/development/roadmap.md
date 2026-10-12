@@ -4,13 +4,13 @@
 
 Web ↔ Android deterministic exported replay, state/visual parity, observed runtime telemetry and machine-readable acceptance. Emulator-backed CI closes TL00 without requiring a physical Android device.
 
-## TL01 — Portability Doctor
+## TL01 — Portability Doctor — CLOSED
 
-Expand static and project checks across platform APIs, renderer capabilities, lifecycle behavior, and asset/mobile budgets.
+Static project, platform API, asset profile and deterministic JSON/HTML reporting implemented in P0–P3; merged via PR #3, #5, #6 and #7.
 
-## TL02 — Performance Budget
+## TL02 — Performance Budget — ACTIVE
 
-Add declared target profiles and statistically sound regressions for FPS, frame time, memory, draw calls, texture pressure and device constraints. Distinguish synthetic/emulator observations from hardware measurements; do not infer device certification from CI.
+Begin with trusted-runner sample provenance (P0), then add declared target profiles and statistically sound regressions for FPS, frame time, memory, draw calls, texture pressure and device constraints. Distinguish synthetic/emulator observations from hardware measurements; do not infer device certification from CI.
 
 ## TL03 — iOS Target
 

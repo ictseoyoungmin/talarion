@@ -53,7 +53,7 @@ async function policy(){
   if(p.schema!=="talarion.play-policy-snapshot/v1"||p.mobileNewSubmissionMinTargetSdk!==36||
     p.effectiveFrom!=="2026-08-31"||!p.sourceUrl.startsWith("https://support.google.com/googleplay/"))
     throw new Error("Unrecognized Google Play policy snapshot; review official policy before building");
-  const age=(Date.now()-Date.parse(p.reviewedOn+"T00:00:00Z"))/86400000;
+  const age=(Date.now()-Date.parse(p.reviewedOn+"T00:00:00+09:00"))/86400000;
   if(!Number.isFinite(age)||age<0||age>90)throw new Error("Google Play policy snapshot out of date; review and version policy");
   return p;
 }

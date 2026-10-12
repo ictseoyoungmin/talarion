@@ -129,14 +129,15 @@ node bin/talarion.mjs verify --json
 node bin/talarion.mjs test web --json
 ```
 
-## Adapter interface inspection (TL04-P0)
+## Adapter interface inspection (TL04)
 
 ```bash
 node bin/talarion.mjs adapter inspect --json
 node bin/talarion.mjs adapter inspect web --json
+node bin/talarion.mjs adapter validate src/adapters/godot.manifest.json --json
 ```
 
-The Godot adapter manifest declares engine/target identity and six explicitly supported, unsupported or unknown capabilities. This is a **static interface and source-entrypoint audit**, not evidence that an exported game ran or that hardware is compatible. Web/Android build and test commands bind those declarations to the existing reviewed Godot implementations; arbitrary manifest paths are never dynamically imported. `adapter inspect ios` intentionally fails because iOS support is deferred. `verify` includes this source-only check; actual Web/Android evidence remains the independent runtime gate. See [TL04-P0](docs/development/tl04-p0.md).
+The Godot adapter manifest declares engine/target identity and six explicitly supported, unsupported or unknown capabilities. This is a **static interface and source-entrypoint audit**, not evidence that an exported game ran or that hardware is compatible. Web/Android build and test commands bind those declarations to the existing reviewed Godot implementations; arbitrary manifest paths are never dynamically imported. `adapter inspect ios` intentionally fails because iOS support is deferred. `verify` includes this source-only check; actual Web/Android evidence remains the independent runtime gate. Candidate `adapter validate` checks a repository-local JSON file without loading or registering code. See [TL04-P0](docs/development/tl04-p0.md) and [TL04-P2](docs/development/tl04-p2.md).
 
 ## Portability Doctor
 

@@ -16,6 +16,7 @@
 
 ### Added
 
+- TL04-P2 source-only `adapter validate <candidate.json> [target] --json` with bounded repository-local JSON, symlink checks, source SHA-256, structured `AC001–AC004` errors, negative fixtures and extension guide. Candidate validation never loads or registers an engine.
 - TL04-P1 concrete Web/Android engine/runner dispatch behind validated P0 Godot manifests and an explicit allowlist; unknown/deferred targets and altered paths fail before export or runtime. Exposes `talarion.adapter-dispatch/v1` source-binding reports without upgrading to runtime/physical evidence.
 - TL04-P0 Godot reference adapter manifest (`talarion.adapter-manifest/v1`), explicit supported/unsupported/unknown capabilities, static agent-friendly `adapter inspect [target] --json`, and fail-closed negative tests. Added source-only manifest conformance to `verify`; deferred iOS remains unsupported in the stable adapter and hardware/runtime certificates remain separate.
 - TL03-P1 macOS-only iOS Xcode project ZIP export command, strict preflight/preset identity checks, structural archive inspection and SHA-256/replay provenance with an uncertified JSON report. Linux CI exercises negative gates only; native macOS evidence remains pending.

@@ -12,6 +12,10 @@
 
 ### Added
 
+- TL01-P3 portable Doctor report schema with deterministic per-finding identifiers and actionable severity/target/remediation summaries, while preserving `talarion.doctor/v1`.
+- `talarion doctor report <output-dir>` produces offline escaped HTML and byte-reproducible JSON, with safe in-repository output paths and nonzero exit status on error-level findings.
+- Node CI publishes Doctor report artifacts; tests cover deterministic ordering, missing/invalid target states, HTML escaping, repeat exports, symlink escape attempts and fail-closed report exit semantics.
+
 - TL01-P2 deterministic PNG/JPEG/WebP header inspection and per-target static textureMax checks; unsupported/corrupt source observations are explicit UNKNOWN or diagnostic warnings.
 - Source-only assetBudget output separates declared FPS/drawcalls from measured hardware results; profile correctness is a distinct validation gate.
 

@@ -16,8 +16,12 @@ Extend static and project-level portability checks without inventing target-spec
 
 1. **TL01-P0 — CLOSED:** portable API classes, severity, deterministic locations and positive/negative fixtures, accepted in PR #3. See [P0 contract](tl01-p0.md).
 2. **TL01-P1 — CLOSED:** target-only APIs, lifecycle/input assumptions and adapter boundaries, merged in PR #5. [P1 contract](tl01-p1.md).
-3. **TL01-P2 — ACTIVE:** inspect source raster dimensions against Web/Android textureMax and surface explicit unknowns, independently of device performance. [P2 contract](tl01-p2.md).
-4. **TL01-P3:** integrate doctor findings into CLI JSON and human-facing reports with reproducible file/rule identifiers.
+3. **TL01-P2 — CLOSED:** inspected source PNG/JPEG/WebP headers, profiles and explicit unknowns in PR #6. [P2 contract](tl01-p2.md).
+4. **TL01-P3 — candidate:** deterministic, actionable JSON/HTML Doctor reports, stable source-rule finding IDs, CLI export and CI artifacts. [P3 contract](tl01-p3.md). Close only after exact-head CI and merge.
+
+## After TL01
+
+TL02 Performance Budget is the next engineering milestone, with separate measured versus declared performance evidence. Keep physical-device Release Certification independent; retain visual capture race QA issue #4 as OPEN until root-caused.
 
 ## Quality gates
 

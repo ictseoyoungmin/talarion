@@ -4,7 +4,9 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
-import { planReleaseAab,buildReleaseAab,verifyReleaseAab } from "../src/android-webview/release.mjs";
+import { planReleaseAab,buildReleaseAab,verifyReleaseAab,testReleaseAab } from "../src/android-webview/release.mjs";
+import { testWebView } from "../src/android-webview/runtime.mjs";
+import { smokeInteractiveWebView } from "../src/android-webview/interactive.mjs";
 
 const project=path.resolve("examples/web-native");
 const env=["TALARION_RELEASE_KEYSTORE","TALARION_RELEASE_ALIAS",
@@ -70,4 +72,35 @@ test("WF03 read-only CLI plan does not claim Play approval",()=>{
   assert.equal(p.schema,"talarion.release-plan/v1");
   assert.equal(p.playApproved,false);
   assert.equal(p.releaseCertified,false);
+});
+
+test("WF03-P1 cannot accept a synthetic release replay or fall back to Debug build",async()=>{
+  const missing=path.join(os.tmpdir(),"wf03-forged-release-does-not-exist.apk");
+  const forged={ok:true,artifactKind:"release-apk",projectId:"signal-garden",
+    package:"dev.talarion.signalgarden",targetSdk:36,runtime:"android-webview",
+    sourceAabSha256:"a".repeat(64),artifactSha256:"b".repeat(64),
+    artifact:missing,identity:{sourceSha256:"c".repeat(64)}};
+  await assert.rejects(testWebView(project,{releaseBuild:forged}),/ENOENT|WR101/);
+  await assert.rejects(smokeInteractiveWebView(project,{releaseBuild:forged}),
+    /WI002|WI003|ENOENT/);
+});
+test("WF03-P1 released APK QA is a separate fail-closed emulator gate",async()=>{
+  const source=await fs.readFile("src/android-webview/release.mjs","utf8");
+  const smoke=await fs.readFile("src/android-webview/interactive.mjs","utf8");
+  const runtime=await fs.readFile("src/android-webview/runtime.mjs","utf8");
+  const ci=await fs.readFile(".github/workflows/ci.yml","utf8");
+  assert.match(source,/ro\.kernel\.qemu/);
+  assert.match(source,/WR103: destructive package swap refused on physical Android hardware/);
+  assert.match(source,/build-apks/);
+  assert.match(source,/apksigner/);
+  assert.match(source,/verified\.gate\.signerCertificateSha256/);
+  assert.match(source,/releaseBuild\}/);
+  assert.match(runtime,/releaseBuild\?\?await buildWebView\(project\)/);
+  assert.match(runtime,/artifacts\/run\/android-webview-release/);
+  assert.match(smoke,/artifacts\/run\/android-webview-release-interactive/);
+  assert.match(ci,/Compare actual extracted Release APK game against independent browser replay/);
+  assert.match(ci,/talarion-wf03-release-runtime-evidence/);
+  // Without an independently generated exact-source signed AAB this MUST fail,
+  // and may never generate or install the legacy Debug APK as a fallback.
+  await assert.rejects(testReleaseAab(project),/ENOENT|untrusted|stale|WR10/);
 });

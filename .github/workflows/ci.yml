@@ -304,7 +304,7 @@ jobs:
           if-no-files-found: error
 
   android-release-aab:
-    name: WF03 signed API36 AAB and independent bundletool validation
+    name: WF03 signed API36 AAB, Release emulator runtime and parity
     needs: [web-native-runtime]
     runs-on: ubuntu-latest
     steps:
@@ -364,10 +364,43 @@ jobs:
       - name: Verify evidence never claims Play certification
         run: |
           node --input-type=module -e 'import fs from "node:fs";const r=JSON.parse(fs.readFileSync("artifacts/build/android-webview-release/release-evidence.json"));if(!r.ok||r.targetSdk!==36||r.playApproved||r.releaseCertified||r.deviceInstallObserved||!r.gate.signatureVerified||!r.gate.bundletoolValidated)process.exit(1)'
-      - name: Upload release evidence only (never signer)
+      - name: Download independently observed WF01 original browser evidence
+        uses: actions/download-artifact@v4
+        with:
+          name: talarion-web-native-evidence
+          path: .evidence/wf03-browser
+      - name: Enable KVM for actual Release APK emulator
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Extract original signed AAB and exercise Release gameplay, trusted touch and HOME lifecycle
+        uses: reactivecircus/android-emulator-runner@v2.38.0
+        with:
+          api-level: 30
+          target: default
+          arch: x86_64
+          profile: pixel_5
+          emulator-options: -no-snapshot-save -no-window -gpu swangle -noaudio -no-boot-anim -camera-back none -camera-front none
+          disable-animations: true
+          script: |
+            adb shell settings put secure immersive_mode_confirmations confirmed || true
+            adb shell wm dismiss-keyguard || true
+            sh -c 'ready=0; for attempt in $(seq 1 45); do if adb shell am get-current-user >/dev/null 2>&1 && adb shell pm path android >/dev/null 2>&1; then ready=1; break; fi; sleep 2; done; if [ "$ready" -ne 1 ]; then echo "Android services never became ready" >&2; exit 1; fi'
+            node bin/talarion.mjs web-native android release test examples/web-native --json
+      - name: Compare actual extracted Release APK game against independent browser replay
+        run: |
+          node --input-type=module -e 'import {compareWebAndWebView} from "./src/android-webview/parity.mjs"; const r=await compareWebAndWebView(".evidence/wf03-browser","artifacts/run/android-webview-release","artifacts/parity/wf03/release-webview-parity.json");console.log(r.text);if(!r.ok)process.exit(1)'
+          node --input-type=module -e 'import fs from "node:fs";const a=JSON.parse(fs.readFileSync("artifacts/build/android-webview-release/release-evidence.json")),t=JSON.parse(fs.readFileSync("artifacts/build/android-webview-release/install-evidence.json")),p=JSON.parse(fs.readFileSync("artifacts/parity/wf03/release-webview-parity.json"));if(!a.ok||!t.ok||!p.ok||t.sourceAabSha256!==a.aabSha256||!t.emulatorRuntimeObserved||t.stateSnapshots<8||t.replayScreenshots!==3||t.trustedTouchActions!==3||t.touchScreenshots!==5||!t.homeResumeStatePreserved||!p.checks.every(x=>x.status==="pass")||t.releaseCertified||t.playApproved||t.hardwareCertified)process.exit(1)'
+      - name: Upload independent WF03 release package and game evidence (never keys or AAB)
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: talarion-wf03-aab-evidence
-          path: artifacts/build/android-webview-release/release-evidence.json
+          name: talarion-wf03-release-runtime-evidence
+          path: |
+            artifacts/build/android-webview-release/release-evidence.json
+            artifacts/build/android-webview-release/install-evidence.json
+            artifacts/run/android-webview-release/
+            artifacts/run/android-webview-release-interactive/
+            artifacts/parity/wf03/
           if-no-files-found: error

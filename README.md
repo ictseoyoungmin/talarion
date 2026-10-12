@@ -37,7 +37,7 @@ Available in the repository:
 - machine-readable `--json` output
 - a minimal Godot 3D sample project
 
-The [Web-first architecture decisions](docs/development/adr/README.md) and [implementation plan](docs/development/next-slice.md) separate Web-native source, runtime provider, Android APK/AAB packaging and release gates. **An original Three.js Web-native playable reference and real Chromium QA are implemented. The same source is packaged as a separately verified offline Android WebView Debug APK and exercised on an Android emulator. A separate experimental API36 Release AAB path is under WF03 review; a Play-ready or published release is not certified.** An installable WebView APK is not a native renderer conversion, production device certification or Google Play approval.
+The [Web-first architecture decisions](docs/development/adr/README.md) and [implementation plan](docs/development/next-slice.md) separate Web-native source, runtime provider, Android APK/AAB packaging and release gates. **An original Three.js Web-native playable reference and real Chromium QA are implemented. The same source is packaged as a separately verified offline Android WebView Debug APK and exercised on an Android emulator. An independent API36 signed Release AAB build and validation path is CI-verified (WF03-P0); actual extracted Release APK gameplay/emulator acceptance is tracked as WF03-P1. A Play-ready or published release is not certified.** An installable WebView APK is not a native renderer conversion, production device certification or Google Play approval.
 
 The first Web/Android vertical slice is CI-verified using exported Godot Web and Android emulator runtimes. Physical Android hardware is **not required for baseline portability QA**; hardware performance and device compatibility claims require a separate [release certification](docs/development/release-certification.md). The runners require a working Godot toolchain and an authorized Android device **or emulator**.
 
@@ -138,15 +138,17 @@ node bin/talarion.mjs web-native android smoke examples/web-native --json
 
 Generated debug artifact: `artifacts/build/android-webview/signal-garden-debug.apk`. Replay evidence is stored at `artifacts/run/android-webview`; the independent **real-touch and HOME/resume** smoke test saves five raw device screenshots, position changes and lifecycle logs at `artifacts/run/android-webview-interactive`. The smoke command requires the already-built exact same APK and cannot silently substitute a stale build. This is **WebView runtime preservation**, not a native rendering-engine conversion or Google Play release AAB. See [WF02-P0](docs/development/wf02-p0.md).
 
-WF03 Release AAB (experimental candidate; not Google Play certification): supply external user-owned upload key files and an independently pinned bundletool JAR, then run:
+WF03 signed AAB build and emulator Release APK QA (not Google Play certification): supply external user-owned upload key files and an independently pinned bundletool JAR, then run:
 
 ~~~bash
 node bin/talarion.mjs web-native android release plan examples/web-native --json
 node bin/talarion.mjs web-native android release build examples/web-native --json
 node bin/talarion.mjs web-native android release verify examples/web-native --json
+# Install the AAB-derived Release APK in an emulator; prove real replay, touch and HOME/resume
+node bin/talarion.mjs web-native android release test examples/web-native --json
 ~~~
 
-The release target is API36, separate from the existing API35 Debug APK. Secrets never belong in the repository. See [WF03-P0](docs/development/wf03-p0.md); successful AAB verification is not store approval or device certification.
+The release target is API36, separate from the existing API35 Debug APK. Secrets never belong in the repository. See [WF03-P0](docs/development/wf03-p0.md) and [WF03-P1](docs/development/wf03-p1.md); an AAB build or emulator PASS is not Play Store approval or physical-device certification.
 
 Build target exports:
 

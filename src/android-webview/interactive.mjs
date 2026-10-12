@@ -76,6 +76,12 @@ async function capture(file,requireGame=true){
   return {name:path.basename(file),file,bytes:bytes.length,
     width:im.width,height:im.height,sha256:sha(bytes)};
 }
+export function landscapeResumeEvidence(observations){
+  return Array.isArray(observations)&&observations.length>=2&&
+    observations.slice(-2).every(x=>Number.isInteger(x.width)&&Number.isInteger(x.height)&&
+      x.width>=320&&x.height>=180&&x.width>x.height);
+}
+
 // Activity.onResume precedes the surface's physical orientation transition.
 // Observe real Android screenshot dimensions before sending a coordinate input;
 // never silently treat a portrait game frame as a successful landscape resume.
@@ -83,13 +89,12 @@ async function awaitLandscapeResume(dir,observations,{limitMs=14000}={}){
   const probe=path.join(dir,"04-resume-orientation-probe.png");
   const final=path.join(dir,"04-resumed.png");
   const started=Date.now();
-  let stable=0,last=null;
+  let last=null;
   while(Date.now()-started<limitMs){
     last=await capture(probe);
     const landscape=last.width>last.height;
     observations.push({width:last.width,height:last.height,sha256:last.sha256,landscape});
-    stable=landscape?stable+1:0;
-    if(stable>=2){
+    if(landscapeResumeEvidence(observations)){
       await fs.rename(probe,final);
       assert("WI017",true,"Two consecutive real Android frames are landscape after HOME/resume");
       return {name:path.basename(final),file:final,bytes:last.bytes,

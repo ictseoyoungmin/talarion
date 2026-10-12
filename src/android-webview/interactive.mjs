@@ -76,13 +76,17 @@ async function capture(file,requireGame=true){
   return {name:path.basename(file),file,bytes:bytes.length,
     width:im.width,height:im.height,sha256:sha(bytes)};
 }
-async function verifyBuild(inspected){
+async function verifyBuild(inspected,releaseBuild=null){
   const dir=path.join(ROOT,"artifacts/build/android-webview");
-  const build=JSON.parse(await fs.readFile(path.join(dir,"build-evidence.json"),"utf8"));
-  const apk=path.join(dir,"signal-garden-debug.apk");
+  const build=releaseBuild??JSON.parse(await fs.readFile(path.join(dir,"build-evidence.json"),"utf8"));
+  const apk=releaseBuild?.artifact??path.join(dir,"signal-garden-debug.apk");
+  const release=!!releaseBuild;
   assert("WI001",build.ok===true&&build.package===PACKAGE&&
-    build.artifactKind==="debug-apk"&&build.runtime==="android-webview",
-    "An independent, correctly classified debug WebView build is required");
+    build.artifactKind===(release?"release-apk":"debug-apk")&&
+    build.runtime==="android-webview"&&(!release||
+      (build.projectId==="signal-garden"&&build.targetSdk===36&&
+      typeof build.sourceAabSha256==="string"&&build.sourceAabSha256.length===64)),
+    "An independent, correctly classified WebView Debug/Release build is required");
   assert("WI002",build.artifactSha256===await shaFile(apk),
     "APK sha256 must exactly match the previously built APK");
   const sourceFiles=await Promise.all(inspected.manifest.sources.slice().sort().map(async f=>({
@@ -106,16 +110,16 @@ async function verifyBuild(inspected){
     "Installed host activity/source revision must match the emitted build manifest");
   return {build,apk};
 }
-export async function smokeInteractiveWebView(project){
+export async function smokeInteractiveWebView(project,{releaseBuild=null}={}){
   checks.length=0;
   const inspection=await inspectWebNative(project);
   assert("WI000",inspection.ok&&inspection.manifest?.id==="signal-garden",
     "Constrained original Signal Garden Web-native source must pass preflight");
-  const {build,apk}=await verifyBuild(inspection);
+  const {build,apk}=await verifyBuild(inspection,releaseBuild);
   const devices=await adb("devices");
   assert("WI006",devices.split(/\r?\n/).filter(x=>/\sdevice$/.test(x)).length===1,
     "Exactly one authorized Android emulator/device is required for real input");
-  const outRoot=path.join(ROOT,"artifacts/run/android-webview-interactive");
+  const outRoot=path.join(ROOT,releaseBuild?"artifacts/run/android-webview-release-interactive":"artifacts/run/android-webview-interactive");
   await fs.mkdir(outRoot,{recursive:true});
   const dir=await fs.mkdtemp(path.join(outRoot,"signal-garden-"));
   const captures=[],actions=[];
@@ -193,6 +197,8 @@ export async function smokeInteractiveWebView(project){
       "Real Android screenshots must reflect distinct observed view states");
     const report={schema:"talarion.android-webview-interactive/v1",ok:true,
       gameId:"signal-garden",runtime:"android-webview",package:PACKAGE,
+      artifactKind:releaseBuild?"release-apk":"debug-apk",
+      sourceAabSha256:releaseBuild?.sourceAabSha256??null,
       provenance:{apkSha256:build.artifactSha256,sourceSha256:build.identity.sourceSha256,
         hostSha256:build.hostSha256,replaySha256:build.identity.replaySha256},
       environment:{observedInAndroidEmulator:emulator,deviceClass:emulator?"emulator":"unverified-device",screenSize:[first.width,first.height]},
@@ -200,7 +206,7 @@ export async function smokeInteractiveWebView(project){
         e.kind==="LIFECYCLE"||e.kind==="VISIBILITY"),runtimeObserved:true,
       humanTouchEquivalentViaAdb:true,physicalDeviceCertified:false,
       releaseCertified:false,visualParityCertified:false,
-      text:"TALARION WF02-P1 TOUCH + LIFECYCLE PASS\nReal Android taps: 3/3; HOME/resume state preserved; screenshots: 5\nNative rendering or Play release: NOT CERTIFIED"};
+      text:"TALARION "+(releaseBuild?"WF03-P1 RELEASE":"WF02-P1 DEBUG")+" TOUCH + LIFECYCLE PASS\nReal Android taps: 3/3; HOME/resume state preserved; screenshots: 5\nNative rendering or Play release: NOT CERTIFIED"};
     await writeJsonl(path.join(dir,"interactive-events.jsonl"),finalPackets);
     await writeJson(path.join(dir,"runner-result.json"),report);
     return report;
@@ -208,7 +214,8 @@ export async function smokeInteractiveWebView(project){
     error=e;
     await writeJson(path.join(dir,"runner-result.json"),{
       schema:"talarion.android-webview-interactive/v1",ok:false,projectId:"signal-garden",
-      artifactSha256:build.artifactSha256,checks:[...checks],actions,captures,
+      artifactSha256:build.artifactSha256,artifactKind:releaseBuild?"release-apk":"debug-apk",
+      sourceAabSha256:releaseBuild?.sourceAabSha256??null,checks:[...checks],actions,captures,
       error:String(e?.stack||e),humanTouchEquivalentViaAdb:false,
       physicalDeviceCertified:false,releaseCertified:false
     });

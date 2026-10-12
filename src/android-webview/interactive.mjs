@@ -76,6 +76,31 @@ async function capture(file,requireGame=true){
   return {name:path.basename(file),file,bytes:bytes.length,
     width:im.width,height:im.height,sha256:sha(bytes)};
 }
+// Activity.onResume precedes the surface's physical orientation transition.
+// Observe real Android screenshot dimensions before sending a coordinate input;
+// never silently treat a portrait game frame as a successful landscape resume.
+async function awaitLandscapeResume(dir,observations,{limitMs=14000}={}){
+  const probe=path.join(dir,"04-resume-orientation-probe.png");
+  const final=path.join(dir,"04-resumed.png");
+  const started=Date.now();
+  let stable=0,last=null;
+  while(Date.now()-started<limitMs){
+    last=await capture(probe);
+    const landscape=last.width>last.height;
+    observations.push({width:last.width,height:last.height,sha256:last.sha256,landscape});
+    stable=landscape?stable+1:0;
+    if(stable>=2){
+      await fs.rename(probe,final);
+      assert("WI017",true,"Two consecutive real Android frames are landscape after HOME/resume");
+      return {name:path.basename(final),file:final,bytes:last.bytes,
+        width:last.width,height:last.height,sha256:last.sha256};
+    }
+    await pause(300);
+  }
+  assert("WI017",false,"Resume surface failed to return to stable landscape. Physical frame sequence: "+
+    JSON.stringify(observations.map(x=>[x.width,x.height])));
+}
+
 async function verifyBuild(inspected,releaseBuild=null){
   const dir=path.join(ROOT,"artifacts/build/android-webview");
   const build=releaseBuild??JSON.parse(await fs.readFile(path.join(dir,"build-evidence.json"),"utf8"));
@@ -122,7 +147,7 @@ export async function smokeInteractiveWebView(project,{releaseBuild=null}={}){
   const outRoot=path.join(ROOT,releaseBuild?"artifacts/run/android-webview-release-interactive":"artifacts/run/android-webview-interactive");
   await fs.mkdir(outRoot,{recursive:true});
   const dir=await fs.mkdtemp(path.join(outRoot,"signal-garden-"));
-  const captures=[],actions=[];
+  const captures=[],actions=[],orientationObservations=[];
   let error=null;
   try{
     await adb("install","-r",apk);
@@ -172,8 +197,10 @@ export async function smokeInteractiveWebView(project,{releaseBuild=null}={}){
     captures.push(await capture(path.join(dir,"03-home.png"),false));
     await adb("shell","am","start","-n",ACTIVITY);
     await until("Android game resumed",p=>p.filter(e=>e.kind==="LIFECYCLE"&&e.value?.phase==="resume").length>=2);
-    await pause(500);
-    captures.push(await capture(path.join(dir,"04-resumed.png")));
+    // The Android launcher is portrait; the resumed Activity may be focused
+    // while its surface still shows a portrait/warped game for several frames.
+    // Gate only on actually observed stable landscape, not a fixed sleep.
+    captures.push(await awaitLandscapeResume(dir,orientationObservations));
     const xDown=first.width-Math.round(109*ratio);
     await adb("shell","input","tap",String(xDown),String(y));
     const after=await until("post-resume trusted tap",p=>
@@ -202,7 +229,7 @@ export async function smokeInteractiveWebView(project,{releaseBuild=null}={}){
       provenance:{apkSha256:build.artifactSha256,sourceSha256:build.identity.sourceSha256,
         hostSha256:build.hostSha256,replaySha256:build.identity.replaySha256},
       environment:{observedInAndroidEmulator:emulator,deviceClass:emulator?"emulator":"unverified-device",screenSize:[first.width,first.height]},
-      actions,captures,checks:[...checks],lifecycle:finalPackets.filter(e=>
+      actions,captures,orientationObservations,checks:[...checks],lifecycle:finalPackets.filter(e=>
         e.kind==="LIFECYCLE"||e.kind==="VISIBILITY"),runtimeObserved:true,
       humanTouchEquivalentViaAdb:true,physicalDeviceCertified:false,
       releaseCertified:false,visualParityCertified:false,
@@ -216,6 +243,7 @@ export async function smokeInteractiveWebView(project,{releaseBuild=null}={}){
       schema:"talarion.android-webview-interactive/v1",ok:false,projectId:"signal-garden",
       artifactSha256:build.artifactSha256,artifactKind:releaseBuild?"release-apk":"debug-apk",
       sourceAabSha256:releaseBuild?.sourceAabSha256??null,checks:[...checks],actions,captures,
+      orientationObservations,
       error:String(e?.stack||e),humanTouchEquivalentViaAdb:false,
       physicalDeviceCertified:false,releaseCertified:false
     });

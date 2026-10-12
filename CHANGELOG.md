@@ -4,6 +4,8 @@
 
 ### Changed
 
+- WF03-P1: Original signed Android API36 AAB is transformed to a separately signed release APK with independently matched certificate and source SHA-256; actual emulator replay (10 states, 3 PNG), 3 trusted UI taps/HOME-resume (5 raw PNG), and independent Web↔Release state/HUD checks WP001–007 PASSED. PR #31, CI #38313382405/#38313902291 both 9/9 SUCCESS. Does not certify Google Play/physical devices.
+
 - Maintenance: replay staging now safely removes its actual configured temporary directory, rejects paths escaping the project and preserves unrelated staged files; malformed replay JSON values return structured invalid results with new negative tests.
 - The CLI `plan` output is explicitly a target build plan, not a claimed executable dependency DAG. Documentation aligns runtime capture/barrier evidence, checkpoint tick 410, TL00 completion, and the deferred iOS/active TL04 priorities.
 - Deferred iOS work no longer runs or uploads an always-blocked preflight artifact in regular CI. Existing iOS negative/contract tests remain under `npm test`; experimental iOS CLI source and tests remain available.

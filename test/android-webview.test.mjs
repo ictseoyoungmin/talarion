@@ -95,5 +95,5 @@ test("WF02-P1 interaction and Activity lifecycle use original game, never a synt
   assert.match(runner,/releaseCertified:false/);
   const cli=spawnSync(process.execPath,["bin/talarion.mjs","web-native","android","smoke","examples/ruins-lite","--json"],{encoding:"utf8"});
   assert.equal(cli.status,1,cli.stderr);
-  assert.match(cli.stderr,/WI000|preflight|Signal Garden/);
+  assert.match(JSON.parse(cli.stdout).error,/WI000|preflight|Signal Garden/);
 });

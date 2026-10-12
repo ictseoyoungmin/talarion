@@ -11,7 +11,7 @@
 
 The first public support boundary remains **Godot → Web/Android**. Stabilize the adapter contract before adding new engines or targets.
 
-1. **TL04-P0 — NEXT:** inventory current Godot adapter, capability declarations, target profiles, runner/evidence outputs, unsupported/unknown distinctions, and explicit provenance. Specify one machine-readable adapter contract and focused negative/conformance tests. [Contract](tl04-p0.md).
+1. **TL04-P0 — implementation under review:** versioned Godot manifest, source-only capability inspection, fail-closed tests and static verify integration. Closure requires exact-head exported regression CI. [Contract](tl04-p0.md).
 2. **TL04-P1:** migrate the existing Godot integration to the stable contract without changing game logic, canonical replay or exported Web/Android acceptance.
 3. **TL04-P2:** publish compact reference adapter fixtures and extension guidance; never imply a second engine/target is supported without observed execution.
 

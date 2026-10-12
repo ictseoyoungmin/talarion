@@ -16,6 +16,7 @@ import { performanceAuthorityCommand } from "../src/runtime/budget-authority.mjs
 import { performanceReportCommand } from "../src/runtime/performance-report.mjs";
 import { iosPreflightCommand } from "../src/ios/preflight.mjs";
 import { iosExportCommand } from "../src/ios/export.mjs";
+import { inspectAdapterCommand } from "../src/adapters/manifest.mjs";
 
 const argv = process.argv.slice(2);
 const jsonMode = argv.includes("--json");
@@ -29,6 +30,7 @@ Usage:
   talarion doctor [--json]
   talarion doctor report <output-dir> [--json]
   talarion plan [--json]
+  talarion adapter inspect [web|android|ios] [--json]
   talarion build <web|android> [--json]
   talarion ios preflight <out.json> [--json]
   talarion ios export <output-dir> [--json]
@@ -62,6 +64,12 @@ try {
       if (args[1] === "preflight") result = await iosPreflightCommand(config, args[2]);
       else if (args[1] === "export") result = await iosExportCommand(config, args[2]);
       else fail("Usage: talarion ios <preflight|export> <path>");
+      break;
+    case "adapter":
+      if (args[1] !== "inspect" || args[3] || args[2] === "") {
+        fail("Usage: talarion adapter inspect [target] [--json]");
+      }
+      result = await inspectAdapterCommand(config, args[2] ?? null);
       break;
     case "plan":
       result = await plan(config);

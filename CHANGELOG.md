@@ -16,6 +16,7 @@
 
 ### Added
 
+- TL04-P0 Godot reference adapter manifest (`talarion.adapter-manifest/v1`), explicit supported/unsupported/unknown capabilities, static agent-friendly `adapter inspect [target] --json`, and fail-closed negative tests. Added source-only manifest conformance to `verify`; deferred iOS remains unsupported in the stable adapter and hardware/runtime certificates remain separate.
 - TL03-P1 macOS-only iOS Xcode project ZIP export command, strict preflight/preset identity checks, structural archive inspection and SHA-256/replay provenance with an uncertified JSON report. Linux CI exercises negative gates only; native macOS evidence remains pending.
 
 - TL03-P0 iOS capability preflight `talarion ios preflight <out.json>`, with conservative macOS/Xcode/iOS SDK, bundle/team identity, preset and Simulator Compatibility-renderer checks; Linux explicitly BLOCKED rather than fabricated export PASS.

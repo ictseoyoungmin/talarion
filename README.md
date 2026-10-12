@@ -129,6 +129,15 @@ node bin/talarion.mjs verify --json
 node bin/talarion.mjs test web --json
 ```
 
+## Adapter interface inspection (TL04-P0)
+
+```bash
+node bin/talarion.mjs adapter inspect --json
+node bin/talarion.mjs adapter inspect web --json
+```
+
+The Godot adapter manifest declares engine/target identity and six explicitly supported, unsupported or unknown capabilities. This is a **static interface and source-entrypoint audit**, not evidence that an exported game ran or that hardware is compatible. `adapter inspect ios` intentionally fails because iOS support is deferred. `verify` includes this source-only check; actual Web/Android evidence remains the independent runtime gate. See [TL04-P0](docs/development/tl04-p0.md).
+
 ## Portability Doctor
 
 Doctor scans portable gameplay for Web/Android dependencies and reports rule ID, affected target, capability, source position and a suggested remediation. Warnings require review and are not proof that a game will fail. Optional adapter declarations and their limitations are documented in [TL01-P1](docs/development/tl01-p1.md). Source image and mobile profile limitations are described in [TL01-P2](docs/development/tl01-p2.md); they do not certify GPU memory, draw calls or physical-device FPS.

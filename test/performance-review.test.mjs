@@ -123,7 +123,7 @@ test("P3 report HTML escapes untrusted run identifiers",()=>{
   assert.ok(html.startsWith("<!doctype html>"));
   assert.ok(html.includes("&lt;img src=x onerror=&quot;alert(1)&quot;&gt;"));
   assert.ok(!html.includes('<img src=x onerror="alert(1)">'));
-  assert.ok(html.includes("not a target FPS"));
+  assert.ok(html.includes("Not a target FPS"));
 });
 
 test("P3 CLI writes byte-stable single-run JSON/HTML, rejects invalid manifests and path escapes",async()=>{
@@ -162,7 +162,7 @@ test("P3 CLI writes byte-stable single-run JSON/HTML, rejects invalid manifests 
     await fs.writeFile(path.join(root,"cohorts.json"),JSON.stringify(manifest));
     const bad=execute("budget","report","cohorts.json","bad-report");
     assert.equal(bad.status,1);
-    assert.match(JSON.parse(bad.stdout).error,/digest/i);
+    assert.match(JSON.parse(bad.stdout).error,/SHA-256/i);
     await fs.symlink(path.join(root,"out"),path.join(root,"linked"));
     assert.equal(execute("budget","report","current","authority.json","linked/x").status,1);
   }finally{await fs.rm(root,{recursive:true,force:true})}

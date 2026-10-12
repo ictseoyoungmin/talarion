@@ -14,7 +14,7 @@ Talarion connects those workflows around three capabilities:
 
 - **Portability Doctor** — detects code, asset, and target assumptions that can become porting debt.
 - **Deterministic Replay & Parity** — runs the same gameplay actions across runtimes and compares authoritative state.
-- **Build Graph** — makes target builds and QA evidence reproducible from the command line.
+- **Target Build Plan & Orchestration** — lists configured targets and executes Web/Android builds; an executable dependency graph is a future extension, not yet implemented.
 
 ## Project status
 

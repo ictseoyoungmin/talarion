@@ -36,7 +36,7 @@ Portability Doctor   Parity Test
          +------Build-----+
                 Graph
          /        |        \
-       Web     Android     iOS
+       Web     Android     iOS (deferred)
 ```
 
 The roadmap prioritizes contract quality and reproducible evidence before backend breadth.

@@ -4,18 +4,22 @@
 
 ### Changed
 
+- Maintenance: replay staging now safely removes its actual configured temporary directory, rejects paths escaping the project and preserves unrelated staged files; malformed replay JSON values return structured invalid results with new negative tests.
+- The CLI `plan` output is explicitly a target build plan, not a claimed executable dependency DAG. Documentation aligns runtime capture/barrier evidence, checkpoint tick 410, TL00 completion, and the deferred iOS/active TL04 priorities.
+- Deferred iOS work no longer runs or uploads an always-blocked preflight artifact in regular CI. Existing iOS negative/contract tests remain under `npm test`; experimental iOS CLI source and tests remain available.
+
 - TL00 foundation merged into `main` after Web/Android emulator, state, visual, telemetry, provenance and 9/9 acceptance checks passed (October 12, 2026). Physical-device certification remains independent.
 
 - TL00 runtime acceptance now requires full exported Web/Android emulator evidence, not physical Android hardware; added machine-verifiable `talarion gate tl00` result and CI check.
 - Physical device performance, thermal, compatibility and lifecycle certification moved into a separate optional release gate; emulator FPS is explicitly observational only.
-- TL01 Portability Doctor becomes the next development slice after TL00 acceptance.
+- TL01 Portability Doctor followed TL00 acceptance; TL01 and TL02 are now closed, TL03 iOS is deferred and TL04 Adapter SDK is next.
 
 ### Added
 
 - TL03-P1 macOS-only iOS Xcode project ZIP export command, strict preflight/preset identity checks, structural archive inspection and SHA-256/replay provenance with an uncertified JSON report. Linux CI exercises negative gates only; native macOS evidence remains pending.
 
 - TL03-P0 iOS capability preflight `talarion ios preflight <out.json>`, with conservative macOS/Xcode/iOS SDK, bundle/team identity, preset and Simulator Compatibility-renderer checks; Linux explicitly BLOCKED rather than fabricated export PASS.
-- Versioned `talarion.ios-preflight/v1` diagnostics and Node 24 CI artifact. Export templates/signing and simulator/physical runtime remain UNVERIFIED; real export begins TL03-P1.
+- Versioned `talarion.ios-preflight/v1` diagnostics; an early Node 24 CI artifact was later removed when TL03 was deferred. Export templates/signing and simulator/physical runtime remain UNVERIFIED; real native export is pending outside the active development scope.
 
 - TL02-P3 source-verified multi-run performance cohort reviews, explicit observational budget/relative-regression states, and deterministic standalone escaped JSON/HTML reports.
 - `talarion budget report current <authority> <output-dir>` CI artifact reports only evidence completeness; `budget report <manifest> <output-dir>` processes unique SHA-256-pinned independent cohorts and rejects duplicated artifacts, cross-environment comparisons and missing provenance.

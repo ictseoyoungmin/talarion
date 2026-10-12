@@ -1,0 +1,10 @@
+{
+  "schema": "talarion.play-policy-snapshot/v1",
+  "platform": "android-mobile",
+  "submissionKind": "new-app-or-update",
+  "effectiveFrom": "2026-08-31",
+  "reviewedOn": "2026-10-13",
+  "mobileNewSubmissionMinTargetSdk": 36,
+  "sourceUrl": "https://support.google.com/googleplay/android-developer/answer/11926878?hl=en",
+  "notes": "Versioned factual snapshot, not a standing Google Play approval or policy-compliance certification. Recheck official policies on every new release; extensions/exemptions require Play Console confirmation."
+}

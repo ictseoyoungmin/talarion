@@ -58,5 +58,11 @@
     "warmupTicks": 120,
     "sampleStepTicks": 60,
     "minSamples": 5
+  },
+  "ios": {
+    "preset": "iOS",
+    "bundleIdentifier": "dev.talarion.ruinslite",
+    "appStoreTeamId": null,
+    "simulatorRenderer": "gl_compatibility"
   }
 }

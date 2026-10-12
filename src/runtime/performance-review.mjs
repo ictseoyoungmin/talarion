@@ -62,7 +62,9 @@ function targetReview(target,group,policy) {
   const base=group?.baseline??[],candidate=group?.candidate??[];
   const entries=[...base,...candidate],all=entries.map(r=>verify(r,target));
   const ids=entries.map(r=>r?.runId);
-  const unique=new Set(ids).size===ids.length;
+  const unique=new Set(ids).size===ids.length &&
+    new Set(all.filter(Boolean).map(r=>r.sha256)).size===all.filter(Boolean).length &&
+    new Set(all.filter(Boolean).map(r=>r.sampleSha256)).size===all.filter(Boolean).length;
   const uniform=all.filter(Boolean).length<2 ||
     all.every(r=>r && fingerprint(r)===fingerprint(all[0]));
   const valid=entries.length>0 && unique && all.every(Boolean) && uniform;

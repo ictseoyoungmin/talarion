@@ -67,25 +67,14 @@ test("TL03-P0 rejects missing Xcode, SDK, Godot, team, bundle and iOS preset",()
   }
 });
 
-test("TL03-P0 simulator requires Compatibility renderer, never infer from Mobile/Vulkan",()=>{
-  const projectVariants=[
-    "",'[rendering]\nrenderer/rendering_method="gl_compatibility"',
-    '[rendering]\nrenderer/rendering_method="gl_compatibility"\nrenderer/rendering_method.mobile="gl_compatibility"',
-    '[rendering]\nrenderer/rendering_method="gl_compatibility"\nrenderer/rendering_method.mobile="gl_compatibility"'
-  ];
-  assert.equal(check(assess({projectText:projectVariants[0]}),"IOS-09"),"blocked");
-  assert.equal(check(assess({projectText:projectVariants[1]}),"IOS-09"),"pass");
-  assert.equal(check(assess({projectText:'[rendering]\nrenderer/rendering_method="gl_compatibility"\nrenderer/rendering_method.mobile="gl_compatibility"'}),"IOS-09"),"pass");
-  assert.equal(check(assess({projectText:'[rendering]\nrenderer/rendering_method="gl_compatibility"\nrenderer/rendering_method.mobile="gl_compatibility"\n'}),"IOS-09"),"pass");
-  assert.equal(check(assess({projectText:'[rendering]\nrenderer/rendering_method="gl_compatibility"\nrenderer/rendering_method.mobile="gl_compatibility"'}),"IOS-09"),"pass");
-  assert.equal(check(assess({projectText:'[rendering]\nrenderer/rendering_method="gl_compatibility"\nrenderer/rendering_method.mobile="gl_compatibility"\n'}),"IOS-09"),"pass");
-  assert.equal(check(assess({projectText:'[rendering]\nrenderer/rendering_method="gl_compatibility"\nrenderer/rendering_method.mobile="gl_compatibility"'}),"IOS-09"),"pass");
-  assert.equal(check(assess({projectText:'[rendering]\nrenderer/rendering_method="gl_compatibility"\nrenderer/rendering_method.mobile="gl_compatibility"\n'}),"IOS-09"),"pass");
-  assert.equal(check(assess({projectText:'[rendering]\nrenderer/rendering_method="gl_compatibility"\nrenderer/rendering_method.mobile="gl_compatibility"'}),"IOS-09"),"pass");
-  assert.equal(check(assess({projectText:'[rendering]\nrenderer/rendering_method="gl_compatibility"\nrenderer/rendering_method.mobile="gl_compatibility"\n'}),"IOS-09"),"pass");
-  assert.equal(check(assess({projectText:'[rendering]\nrenderer/rendering_method="gl_compatibility"\nrenderer/rendering_method.mobile="gl_compatibility"'}),"IOS-09"),"pass");
-  assert.equal(check(assess({projectText:'[rendering]\nrenderer/rendering_method="gl_compatibility"\nrenderer/rendering_method.mobile="gl_compatibility"\n'}),"IOS-09"),"pass");
-  assert.equal(check(assess({projectText:'[rendering]\nrenderer/rendering_method="gl_compatibility"\nrenderer/rendering_method.mobile="gl_compatibility"'}),"IOS-09"),"pass");
+test("TL03-P0 simulator uses mobile renderer override, not a desktop fallback",()=>{
+  const compatible='[rendering]\nrenderer/rendering_method="gl_compatibility"\nrenderer/rendering_method.mobile="gl_compatibility"\n';
+  const mobileVulkan='[rendering]\nrenderer/rendering_method="gl_compatibility"\nrenderer/rendering_method.mobile="gl_compatibility"\n'.replace('mobile="gl_compatibility"','mobile="gl_compatibility"');
+  assert.equal(check(assess({projectText:compatible}),"IOS-09"),"pass");
+  assert.equal(check(assess({projectText:'[rendering]\nrenderer/rendering_method="mobile"\n'}),"IOS-09"),"blocked");
+  assert.equal(check(assess({projectText:compatible.replace('renderer/rendering_method.mobile="gl_compatibility"','renderer/rendering_method.mobile="gl_compatibility"')}),"IOS-09"),"pass");
+  assert.equal(check(assess({projectText:compatible.replace('renderer/rendering_method.mobile="gl_compatibility"','renderer/rendering_method.mobile="mobile"')}),"IOS-09"),"blocked");
+  assert.equal(check(assess({projectText:""}),"IOS-09"),"blocked");
 });
 
 test("TL03-P0 CLI exports deterministic blocked report on Linux and refuses unsafe output",async()=>{

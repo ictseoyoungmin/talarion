@@ -18,7 +18,7 @@ Talarion connects those workflows around three capabilities:
 
 ## Project status
 
-Talarion is in early development. The **TL00 Godot/Web/Android foundation is complete and merged into `main`**, backed by exported runtime state, visual and telemetry CI evidence. This is not a certification of all Android devices or production-game performance.
+Talarion is in early development. **Godot Web and Android are the currently maintained and CI-verified targets**, backed by exported runtime state, strict visual and telemetry evidence. The adapter interface is the next development focus. iOS remains an optional, **deferred experimental export capability**, not a prerequisite for using or developing Talarion. This is not a certification of all Android devices or production-game performance.
 
 Available in the repository:
 
@@ -163,9 +163,9 @@ node bin/talarion.mjs budget report evidence/cohorts.json artifacts/performance-
 
 The default CI publishes an `evidence-only` report from **one Web and one Android run**; it does not invent multi-run performance PASS. External baseline/candidate cohort manifests require SHA-256-pinned authority artifacts and independent runtime identities. See [TL02-P3](docs/development/tl02-p3.md).
 
-## iOS capability preflight (TL03)
+## Optional iOS capability preflight (deferred)
 
-iOS is an **unimplemented export target**, not a hidden alias for Android. Check the current host and sample project configuration without building or certifying iOS:
+iOS support is **experimental and deferred**, not a maintained or verified runtime target and not a hidden alias for Android. The diagnostic remains available without building or certifying iOS:
 
 ```bash
 node bin/talarion.mjs ios preflight artifacts/ios/ios-preflight.json --json
@@ -173,16 +173,16 @@ node bin/talarion.mjs ios preflight artifacts/ios/ios-preflight.json --json
 
 The output deliberately reports `status: "blocked"` on Linux CI; `ok: true` means the preflight audit ran, **not** that iOS export or simulator/device replay succeeded. The tool checks Apple Xcode/SDK prerequisites, bundle/team/preset and simulator renderer constraints. See [TL03-P0](docs/development/tl03-p0.md).
 
-## iOS Xcode project export (TL03-P1)
+## Optional iOS Xcode project export (deferred, TL03-P1)
 
-On a provisioned **macOS** host with full Xcode, both iPhoneOS/iPhoneSimulator SDKs, Godot and matching iOS export templates, configure the real nonsecret Apple Team ID in both `talarion.config.json` and the `iOS` preset's `application/app_store_team_id` field. The sample deliberately leaves these unset; no dummy Team ID is shipped.
+The iOS adapter's code is retained for a future opt-in effort; it is **not part of the current Web/Android support or CI acceptance contract**. On a provisioned **macOS** host with full Xcode, both iPhoneOS/iPhoneSimulator SDKs, Godot and matching iOS export templates, configure a real nonsecret Apple Team ID in both `talarion.config.json` and the `iOS` preset's `application/app_store_team_id` field. The sample deliberately leaves these unset; no dummy Team ID or signing credentials are shipped.
 
 ```bash
 node bin/talarion.mjs ios preflight artifacts/ios/preflight.json --json
 node bin/talarion.mjs ios export artifacts/build/ios --json
 ```
 
-A successful export produces `ios-export.json`, `ios-preflight.json` and a SHA-256-fingerprinted Godot iOS ZIP containing an Xcode `.xcodeproj/project.pbxproj`. Export fails closed on Linux/Windows, missing prerequisites, mismatched bundle/team identifiers, unsafe output paths, existing ZIPs, Godot failure or invalid archives. This **does not** certify an Xcode compilation, Apple signing, simulator/device execution or iOS parity. Real macOS export evidence is pending; see [TL03-P1](docs/development/tl03-p1.md).
+A successful export produces `ios-export.json`, `ios-preflight.json` and a SHA-256-fingerprinted Godot iOS ZIP containing an Xcode `.xcodeproj/project.pbxproj`. Export fails closed on Linux/Windows, missing prerequisites, mismatched bundle/team identifiers, unsafe output paths, existing ZIPs, Godot failure or invalid archives. This **does not** certify an Xcode compilation, Apple signing, simulator/device execution or iOS parity. Real macOS export evidence is uncollected, and iOS development is deferred; see [TL03-P1](docs/development/tl03-p1.md) and the [roadmap](docs/development/roadmap.md).
 
 ## TL00 automated acceptance
 

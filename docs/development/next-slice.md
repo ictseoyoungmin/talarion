@@ -23,9 +23,9 @@
 - Persist project-source/build/replay/runtime hashes and separate run outputs. Negative test untrusted projects, missing capabilities and invalid evidence.
 - **Exit:** executable original browser game and independent runtime evidence **from that game**, plus unchanged Godot exported Web/Android CI and TL00 QA.
 
-### WF02 — Runtime-preserving Android Debug APK (NEXT)
+### WF02 — Runtime-preserving Android Debug APK (P0 in implementation)
 
-- Package the same original Web-native source as an installable Android app via a deliberately isolated and secure WebView host; handle offline assets, asset origins, bridge/permissions, touch/lifecycle and navigation.
+- WF02-P0: implement offline Android WebView host and debug APK builder with per-game runtime evidence; verify on emulator and compare original browser game state/checkpoints. [Implementation contract](wf02-p0.md).
 - Test Android emulator installation, launch, native container identity, state replay and named screenshots against the browser run. Record exact artifact/source provenance and portability class `same-runtime`.
 - **Exit:** independently produced Debug APK and Android runtime proof; do not claim native GPU engine or physical-device certification.
 

@@ -37,7 +37,7 @@ Available in the repository:
 - machine-readable `--json` output
 - a minimal Godot 3D sample project
 
-The [Web-first architecture decisions](docs/development/adr/README.md) and [implementation plan](docs/development/next-slice.md) separate Web-native source, runtime provider, Android APK/AAB packaging and release gates. **An original Three.js Web-native playable reference and real Chromium QA are implemented. Web-native-to-Android packaging and Play-ready AAB generation are not implemented yet.** They are documented design targets, not current CLI capabilities.
+The [Web-first architecture decisions](docs/development/adr/README.md) and [implementation plan](docs/development/next-slice.md) separate Web-native source, runtime provider, Android APK/AAB packaging and release gates. **An original Three.js Web-native playable reference and real Chromium QA are implemented. The Android WebView Debug APK route is being validated; Play-ready AAB generation is not implemented yet.** They are documented design targets, not current CLI capabilities.
 
 The first Web/Android vertical slice is CI-verified using exported Godot Web and Android emulator runtimes. Physical Android hardware is **not required for baseline portability QA**; hardware performance and device compatibility claims require a separate [release certification](docs/development/release-certification.md). The runners require a working Godot toolchain and an authorized Android device **or emulator**.
 
@@ -123,7 +123,19 @@ Open the printed local URL to play with WASD/arrow keys or touch controls. In an
 node bin/talarion.mjs web-native test examples/web-native --json
 ~~~
 
-The game serves its pinned local Three.js module and does not require Godot. Web-native game QA is separate from Godot's Web/Android parity. **Android WebView APK and Play release AAB are not implemented by WF01.** See [WF01-P0](docs/development/wf01-p0.md).
+The game serves its pinned local Three.js module and does not require Godot. Web-native game QA is separate from Godot's Web/Android parity. See [WF01-P0](docs/development/wf01-p0.md).
+
+## Android WebView Debug APK (WF02)
+
+The original Web-native game can be packaged inside an **offline Android WebView**; this yields an installable Android APK without translating Three.js into Godot. The Android SDK (Platform 35, Build Tools 35.0.1), Java 17+, ADB and Android emulator are needed for the Android test:
+
+~~~bash
+node bin/talarion.mjs web-native android plan examples/web-native --json
+node bin/talarion.mjs web-native android build examples/web-native --json
+node bin/talarion.mjs web-native android test examples/web-native --json
+~~~
+
+Generated debug artifact: `artifacts/build/android-webview/signal-garden-debug.apk`. Captured states and Android screenshots: `artifacts/run/android-webview`. This is **WebView runtime preservation**, not a native rendering-engine conversion or Google Play release AAB. See [WF02-P0](docs/development/wf02-p0.md).
 
 Build target exports:
 

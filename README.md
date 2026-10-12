@@ -270,7 +270,7 @@ Web and Android runners emit `performance.jsonl` and a `talarion.performance/v1`
 
 ## Trying another Godot project (experimental)
 
-The current checkout can statically inspect an alternate Godot project stored in a subdirectory by changing the project path, replay and preset/package fields in \`talarion.config.json\`. Then run:
+The current checkout can statically inspect an alternate Godot project stored in a subdirectory by changing the project path, replay and preset/package fields in `talarion.config.json`. Then run:
 
 ~~~bash
 node bin/talarion.mjs project inspect --json

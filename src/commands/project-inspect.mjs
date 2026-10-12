@@ -83,6 +83,16 @@ export async function inspectProjectAdoption(config) {
     readProject("talarion_bridge.gd")
   ]);
   check("TA002", typeof projectText === "string", "Godot project.godot exists");
+  check("TA011", config?.project?.engine === "godot",
+    "Current adoption contract supports only the Godot engine");
+  const sceneMatch = typeof projectText === "string" ?
+    /^\s*run\/main_scene\s*=\s*"res:\/\/([^"]+)"\s*$/m.exec(projectText) : null;
+  const sceneName = sceneMatch?.[1];
+  const sceneFile = typeof sceneName === "string" ?
+    path.resolve(project, sceneName) : project;
+  const mainSceneOk = projectSafe && !!sceneName && within(project, sceneFile) &&
+    await checkComponents(root, sceneFile);
+  check("TA012", !!mainSceneOk, "Configured res:// main scene exists inside Godot project");
   check("TA003", typeof bridgeText === "string", "TalarionBridge script exists at project root");
   const autoloadSection = typeof projectText === "string" ?
     (/\[autoload\]([\s\S]*?)(?=\n\[|$)/.exec(projectText) ?? [,""])[1] : "";

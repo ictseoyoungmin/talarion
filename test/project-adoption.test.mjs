@@ -42,11 +42,15 @@ test("alternate Godot project is checked without exports, mutations or fabricate
   const original=path.join(c.root,"examples","ruins-lite");
   const copy=async name=>fs.copyFile(path.join(original,name),path.join(project,name));
   try {
-    await Promise.all(["project.godot","export_presets.cfg","talarion_bridge.gd"].map(copy));
+    await Promise.all(["project.godot","export_presets.cfg","talarion_bridge.gd","main.tscn"].map(copy));
     const external={...c,project:{...c.project,name:"different-game",path:path.relative(c.root,project)}};
     let result=await inspectProjectAdoption(external);
     assert.equal(result.ok,true,JSON.stringify(result.checks.filter(x=>x.status==="fail")));
     assert.equal(result.independentProjectVerified,false);
+    await fs.rm(path.join(project,"main.tscn"));
+    result=await inspectProjectAdoption(external);
+    assert.ok(fails(result,"TA012"));
+    await copy("main.tscn");
 
     const presetFile=path.join(project,"export_presets.cfg");
     const presets=await fs.readFile(presetFile,"utf8");
@@ -70,6 +74,8 @@ test("alternate Godot project is checked without exports, mutations or fabricate
 
 test("invalid replay and unsafe output fail structured checks",async()=>{
   const c=await cfg();
+  const wrongEngine={...c,project:{...c.project,engine:"unity"}};
+  assert.ok(fails(await inspectProjectAdoption(wrongEngine),"TA011"));
   const badReplay={...c,replay:{...c.replay,default:"fixtures/replay/absent.json"}};
   assert.ok(fails(await inspectProjectAdoption(badReplay),"TA010"));
   const badOutput={...c,targets:{...c.targets,web:{...c.targets.web,output:"../../outside.html"}}};

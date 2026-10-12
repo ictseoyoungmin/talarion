@@ -1,0 +1,8 @@
+node_modules/
+.godot/
+.DS_Store
+*.keystore
+*.jks
+artifacts/*
+!artifacts/.gitkeep
+examples/ruins-lite/talarion_runtime/

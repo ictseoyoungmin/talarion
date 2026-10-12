@@ -133,9 +133,10 @@ The original Web-native game can be packaged inside an **offline Android WebView
 node bin/talarion.mjs web-native android plan examples/web-native --json
 node bin/talarion.mjs web-native android build examples/web-native --json
 node bin/talarion.mjs web-native android test examples/web-native --json
+node bin/talarion.mjs web-native android smoke examples/web-native --json
 ~~~
 
-Generated debug artifact: `artifacts/build/android-webview/signal-garden-debug.apk`. Captured states and Android screenshots: `artifacts/run/android-webview`. This is **WebView runtime preservation**, not a native rendering-engine conversion or Google Play release AAB. See [WF02-P0](docs/development/wf02-p0.md).
+Generated debug artifact: `artifacts/build/android-webview/signal-garden-debug.apk`. Replay evidence is stored at `artifacts/run/android-webview`; the independent **real-touch and HOME/resume** smoke test saves five raw device screenshots, position changes and lifecycle logs at `artifacts/run/android-webview-interactive`. The smoke command requires the already-built exact same APK and cannot silently substitute a stale build. This is **WebView runtime preservation**, not a native rendering-engine conversion or Google Play release AAB. See [WF02-P0](docs/development/wf02-p0.md).
 
 Build target exports:
 

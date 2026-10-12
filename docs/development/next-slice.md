@@ -1,4 +1,4 @@
-# Next Slice — Android Touch & Lifecycle QA (WF02-P1)
+# Next Slice — Google Play Release AAB Preflight (WF03)
 
 ## Accepted baseline
 
@@ -23,11 +23,11 @@
 - Persist project-source/build/replay/runtime hashes and separate run outputs. Negative test untrusted projects, missing capabilities and invalid evidence.
 - **Exit:** executable original browser game and independent runtime evidence **from that game**, plus unchanged Godot exported Web/Android CI and TL00 QA.
 
-### WF02 — Runtime-preserving Android Debug APK (P0 CLOSED; P1 under verification)
+### WF02 — Runtime-preserving Android Debug APK (P0/P1 CLOSED)
 
 - **WF02-P0 CLOSED:** independently built/installable offline Android WebView Debug APK hosting exactly the same Three.js source. Browser and emulator Replay each supply 10 authoritative snapshots, 3 PNG checkpoints, exact source/vendor/replay hashes and 3/3 victory HUD image assertions. Browser↔WebView `WP001–WP007` PASS, verified on PR #26 exact head CI #38293231318, after QA #4 mitigation PR #27 exact head CI #38297356791 and main CI #38297831598, each 8/8 PASS. [Implementation contract](wf02-p0.md).
-- **WF02-P1 IMPLEMENTED / NOT YET VERIFIED:** a new `web-native android smoke` runner installs the exact previously built APK, generates 3 real ADB taps in interactive mode, checks original game's trusted-input state and beacon collection, exercises HOME/resume, and preserves 5 actual Android screenshots with build/source identity. [WF02-P1 QA contract](wf02-p1.md). Require a green exported emulator run and inspect actual images before marking this slice CLOSED. The P0 Replay is independently required and unchanged.
-- **P1 exit:** real installed app interaction/lifecycle evidence, source/build provenance and explicit limits, without altering or weakening the existing WF02-P0 and legacy Godot runtime/parity gates. No physical-device certification.
+- **WF02-P1 CLOSED (reference game/emulator):** `web-native android smoke` reinstalls the existing SHA-256 verified Debug APK; 3 real ADB taps change authoritative game positions [-3,-3] → [-2,-3] → [-1,-3] → [-1,-2], collecting beacon 1; HOME triggers Activity.pause and WebView visibility hidden, then resume without reload retains source state. Five raw Android captures, 21 passed check instances and provenance are recorded. [WF02-P1 QA contract](wf02-p1.md). PR #29 exact-head CI [#38303167847](https://github.com/ictseoyoungmin/talarion/actions/runs/38303167847) **8/8 PASS**, original P0 Replay and legacy Godot gates unchanged.
+- **P1 exit satisfied for constrained reference/emulator:** the original actual Android game preserved gameplay state through HOME/resume. Not proven: orientation-change recovery, Android process death/persistence, real physical-device performance, all Android OEM skins or app-store release readiness.
 
 ### WF03 — Google Play Release AAB preflight
 

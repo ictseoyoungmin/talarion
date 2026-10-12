@@ -130,6 +130,7 @@ export async function smokeInteractiveWebView(project){
       start.match.value.replay===false&&start.match.value.state?.moves===0,
       "Original game must load in real interactive mode at an empty state");
     await pause(450);
+    const emulator=(await adb("shell","getprop","ro.kernel.qemu")).trim()==="1";
     const first=await capture(path.join(dir,"01-start.png"));captures.push(first);
     assert("WI008",first.width>first.height,
       "Android game must be displayed in physical landscape orientation");
@@ -194,7 +195,7 @@ export async function smokeInteractiveWebView(project){
       gameId:"signal-garden",runtime:"android-webview",package:PACKAGE,
       provenance:{apkSha256:build.artifactSha256,sourceSha256:build.identity.sourceSha256,
         hostSha256:build.hostSha256,replaySha256:build.identity.replaySha256},
-      environment:{observedInAndroidEmulator:true,screenSize:[first.width,first.height]},
+      environment:{observedInAndroidEmulator:emulator,deviceClass:emulator?"emulator":"unverified-device",screenSize:[first.width,first.height]},
       actions,captures,checks:[...checks],lifecycle:finalPackets.filter(e=>
         e.kind==="LIFECYCLE"||e.kind==="VISIBILITY"),runtimeObserved:true,
       humanTouchEquivalentViaAdb:true,physicalDeviceCertified:false,

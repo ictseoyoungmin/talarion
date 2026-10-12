@@ -52,14 +52,16 @@ export function summarizePerformanceWindow(samples, {
     prior = row.tick;
     return true;
   });
-  const measured = valid && validSamples
+  const withinReplay = valid && validSamples &&
+    rows.every(r => r.tick <= replayEndTick);
+  const measured = withinReplay
     ? rows.filter(r => r.tick > settings.warmupTicks && r.tick <= replayEndTick)
     : [];
   const actualTicks = measured.map(r => r.tick);
   const complete = actualTicks.length === expected.length &&
     actualTicks.every((tick, i) => tick === expected[i]);
   const status = !configured ? "not-configured" : invalid || !valid
-    ? "invalid-window" : !evidenceVerified || !validSamples
+    ? "invalid-window" : !evidenceVerified || !validSamples || !withinReplay
       ? "unverified" : measured.length < settings.minSamples ||
         expected.length < settings.minSamples || !complete
         ? "incomplete-window" : "complete-window";

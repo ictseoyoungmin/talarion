@@ -38,8 +38,10 @@ export async function cleanupStagedReplay(config) {
   while (dir !== projectDir && (dir === stageRoot || dir.startsWith(stageRoot + path.sep))) {
     try {
       await fs.rmdir(dir);
-    } catch {
-      break;
+    } catch (error) {
+      // An already-removed nested directory must not prevent pruning its
+      // now-empty staging parent; any non-ENOENT error still stops safely.
+      if (error?.code !== "ENOENT") break;
     }
     if (dir === stageRoot) break;
     dir = path.dirname(dir);

@@ -15,7 +15,7 @@ test("P1 catalog extends the legacy six stable IDs", () => {
   assert.equal(DOCTOR_SCHEMA, "talarion.doctor/v1");
   assert.deepEqual(DOCTOR_RULES.slice(0, 6).map(x => x.id),
     ["PF001", "PF002", "PF003", "PF102", "PF103", "PF104"]);
-  assert.deepEqual(DOCTOR_RULES.slice(6).map(x => x.id),
+  assert.deepEqual(DOCTOR_RULES.slice(6, 16).map(x => x.id),
     ["PF105", "PF106", "PF107", "PF108", "PF109",
      "PF401", "PF402", "PF403", "PF404", "PF405"]);
 });

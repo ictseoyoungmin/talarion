@@ -167,3 +167,44 @@ test("P3 CLI writes byte-stable single-run JSON/HTML, rejects invalid manifests 
     assert.equal(execute("budget","report","current","authority.json","linked/x").status,1);
   }finally{await fs.rm(root,{recursive:true,force:true})}
 });
+
+
+test("P3 CLI processes six distinct pinned cohort files, blocks degradation and is order-invariant",async()=>{
+  const root=await fs.mkdtemp(path.join(os.tmpdir(),"talarion-cohorts-"));
+  try {
+    await fs.writeFile(path.join(root,"talarion.config.json"),"{}");
+    const baselines=["b1","b2","b3"].map(tag=>entry(tag,64,42));
+    const candidates=["c1","c2","c3"].map(tag=>entry(tag,40,21));
+    for(const e of [...baselines,...candidates])
+      await fs.writeFile(path.join(root,e.runId+".json"),e.body);
+    const items=(records,target)=>records.map(e=>({
+      runId:target+"-"+e.runId,environmentKey:"fixed-linux-amd64",
+      file:e.runId+".json",sha256:e.sha256
+    }));
+    const manifest={schema:"talarion.performance-cohorts/v1",policy,
+      cohorts:Object.fromEntries(["web","android"].map(target=>[
+        target,{baseline:items(baselines,target),candidate:items(candidates,target)}
+      ]))};
+    const file=path.join(root,"cohorts.json");
+    await fs.writeFile(file,JSON.stringify(manifest));
+    const command=()=>spawnSync(process.execPath,[
+      CLI,"budget","report","cohorts.json","out","--json"
+    ],{cwd:root,encoding:"utf8"});
+    const result=command();
+    assert.equal(result.status,1);
+    const review=JSON.parse(await fs.readFile(path.join(root,"out/performance-review.json")));
+    assert.equal(review.decision,"blocked-observational-degradation");
+    assert.ok(review.targets.every(t=>t.regression.status==="regression-observed"));
+    const html=await fs.readFile(path.join(root,"out/performance-review.html"),"utf8");
+    assert.ok(html.includes("observed-degradation"));
+    const snapshot=JSON.stringify(review);
+    for(const t of ["web","android"]){
+      manifest.cohorts[t].baseline.reverse();
+      manifest.cohorts[t].candidate.reverse();
+    }
+    await fs.writeFile(file,JSON.stringify(manifest));
+    assert.equal(command().status,1);
+    assert.equal(JSON.stringify(JSON.parse(await fs.readFile(
+      path.join(root,"out/performance-review.json")))),snapshot);
+  }finally {await fs.rm(root,{recursive:true,force:true})}
+});

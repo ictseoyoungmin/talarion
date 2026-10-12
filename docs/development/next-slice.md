@@ -12,7 +12,7 @@
 
 [ADR-001–005](adr/README.md) specify the forward architecture: source-owned Web-first development; source/runtime/artifact independence; single game-state authority and optional limited IR; separate build/runtime/parity/store proof; isolated external projects and provenance-aware graph.
 
-**ADR acceptance is not implementation evidence.** The existing Godot `talarion.config.json` stays v1. A separate `web-native dev/test` runner now exists for one Three.js reference project; no general-purpose Babylon.js adapter, Play release AAB or cross-engine IR exists. The original Signal Garden Web-native game now has a constrained offline Android WebView Debug APK builder and emulator-tested replay/parity.
+**ADR acceptance is not implementation evidence.** The existing Godot `talarion.config.json` stays v1. A separate `web-native dev/test` runner now exists for one Three.js reference project; no general-purpose Babylon.js adapter, verified Play-ready release AAB or cross-engine IR exists. The original Signal Garden Web-native game now has a constrained offline Android WebView Debug APK builder and emulator-tested replay/parity.
 
 ## New prioritized implementation slices
 
@@ -29,9 +29,10 @@
 - **WF02-P1 CLOSED (reference game/emulator):** `web-native android smoke` reinstalls the existing SHA-256 verified Debug APK; 3 real ADB taps change authoritative game positions [-3,-3] → [-2,-3] → [-1,-3] → [-1,-2], collecting beacon 1; HOME triggers Activity.pause and WebView visibility hidden, then resume without reload retains source state. Five raw Android captures, 21 passed check instances and provenance are recorded. [WF02-P1 QA contract](wf02-p1.md). PR #29 exact-head CI [#38303167847](https://github.com/ictseoyoungmin/talarion/actions/runs/38303167847) **8/8 PASS**, original P0 Replay and legacy Godot gates unchanged.
 - **P1 exit satisfied for constrained reference/emulator:** the original actual Android game preserved gameplay state through HOME/resume. Not proven: orientation-change recovery, Android process death/persistence, real physical-device performance, all Android OEM skins or app-store release readiness.
 
-### WF03 — Google Play Release AAB preflight
+### WF03 — Google Play Release AAB preflight (P0 implementation candidate)
 
-- Generate an isolated **release AAB** for the same Web-native game and independently validate package structure, signing/upload-key custody, package/version, effective target/API policies, 64-bit ABI where applicable, device extraction/install via bundle tooling, permissions and store readiness.
+- **WF03-P0 (IN REVIEW):** An isolated API36 release AAB candidate now builds a protobuf base module via aapt2/bundletool, uses an external user-controlled upload key, independently checks signing/package/module/provenance, and optionally extracts/installs a universal APK. [WF03-P0 contract](wf03-p0.md). Do not mark completed until exact-head CI and independent evidence pass.
+- Independent device extraction/install evidence, package/version policies, native ABI applicability, and release/Play readiness remain separate from mere build success.
 - Prefer current official policy at gate execution; version the policy snapshot. No embedded keys, no auto-publishing, no inferred Play approval.
 - **Exit:** independently inspectable signed release AAB and a release-preflight report distinct from build/runtime pass; publication unverified until Play confirms.
 

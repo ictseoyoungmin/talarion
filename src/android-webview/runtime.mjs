@@ -151,10 +151,17 @@ async function screenshot(adb,file){
   await fs.writeFile(file,bytes);
   return {bytes:bytes.length,sha256:sha(bytes)};
 }
-export async function testWebView(project,{timeoutMs=90000}={}){
+export async function testWebView(project,{timeoutMs=90000,releaseBuild=null}={}){
   const inspected=await requireWebGame(project);
-  // Build and run the exact same source in one command to prevent stale artifact reuse.
-  const build=await buildWebView(project);
+  // Default WF02 behavior always builds Debug; only verified WF03 passes a prepared Release APK.
+  if(releaseBuild&&(releaseBuild.artifactKind!=="release-apk"||
+    releaseBuild.projectId!==inspected.manifest.id||releaseBuild.package!==PACKAGE||
+    releaseBuild.runtime!=="android-webview"||releaseBuild.targetSdk!==36||
+    !releaseBuild.sourceAabSha256||
+    !releaseBuild.identity||
+    !releaseBuild.artifactSha256||await hashFile(releaseBuild.artifact)!==releaseBuild.artifactSha256))
+    throw new Error("WR101: release replay rejected mismatched/mutated APK or untrusted metadata");
+  const build=releaseBuild??await buildWebView(project);
   const adb=process.env.ADB||"adb";
   await safeRun(adb,["version"]);
   const devices=await safeRun(adb,["devices"]);
@@ -166,7 +173,7 @@ export async function testWebView(project,{timeoutMs=90000}={}){
   await safeRun(adb,["install","-r",build.artifact]);
   await safeRun(adb,["logcat","-c"]);
   await safeRun(adb,["shell","am","force-stop",PACKAGE]);
-  const evidenceRoot=path.join(ROOT,"artifacts/run/android-webview");
+  const evidenceRoot=path.join(ROOT,releaseBuild?"artifacts/run/android-webview-release":"artifacts/run/android-webview");
   await fs.mkdir(evidenceRoot,{recursive:true});
   const runDir=await fs.mkdtemp(path.join(evidenceRoot,inspected.manifest.id+"-"));
   const state=[],performance=[],captures=[],issues=[],ready=[];
@@ -222,7 +229,9 @@ export async function testWebView(project,{timeoutMs=90000}={}){
     const stateFile=path.join(runDir,"state.jsonl"),performanceFile=path.join(runDir,"performance.jsonl");
     await Promise.all([writeJsonl(stateFile,state),writeJsonl(performanceFile,performance)]);
     const report={schema:"talarion.android-webview-run/v1",ok:valid,projectId:inspected.manifest.id,
-      runtime:"android-webview",host:"android",portabilityClass:"same-runtime",artifact:build.artifact,
+      runtime:"android-webview",host:"android",portabilityClass:"same-runtime",
+      artifactKind:releaseBuild?"release-apk":"debug-apk",sourceAabSha256:releaseBuild?.sourceAabSha256??null,
+      artifact:build.artifact,
       artifactSha256:build.artifactSha256,identity:build.identity,device,
       evidence:{stateFile,performanceFile,screenshots:captures,finished},
       observed:{runtimeObserved:true,stateCount:state.length,captureCount:captures.length,performanceSamples:performance.length},

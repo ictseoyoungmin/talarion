@@ -263,8 +263,9 @@ export async function testReleaseAab(project){
     sourceAabSha256:verified.artifactSha256};
   // No hidden Debug APK build or Debug keystore: the same SHA-256-pinned extracted
   // Release APK is installed in a separate emulator replay and actual ADB touch run.
-  const installed=await safe(adb,["shell","pm","path",PACKAGE]);
-  if(installed.includes("package:"))await safe(adb,["uninstall",PACKAGE]);
+  const installed=await safe(adb,["shell","pm","list","packages",PACKAGE]);
+  if(installed.split(/\r?\n/).includes("package:"+PACKAGE))
+    await safe(adb,["uninstall",PACKAGE]);
   const replay=await testWebView(project,{releaseBuild});
   if(replay.artifactKind!=="release-apk"||replay.artifactSha256!==apkSha256||
     replay.sourceAabSha256!==verified.artifactSha256||

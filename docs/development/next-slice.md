@@ -1,28 +1,27 @@
-# Next Implementation Slice — TL04 Adapter SDK
+# Next Implementation Slice — External Godot Project Adoption (Proposed TL05)
 
-## Stable foundation
+## Accepted foundation
 
-- **TL00 — CLOSED:** exported Godot Web/Android replay parity 15/15 states, 3/3 strict visual checkpoints, TL00 9/9 acceptance.
-- **TL01 — CLOSED:** Portability Doctor and deterministic source diagnostics/reports.
-- **TL02 — CLOSED:** measured-versus-declared performance evidence authority, review reports and reproducible provenance.
-- **TL03 — DEFERRED:** iOS preflight and export adapter implementation are preserved in `main`; native Xcode export/runtime evidence is not observed. iOS is **not** a blocking release, CI, or TL04 dependency. See [TL03-P1](tl03-p1.md).
+- **TL00 — CLOSED:** actual exported Godot Web/Android replay state 15/15, strict visual 3/3 and acceptance 9/9.
+- **TL01 — CLOSED:** portable-source Doctor and deterministic reports.
+- **TL02 — CLOSED:** observational performance evidence authority and cohort reporting, without hardware self-certification.
+- **TL03 — DEFERRED:** experimental iOS preflight/export code is retained, but unverified native macOS/Xcode/iOS targets are excluded from all active acceptance criteria.
+- **TL04 — CLOSED:** [P0](tl04-p0.md) versioned adapter manifest and source-only inspector (PR #17); [P1](tl04-p1.md) explicitly allowlisted Godot Web/Android build/runner binding (PR #18); [P2](tl04-p2.md) read-only candidate manifest conformance, source provenance, negative fixtures and extension guide (PR #19). Each PR head passed Node 20/22/24, real exported Web and Android replay, 15/15 state, 3/3 strict visual and TL00 9/9.
 
-## Active next work: TL04
+## Next bottleneck: portability beyond the single sample
 
-The first public support boundary remains **Godot → Web/Android**. Stabilize the adapter contract before adding new engines or targets.
+The present proof uses the canonical `examples/ruins-lite` reference project. A stable manifest does not yet demonstrate that an **independent Godot project** can be onboarded without editing Talarion internals. Avoid adding a second game engine or cloud service until that gap is addressed.
 
-1. **TL04-P0 — CLOSED:** versioned Godot manifest, source-only capability inspection, fail-closed tests and static verify integration, merged via PR #17 (CI #38255512684 6/6). [Contract](tl04-p0.md).
-2. **TL04-P1 — CLOSED:** Godot build/test uses reviewed Web/Android dispatch; PR #18 merged, exact-head CI #38261527177 6/6 PASS. [Contract](tl04-p1.md).
-3. **TL04-P2 — in review:** read-only candidate manifest validation, source SHA-256, negative fixtures and contributor guidance, pending PR exported-runtime CI. [Contract](tl04-p2.md).
+**Proposed TL05 — External Godot Project Adoption** (not implemented or certified):
 
-## Non-negotiable gates
+1. **P0 — Sample-coupling inventory:** trace project-specific paths and assumptions in runtime contract checks, `verify`, capture/replay staging, runners, target presets and parity CLI. Specify opt-in, non-destructive installation/validation for an independent project.
+2. **P1 — Independent Godot vertical slice:** onboard a second deliberately different small Godot game without editing core Talarion engine or runner code. Prove actual Web/Android exported replay and evidence.
+3. **P2 — Reproducible onboarding and agent diagnostics:** generalize only demonstrated integration boundaries, publish an executable project-adoption example and focused failures, and maintain TL00 acceptance regression.
 
-- Preserve the Web/Android 15/15 replay state, 3/3 strict spatial visual and 9/9 TL00 acceptance.
-- No baseline dependency on Apple developer credentials, macOS, physical devices or paid cloud services.
-- Declared capabilities are **not** proof of engine/runtime/device certification; unsupported, unknown and unverified evidence remain distinct.
-- Keep [QA screenshot race issue #4](https://github.com/ictseoyoungmin/talarion/issues/4) separate until raw artifacts have been reviewed. Maintain its 2% spatial visual threshold.
-- iOS can resume only by an explicit scope decision with real Apple identity/macOS export prerequisites; resume from native Xcode ZIP provenance rather than redoing P0/P1 source work.
+## Immutable boundaries
 
-## Release certification
-
-[Hardware certification](release-certification.md) stays separate from feature development. No emulator performance measurement becomes a physical-device guarantee.
+- Preserve Web/Android 15/15 state, 3/3 strict spatial visual threshold 2% and TL00 9/9 for the canonical sample.
+- Capability declarations and source binding are **not** runtime or physical hardware proof.
+- iOS stays deferred. Do not require Apple credentials, macOS, paid cloud services, new engine backends or physical-device verification for infrastructure CI.
+- Keep [QA screenshot race issue #4](https://github.com/ictseoyoungmin/talarion/issues/4) separately open until raw before/after image diff review.
+- Dependency lockfile generation and `npm ci` reproducibility remain a separate verified maintenance slice; do not fabricate an offline lockfile.

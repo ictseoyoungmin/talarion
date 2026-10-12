@@ -16,9 +16,13 @@ Implemented P0–P3 measured-versus-declared runtime authority, strict units, de
 
 iOS is outside the currently supported and validated Web/Android scope. P0 macOS/Xcode preflight and P1 Godot Xcode-project ZIP export implementation are merged, preserved and tested for fail-closed behavior, but **real native macOS export, iOS runtime, parity and signing are not certified**. No iOS CI job, Apple developer account, macOS host or paid third-party service is required for baseline development or release. Resume only on an explicit target decision after actual Apple Team/developer identity and macOS/Xcode/Godot export prerequisites are available. [TL03-P0](tl03-p0.md) · [TL03-P1](tl03-p1.md).
 
-## TL04 — Adapter SDK — NEXT
+## TL04 — Adapter SDK — CLOSED
 
-Stabilize the engine/target adapter contract before expanding engine or platform breadth. [TL04-P0](tl04-p0.md) inventories existing Godot and Web/Android boundaries and designs deterministic, agent-friendly capability/conformance interfaces. P1 aligns the reference Godot adapter without replay/evidence regressions; P2 adds focused extension examples and negative fixtures. No additional engine, iOS, hardware certification, or cloud dependency is implied.
+P0 [versioned reference manifest and source-only inspection](tl04-p0.md), P1 [allowlisted Godot Web/Android execution binding](tl04-p1.md), and P2 [candidate JSON conformance and extension guidance](tl04-p2.md) merged in PR #17–#19. Every PR passed actual exported Web/Android runtime replay and the unchanged 15/15 state, 3/3 strict spatial visual and TL00 9/9 acceptance. SDK source binding cannot self-certify a device, engine runtime or unsupported platform.
+
+## TL05 — External Godot Project Adoption — PROPOSED
+
+Demonstrate that an independent Godot game, beyond Ruins Lite, can use the same export/replay/evidence contract without changes to Talarion core. Begin with a project-coupling audit, then one flagship-quality end-to-end adoption proof. [Next implementation slice](next-slice.md). No additional engine or iOS work is assumed.
 
 ## Release Certification (separate gate)
 

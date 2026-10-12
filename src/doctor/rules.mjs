@@ -128,6 +128,12 @@ const specs = [
     pattern: /\bOS\s*\.\s*execute\s*\(/.source
   },
   {
+    id: "PF405", severity: "warning", capability: "platform.adapter",
+    targets: ["web", "android"],
+    message: "Portable capability needs a declared, existing target adapter.",
+    remediation: "Declare an actual target adapter source under project/adapters/<target>/ and review its implementation."
+  },
+  {
     id: "PF201", severity: "warning", capability: "asset.texture",
     targets: ["web", "android"],
     message: "Source texture exceeds the declared textureMax dimension.",
@@ -150,12 +156,6 @@ const specs = [
     targets: ["web", "android"],
     message: "Texture dimensions are unknown to the static inspector.",
     remediation: "Provide a supported raster source or validate this asset with engine import/render evidence."
-  },
-  {
-    id: "PF405", severity: "warning", capability: "platform.adapter",
-    targets: ["web", "android"],
-    message: "Portable capability needs a declared, existing target adapter.",
-    remediation: "Declare an actual target adapter source under project/adapters/<target>/ and review its implementation."
   }
 ];
 

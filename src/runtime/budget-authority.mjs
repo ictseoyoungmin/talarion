@@ -4,6 +4,7 @@ import { summarizePerformance } from "./performance.mjs";
 import { sha256File } from "./provenance.mjs";
 import { resolveFromRoot } from "../core/config.mjs";
 import { analyzeBudgetProfile } from "./budget-profile.mjs";
+import { summarizePerformanceWindow } from "./performance-window.mjs";
 
 export const AUTHORITY_SCHEMA = "talarion.performance-authority/v1";
 const RUNNER_SCHEMA = "talarion.runner-result/v1";
@@ -22,7 +23,7 @@ const text = result => "TALARION PERFORMANCE AUTHORITY\n" +
   "\nNo target FPS, GPU or physical-device certification.";
 
 export function assessPerformanceAuthority({ config, manifests, samples, replaySha256,
-  sampleHashes = {} } = {}) {
+  sampleHashes = {}, replayEndTick = null, replayTickRate = null } = {}) {
   const targets = [];
   for (const target of ["web", "android"]) {
     const runner = manifests?.[target];
@@ -83,9 +84,13 @@ export function assessPerformanceAuthority({ config, manifests, samples, replayS
     check("PA08", coverage.errors.every(e => e.code !== "BP03" && e.code !== "BP04"),
       "Optional explicit budget units agree with the fixed metric units.");
     const ok = checks.every(c => c.ok);
+    const performanceWindow = summarizePerformanceWindow(samples?.[target] ?? [], {
+      window: config?.performanceWindow ?? null,
+      replayEndTick, replayTickRate, evidenceVerified: ok
+    });
     targets.push({
       target, ok, runtimeKind,
-      declared, budgetCoverage: coverage,
+      declared, budgetCoverage: coverage, performanceWindow,
       observation: {
         status: ok ? "validated-runner-observation" : "unverified",
         source: "engine-protocol-jsonl",
@@ -146,9 +151,17 @@ export async function performanceAuthorityCommand(config, webDir, androidDir, ou
     samples[target] = parseJsonl(await fs.readFile(sampleFile, "utf8"));
     sampleHashes[target] = await sha256File(sampleFile);
   }
-  const replaySha256 = await sha256File(resolveFromRoot(config, config.replay.default));
+  const replayFile = resolveFromRoot(config, config.replay.default);
+  const replaySha256 = await sha256File(replayFile);
+  const replay = JSON.parse(await fs.readFile(replayFile, "utf8"));
+  const replayTickRate = replay?.tickRate;
+  const replayEndTick = replay?.schema === "talarion.replay/v1" &&
+    Array.isArray(replay.events) && replay.events.length &&
+    replay.events.every(e => Number.isSafeInteger(e.tick) && e.tick >= 0)
+    ? Math.max(...replay.events.map(e => e.tick)) : null;
   const result = assessPerformanceAuthority({
-    config, manifests, samples, sampleHashes, replaySha256
+    config, manifests, samples, sampleHashes, replaySha256,
+    replayEndTick, replayTickRate
   });
   const output = path.resolve(outputFile);
   await fs.mkdir(path.dirname(output), { recursive: true });

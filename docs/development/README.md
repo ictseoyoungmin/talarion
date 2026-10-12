@@ -19,6 +19,7 @@ This directory contains the engineering specification for Talarion.
 - [TL02-P1](tl02-p1.md) — strict unit vocabulary, source metric coverage and no false budget pass.
 - [TL02-P2](tl02-p2.md) — canonical replay sample windows, variation summaries and conservative observational regression.
 - [TL02-P3](tl02-p3.md) — verified multi-run cohort manifests, offline performance review and noncertifying CI decisions.
+- [TL03-P0](tl03-p0.md) — macOS/Xcode/SDK iOS toolchain preflight and unverified export/runtime boundary.
 - [Next Slice](next-slice.md) — immediate implementation target.
 - [Roadmap](roadmap.md) — TL00 through adapter ecosystem milestones.
 - [OSS Strategy](oss-strategy.md) — repository positioning, local-first requirements, and contributor-facing product constraints.

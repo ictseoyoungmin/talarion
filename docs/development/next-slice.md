@@ -14,11 +14,15 @@ Distinguish declared goals from engine-measured Web/Android telemetry with repro
 
 1. **TL02-P0 — CLOSED:** raw sample recomputation, provenance, target identity, evidence authority. Merged PR #8. [Contract](tl02-p0.md).
 2. **TL02-P1 — CLOSED:** fixed-unit metric vocabulary, strict target profiles, explicit budget coverage with no automatic PASS, merged PR #9. [Contract](tl02-p1.md).
-3. **TL02-P2 — ACTIVE:** canonical warmup and sample ticks, guarded engine-reported distributions and multi-run noise-aware observational regressions (no auto-certified FPS). [Contract](tl02-p2.md).
-4. **TL02-P3:** reproducible CI decisions and reports, with observational emulator outcomes clearly separated from physical-device Release Certification.
+3. **TL02-P2 — CLOSED:** canonical warmup and sampling, verified distributions and conservative regression helper (PR #10). [Contract](tl02-p2.md).
+4. **TL02-P3 — candidate:** evidence-bound independent cohorts, JSON/HTML reports, observational regression decisions and noncertifying single-run CI artifact. [Contract](tl02-p3.md). Close after exact-head and post-merge CI.
 
 ## Invariants
 
 - Preserve TL00 exported runtime 15/15, 3/3 and 9/9 acceptance gates and TL01 source-only diagnostics.
 - No physical-device FPS, GPU residency or draw-call claims from emulator-only telemetry.
 - The [QA screenshot capture issue #4](https://github.com/ictseoyoungmin/talarion/issues/4) stays OPEN until evidence-based correction without relaxing the visual gate.
+
+## After TL02
+
+Proceed to TL03 Web ↔ Android target adapters and lifecycle portability, once P3 passes unchanged TL00 acceptance. Physical-device release certification and QA issue #4 remain separate.

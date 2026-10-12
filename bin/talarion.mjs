@@ -13,6 +13,7 @@ import { testTargetCommand } from "../src/commands/test-target.mjs";
 import { visualCommand } from "../src/commands/visual.mjs";
 import { tl00AcceptanceCommand } from "../src/runtime/gates.mjs";
 import { performanceAuthorityCommand } from "../src/runtime/budget-authority.mjs";
+import { performanceReportCommand } from "../src/runtime/performance-report.mjs";
 
 const argv = process.argv.slice(2);
 const jsonMode = argv.includes("--json");
@@ -35,6 +36,8 @@ Usage:
   talarion verify [--json]
   talarion gate tl00 <web-dir> <android-dir> <visual-result.json> <out.json> [--json]
   talarion budget authority <web-dir> <android-dir> <out.json> [--json]
+  talarion budget report current <authority.json> <output-dir> [--json]
+  talarion budget report <cohorts.json> <output-dir> [--json]
 `;
 
 try {
@@ -75,10 +78,16 @@ try {
       result = await reportCommand(config, args[1], args[2], args[3], args[4], args[5], args[6]);
       break;
     case "budget":
-      if (args[1] !== "authority" || !args[2] || !args[3] || !args[4] || args[5]) {
-        fail("Usage: talarion budget authority <web-dir> <android-dir> <out.json>");
+      if (args[1] === "authority" && args[2] && args[3] && args[4] && !args[5]) {
+        result = await performanceAuthorityCommand(config, args[2], args[3], args[4]);
+      } else if (args[1] === "report" && args[2] === "current" &&
+          args[3] && args[4] && !args[5]) {
+        result = await performanceReportCommand(config, args[3], args[4], true);
+      } else if (args[1] === "report" && args[2] && args[3] && !args[4]) {
+        result = await performanceReportCommand(config, args[2], args[3]);
+      } else {
+        fail("Usage: talarion budget authority ... | budget report [current] <input> <output-dir>");
       }
-      result = await performanceAuthorityCommand(config, args[2], args[3], args[4]);
       break;
     case "gate":
       if (args[1] !== "tl00") fail("Usage: talarion gate tl00 <web-dir> <android-dir> <visual-result.json> <out.json>");

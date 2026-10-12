@@ -190,6 +190,11 @@ jobs:
           node bin/talarion.mjs budget authority .evidence/web .evidence/android artifacts/parity/performance-authority.json --json
           node --input-type=module -e 'import fs from "node:fs"; const x=JSON.parse(fs.readFileSync("artifacts/parity/performance-authority.json")); if(!x.ok||x.targets.some(t=>!t.budgetCoverage?.ok||t.budgetCoverage.metrics.some(m=>m.comparisonEvaluated||m.decision!=="not-evaluated")||t.performanceWindow?.status!=="complete-window"||!t.performanceWindow.metrics||t.performanceWindow.budgetDecision!=="not-evaluated")||x.certification.physicalDevice) process.exit(1);'
 
+      - name: TL02-P3 evidence-only performance report
+        run: |
+          node bin/talarion.mjs budget report current artifacts/parity/performance-authority.json artifacts/parity/performance-review --json
+          node --input-type=module -e 'import fs from "node:fs"; const r=JSON.parse(fs.readFileSync("artifacts/parity/performance-review/performance-review.json")); if(!r.ok||r.decision!=="evidence-only"||r.hardwareCertified||r.performanceCertified||r.targets.length!==2||r.targets.some(t=>!t.evidenceValid||t.candidateCount!==1||t.baselineCount!==0||t.regression.status!=="not-evaluated"))process.exit(1);'
+
       - name: Generate parity report
         if: always()
         run: |

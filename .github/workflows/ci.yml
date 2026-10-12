@@ -287,6 +287,7 @@ jobs:
             adb shell wm dismiss-keyguard || true
             sh -c 'ready=0; for attempt in $(seq 1 45); do if adb shell am get-current-user >/dev/null 2>&1 && adb shell pm path android >/dev/null 2>&1; then ready=1; break; fi; sleep 2; done; if [ "$ready" -ne 1 ]; then echo "Android services never became ready" >&2; exit 1; fi'
             node bin/talarion.mjs web-native android test examples/web-native --json
+            node bin/talarion.mjs web-native android smoke examples/web-native --json
       - name: Compare independently recorded browser and WebView game state
         run: |
           node --input-type=module -e 'import {compareWebAndWebView} from "./src/android-webview/parity.mjs"; const r=await compareWebAndWebView(".evidence/wf01-browser","artifacts/run/android-webview","artifacts/parity/wf02/webview-parity.json");console.log(r.text);if(!r.ok)process.exit(1)'
@@ -298,5 +299,6 @@ jobs:
           path: |
             artifacts/build/android-webview/
             artifacts/run/android-webview/
+            artifacts/run/android-webview-interactive/
             artifacts/parity/wf02/
           if-no-files-found: error

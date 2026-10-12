@@ -23,10 +23,10 @@
 - Persist project-source/build/replay/runtime hashes and separate run outputs. Negative test untrusted projects, missing capabilities and invalid evidence.
 - **Exit:** executable original browser game and independent runtime evidence **from that game**, plus unchanged Godot exported Web/Android CI and TL00 QA.
 
-### WF02 — Runtime-preserving Android Debug APK (P0 CLOSED; P1 NEXT)
+### WF02 — Runtime-preserving Android Debug APK (P0 CLOSED; P1 under verification)
 
 - **WF02-P0 CLOSED:** independently built/installable offline Android WebView Debug APK hosting exactly the same Three.js source. Browser and emulator Replay each supply 10 authoritative snapshots, 3 PNG checkpoints, exact source/vendor/replay hashes and 3/3 victory HUD image assertions. Browser↔WebView `WP001–WP007` PASS, verified on PR #26 exact head CI #38293231318, after QA #4 mitigation PR #27 exact head CI #38297356791 and main CI #38297831598, each 8/8 PASS. [Implementation contract](wf02-p0.md).
-- **WF02-P1 NEXT — interactive touch and lifecycle QA:** install the already-built APK in an emulator, exercise real touch controls, HOME/resume and storage/rotation/foreground behavior, and capture independent before/after screenshots and observed gameplay state. The successful automated replay is **not** evidence that manual touch or lifecycle transitions are verified.
+- **WF02-P1 IMPLEMENTED / NOT YET VERIFIED:** a new `web-native android smoke` runner installs the exact previously built APK, generates 3 real ADB taps in interactive mode, checks original game's trusted-input state and beacon collection, exercises HOME/resume, and preserves 5 actual Android screenshots with build/source identity. [WF02-P1 QA contract](wf02-p1.md). Require a green exported emulator run and inspect actual images before marking this slice CLOSED. The P0 Replay is independently required and unchanged.
 - **P1 exit:** real installed app interaction/lifecycle evidence, source/build provenance and explicit limits, without altering or weakening the existing WF02-P0 and legacy Godot runtime/parity gates. No physical-device certification.
 
 ### WF03 — Google Play Release AAB preflight

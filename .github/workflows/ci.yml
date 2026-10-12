@@ -22,6 +22,16 @@ jobs:
           node-version: ${{ matrix.node }}
       - run: npm test
       - run: npm run verify
+      - name: Export deterministic Doctor report
+        run: node bin/talarion.mjs doctor report artifacts/doctor --json
+
+      - name: Upload Doctor report
+        if: matrix.node == 24
+        uses: actions/upload-artifact@v4
+        with:
+          name: talarion-doctor-report
+          path: artifacts/doctor/
+          if-no-files-found: error
 
   web-runtime:
     name: Godot Web runtime replay

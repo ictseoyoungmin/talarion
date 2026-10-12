@@ -1,0 +1,52 @@
+{
+  "schema": "talarion.adapter-manifest/v1",
+  "id": "godot-reference",
+  "engine": {
+    "id": "godot",
+    "versionPolicy": "configuration-recommended"
+  },
+  "authority": "declared-interface-only",
+  "targets": {
+    "web": {
+      "status": "supported",
+      "capabilities": {
+        "project-inspection": "supported",
+        "export": "supported",
+        "replay": "supported",
+        "state": "supported",
+        "visual": "supported",
+        "performance": "supported"
+      },
+      "entrypoints": {
+        "export": "src/adapters/godot.mjs",
+        "runner": "src/runners/web.mjs"
+      }
+    },
+    "android": {
+      "status": "supported",
+      "capabilities": {
+        "project-inspection": "supported",
+        "export": "supported",
+        "replay": "supported",
+        "state": "supported",
+        "visual": "supported",
+        "performance": "supported"
+      },
+      "entrypoints": {
+        "export": "src/adapters/godot.mjs",
+        "runner": "src/runners/android.mjs"
+      }
+    },
+    "ios": {
+      "status": "unsupported",
+      "capabilities": {
+        "project-inspection": "unsupported",
+        "export": "unsupported",
+        "replay": "unsupported",
+        "state": "unsupported",
+        "visual": "unsupported",
+        "performance": "unsupported"
+      }
+    }
+  }
+}

@@ -120,12 +120,23 @@ async function startReplay(){
    throw new Error("Invalid game replay");
  protocol("REPLAY_READY",{gameId:replay.gameId,tickRate:replay.tickRate,seed:replay.seed,events:replay.events.length});
  let currentIndex=0;
+ let captureHold=false;
  const interval=setInterval(()=>{
+  if(captureHold)return;
   state.tick++;
   while(currentIndex<replay.events.length&&replay.events[currentIndex].tick===state.tick){
    const e=replay.events[currentIndex++];
    if(e.type==="move")applyMovement(e.dx,e.dz);
-   else if(e.type==="capture")protocol("CAPTURE",{name:e.name,tick:state.tick});
+   else if(e.type==="capture"){
+    // Hold authoritative replay tick until two game draw frames have completed.
+    // Capture is emitted only after presentation has had a chance to catch up.
+    captureHold=true;
+    const checkpoint={name:e.name,tick:state.tick};
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      protocol("CAPTURE",checkpoint);
+      setTimeout(()=>{captureHold=false;},900);
+    }));
+   }
    else {clearInterval(interval);throw new Error("Unknown replay event "+e.type)}
   }
   if(state.tick%30===0 || state.mode==="VICTORY"&&state.tick===270)

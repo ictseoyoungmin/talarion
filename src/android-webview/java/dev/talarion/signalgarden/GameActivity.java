@@ -26,6 +26,7 @@ public final class GameActivity extends Activity {
     private static final String URL = "https://" + ORIGIN + "/index.html";
     private static final String TAG = "TalarionGame";
     private WebView game;
+    private long nextVisualRequest = 0;
 
     private static WebResourceResponse blocked(int code) {
         return new WebResourceResponse("text/plain", "UTF-8", code, "Blocked",
@@ -73,7 +74,18 @@ public final class GameActivity extends Activity {
         game.setWebChromeClient(new WebChromeClient() {
             @Override public boolean onConsoleMessage(ConsoleMessage line) {
                 String message = line.message();
-                if (message.startsWith("TALARION_")) {
+                if (message.startsWith("TALARION_CAPTURE ")) {
+                    // Android WebView compositing is asynchronous to the replay tick.
+                    // Only forward the capture marker once the visual state is
+                    // committed and a real WebView draw has been scheduled.
+                    final String checkpointLine = message;
+                    game.postVisualStateCallback(++nextVisualRequest, new WebView.VisualStateCallback() {
+                        @Override public void onComplete(long requestId) {
+                            game.postInvalidateOnAnimation();
+                            game.postDelayed(() -> Log.i(TAG, checkpointLine), 170);
+                        }
+                    });
+                } else if (message.startsWith("TALARION_")) {
                     Log.i(TAG, message);
                 } else if (line.messageLevel() == ConsoleMessage.MessageLevel.ERROR) {
                     Log.e(TAG, "JS_ERROR " + message);

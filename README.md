@@ -18,7 +18,7 @@ Talarion connects those workflows around three capabilities:
 
 ## Project status
 
-Talarion is in early development. The first implementation target is **Godot + Web + Android**.
+Talarion is in early development. The **TL00 Godot/Web/Android foundation is complete and merged into `main`**, backed by exported runtime state, visual and telemetry CI evidence. This is not a certification of all Android devices or production-game performance.
 
 Available in the repository:
 

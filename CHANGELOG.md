@@ -12,6 +12,8 @@
 
 ### Added
 
+- TL03-P1 macOS-only iOS Xcode project ZIP export command, strict preflight/preset identity checks, structural archive inspection and SHA-256/replay provenance with an uncertified JSON report. Linux CI exercises negative gates only; native macOS evidence remains pending.
+
 - TL03-P0 iOS capability preflight `talarion ios preflight <out.json>`, with conservative macOS/Xcode/iOS SDK, bundle/team identity, preset and Simulator Compatibility-renderer checks; Linux explicitly BLOCKED rather than fabricated export PASS.
 - Versioned `talarion.ios-preflight/v1` diagnostics and Node 24 CI artifact. Export templates/signing and simulator/physical runtime remain UNVERIFIED; real export begins TL03-P1.
 

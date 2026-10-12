@@ -14,7 +14,7 @@ Implemented P0–P3 measured-versus-declared runtime authority, strict units, de
 
 ## TL03 — iOS Target — ACTIVE
 
-Extend the same replay, evidence, and parity contract to iOS without introducing a separate gameplay implementation. P0 adds a macOS/Xcode/SDK preflight that reports unsupported Linux export as blocked, never certified. [TL03-P0](tl03-p0.md).
+Extend the same replay, evidence, and parity contract to iOS without introducing a separate gameplay implementation. P0 preflight merged. P1 adds a real macOS-only Godot iOS Xcode project ZIP export path with SHA-256 evidence; Linux CI remains strictly blocked. Native macOS export is not yet independently observed. [TL03-P0](tl03-p0.md) · [TL03-P1](tl03-p1.md).
 
 ## TL04 — Adapter SDK
 

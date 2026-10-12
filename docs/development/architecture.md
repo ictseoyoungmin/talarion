@@ -2,104 +2,65 @@
 
 ## Product boundary
 
-Talarion is portability and cross-runtime QA infrastructure. It does not implement a renderer, physics engine, editor, or source-to-source game converter.
+Talarion is a local-first **Web-first game portability, build and evidence platform**. It is not a custom renderer, physics engine, editor or universal source-to-source converter. A game project owns its canonical gameplay source and assets; Talarion owns capability analysis, target orchestration, replay delivery, provenance, quality gates and packaging integration.
 
-The game engine remains responsible for scene execution and rendering. Talarion is responsible for target orchestration, portability constraints, replay delivery, evidence collection, and cross-runtime comparison.
+**Current implementation:** one Godot 4.7.2 Ruins Lite reference with exported Web and Android emulator runners, machine-readable contracts and CI gates. **Target architecture:** runtime-preserving Web-native to Android delivery alongside existing Godot-native exports, with separate package/release proof. This document describes both without asserting that the target architecture has been implemented.
 
-## Canonical game source
+The authoritative decisions are [ADR-001–005](adr/README.md). Existing [TL00](tl00.md) acceptance remains a reference baseline.
 
-Game state and content remain authoritative in one project:
+## Independent dimensions
 
-```text
-gameplay/core       world/content       game schema
-      \                  |                 /
-       +------------------+----------------+
+~~~text
+developer-owned game project
+          |
+      source adapter
+          |
+  capability inspection
+          |
+   runtime provider
+   +------+------+-----------------+
+   |             |                 |
+browser JS   Android WebView   Godot Android native
+   |             |                 |
+web bundle    debug APK / release AAB
+                 |                 |
+              independent evidence and release gates
+~~~
+
+The diagram illustrates supported/planned **classes**: today only Godot -> Web and Godot -> Android debug APK are proven end to end. Web-native/WebView, release AAB and shared-native-JS providers are **unimplemented**.
+
+The [source/runtime/artifact contract](adr/002-source-runtime-artifact-separation.md) distinguishes authoring engine, rendering backend, game-logic runtime, host OS, packaging and porting class. Do not use `android` alone as a capability identity. An Android WebView app is a real installable Android APK/AAB but does not become a native renderer. APK/AAB is an artifact distinction, not an engine.
+
+## Game execution and rendering boundary
+
+A game session has **one authoritative gameplay state owner**. Runtime-preserving builds leave ownership with original game code; a later opt-in portable simulation core may own state when actually integrated. Talarion's replay observer does not create a second physics/gameplay authority.
+
+~~~text
+semantic input -> authoritative game state -> renderer-specific presentation
                           |
-                 portability layer
-                          |
-       +------------------+----------------+
-       |                  |                |
-      Web              Android       iOS (deferred)
-```
+                   state / event / capture evidence
+~~~
 
-Target-specific differences must not create independent gameplay implementations.
+A cross-engine IR is **optional and limited** to operations with versioned, tested semantics. glTF/GLB can transport assets, not general gameplay/physics. Rendering, physics and host APIs remain with providers unless explicitly placed under a portable execution contract. Numeric tolerance is per-domain and per-game; fixed-step replay by itself does not guarantee cross-engine determinism. See [ADR-003](adr/003-game-execution-semantics.md).
 
-## Portability layer
+## Planned modules versus implemented modules
 
-Portable gameplay is designed to use explicit platform interfaces instead of direct target APIs. The following are **interface domains**, not a claim that all implementations already exist:
+| Domain | Implemented today | Target direction |
+| --- | --- | --- |
+| Project discovery | In-repository config and read-only Godot project inspector | Explicit independent project root, safe workspace and opt-in changes |
+| Adapter | Godot manifest, fixed Web/Android dispatch | Distinct source adapter, runtime provider and package builder |
+| Development | Godot exported headless Web QA | Interactive Web-native development and browser feedback |
+| Game QA | Canonical Replay, state, visual and telemetry CI | Per-project immutable evidence and portability matrix |
+| Android | Godot native Debug APK + emulator replay | WebView APK, Release AAB, store readiness and independent device QA |
+| Cross-engine | No gameplay translation | Optional bounded, conformance-tested portable subset |
+| iOS | Experimental deferred export | Not an active target or release prerequisite |
 
-```text
-platform.input
-platform.storage
-platform.audio
-platform.haptics
-platform.lifecycle
-platform.purchase
-```
+## Evidence and build authority
 
-A target adapter implements those interfaces for its runtime.
+The evidence stream must bind game source and assets, replay, runtime provider/toolchain, built artifact and the observed device to every result. Static preflight cannot attest to runtime. Emulator tests cannot certify hardware. Source/game-specific parity, visual fidelity, performance and release policy gates are separate. See [ADR-004](adr/004-evidence-and-android-release-authority.md).
 
-## Render boundary
+Builds should eventually form a typed, provenance-aware dependency graph with isolated outputs; **today** `talarion plan` is a configured target list, not an executable graph. Projects remain developer-owned, and static analysis must not execute plugins or modify game files. See [ADR-005](adr/005-project-isolation-and-build-graph.md).
 
-Engine-specific rendering objects should not leak into portable gameplay logic when a higher-level description is sufficient.
+## Next verification milestone
 
-```text
-Game Logic
-    ↓
-World State
-    ↓
-Render Intent
-    ↓
-Engine / Renderer Backend
-```
-
-Representative render intent:
-
-```text
-spawn entity
-mesh = character_003
-material = skin_02
-animation = run
-lod_policy = character_near
-```
-
-## Target profiles
-
-Target quality differences belong in declarative profiles rather than gameplay forks. Profiles can control:
-
-- texture maximum and compression policy
-- LOD policy
-- shadow quality
-- particle budget
-- draw-call budget
-- frame-rate target
-- post-processing tier
-- evidence/debug instrumentation
-
-Initial profiles:
-
-- `web-qa` — fast build and automated evidence collection
-- `android-low` — constrained mobile budget
-- later native high-end/iOS profiles
-
-## Core subsystems
-
-### Portability Doctor
-
-Static and project-level checks that detect non-portable APIs, unsupported capabilities, asset-budget violations, and missing target configuration.
-
-### Replay and Parity
-
-A semantic action stream is replayed against multiple runtimes. Authoritative state, visual checkpoints, events, and performance evidence are compared under explicit tolerances.
-
-### Build planning and orchestration
-
-Currently `talarion plan` lists configured target/profile/export outputs, and `talarion build` / `test` invoke the existing Godot Web/Android paths. A dependency-resolving build/evidence graph is an **architectural direction**, not yet an implemented executable DAG.
-
-## Design constraints
-
-1. Portability is checked continuously rather than after feature completion.
-2. Web is the primary fast iteration surface; exported Android emulator runtime QA validates TL00 infrastructure, while physical-device testing certifies hardware-specific release claims separately.
-3. Runtime runners return evidence, not only exit codes.
-4. Structured output is a first-class interface for CI and coding agents.
-5. Backend expansion follows contract stability; engine count is not an early success metric.
+Follow [next-slice.md](next-slice.md). Freeze this design boundary, then implement one independent browser-playable Web-native game, runtime-preserving Android Debug APK and a separate Release AAB proof. Keep legacy Godot TL00 15/15 authoritative states, 3/3 strict visual checkpoints and 9/9 machine acceptance on every source-change PR. No cross-engine claim or Play publication is inferred from these experiments.

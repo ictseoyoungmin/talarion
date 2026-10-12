@@ -4,11 +4,12 @@ This directory contains the engineering specification for Talarion.
 
 ## Documents
 
-- [Architecture](architecture.md) — product boundary, canonical source model, adapters, and build graph.
+- [Architecture decisions (ADR-001–005)](adr/README.md) — accepted Web-first product, source/runtime/artifact, semantics, Android release and isolation boundaries (design only).
+- [Architecture](architecture.md) — implemented reference versus target multi-provider model, ownership and evidence boundaries.
 - [Portability Contract](portability-contract.md) — platform boundaries, doctor rule classes, replay/state contracts.
 - [QA and Parity](qa-parity.md) — deterministic replay, state/visual/performance comparison, and device QA cadence.
 - [Runtime Runners](runtime-runners.md) — common evidence contract for Web and Android runners.
-- [Engine Strategy](engine-strategy.md) — Godot-first backend scope and future adapter model.
+- [Engine Strategy](engine-strategy.md) — retained Godot reference, planned Web-native providers and porting classes.
 - [TL00](tl00.md) — emulator-backed Web/Android automated-acceptance contract and closure criteria.
 - [Release Certification](release-certification.md) — optional separate physical-device hardware/compatibility gate.
 - [TL01-P0](tl01-p0.md) — Portability Doctor rule classes, findings and fixture contract.
@@ -25,6 +26,6 @@ This directory contains the engineering specification for Talarion.
 - [TL04-P1](tl04-p1.md) — actual Godot build/runner dispatch behind immutable reference bindings and fail-closed source authority.
 - [TL04-P2](tl04-p2.md) — read-only candidate manifest verification, negative fixtures and contributor guidance; TL04 P0–P2 completed.
 - [TL05-P0](tl05-p0.md) — independent Godot project integration prerequisite inspection, sample-coupling audit and readiness boundaries.
-- [Next Slice](next-slice.md) — completed TL04 baseline and proposed next independent-project adoption proof.
-- [Roadmap](roadmap.md) — TL00 through adapter ecosystem milestones.
+- [Next Slice](next-slice.md) — WF01 browser-native slice first; WF02 Android Debug APK, WF03 release AAB; TL05-P1/P2 backlog.
+- [Roadmap](roadmap.md) — retained TL00–TL05 history and gated Web-first delivery milestones.
 - [OSS Strategy](oss-strategy.md) — repository positioning, local-first requirements, and contributor-facing product constraints.

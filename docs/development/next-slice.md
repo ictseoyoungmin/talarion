@@ -1,27 +1,49 @@
-# Next Implementation Slice — External Godot Project Adoption (Proposed TL05)
+# Next Slice — Web-first Runtime and Android Release Architecture
 
-## Accepted foundation
+## Accepted baseline
 
-- **TL00 — CLOSED:** actual exported Godot Web/Android replay state 15/15, strict visual 3/3 and acceptance 9/9.
-- **TL01 — CLOSED:** portable-source Doctor and deterministic reports.
-- **TL02 — CLOSED:** observational performance evidence authority and cohort reporting, without hardware self-certification.
-- **TL03 — DEFERRED:** experimental iOS preflight/export code is retained, but unverified native macOS/Xcode/iOS targets are excluded from all active acceptance criteria.
-- **TL04 — CLOSED:** [P0](tl04-p0.md) versioned adapter manifest and source-only inspector (PR #17); [P1](tl04-p1.md) explicitly allowlisted Godot Web/Android build/runner binding (PR #18); [P2](tl04-p2.md) read-only candidate manifest conformance, source provenance, negative fixtures and extension guide (PR #19). Each PR head passed Node 20/22/24, real exported Web and Android replay, 15/15 state, 3/3 strict visual and TL00 9/9.
+- **TL00–TL02 CLOSED:** Godot Ruins Lite exported Web/Android runner proof; state 15/15, strict visual 3/3 with declared 2% tile-error limit, TL00 acceptance 9/9; static Doctor and observational performance evidence.
+- **TL03 DEFERRED:** experimental iOS code remains, with no native iOS runtime or signing certification.
+- **TL04 CLOSED:** Godot adapter manifest, explicit dispatch, read-only candidate conformance.
+- **TL05-P0 CLOSED:** non-destructive *read-only* in-repository Godot preflight and sample coupling inventory, PR #21; does not demonstrate independent gameplay.
+- **TL05-P1 / P2 RESEQUENCED — NOT CLOSED:** independent second-Godot-game adoption proof remains valid work but is not the next product bottleneck; do not claim completed or delete its history.
 
-## Next bottleneck: portability beyond the single sample
+## Design gate — accepted ADRs
 
-The present proof uses the canonical `examples/ruins-lite` reference project. A stable manifest does not yet demonstrate that an **independent Godot project** can be onboarded without editing Talarion internals. Avoid adding a second game engine or cloud service until that gap is addressed.
+[ADR-001–005](adr/README.md) specify the forward architecture: source-owned Web-first development; source/runtime/artifact independence; single game-state authority and optional limited IR; separate build/runtime/parity/store proof; isolated external projects and provenance-aware graph.
 
-**TL05 — External Godot Project Adoption** (P0 closed, P1 next; independent-game runtime not yet certified):
+**ADR acceptance is not implementation evidence.** The existing Godot `talarion.config.json` stays v1. No `dev web`, Babylon.js integration, WebView packager or AAB builder currently exists.
 
-1. **P0 — CLOSED:** sample-coupling inventory and read-only `project inspect --json` with TA001–TA012 static prerequisites, negative tests and unverified integration limitations. [P0 contract](tl05-p0.md) · PR #21 (exact-head CI #38266679450, 6/6 after SDK installation retry).
-2. **P1 — NEXT:** onboard a genuinely independent Godot game without editing core Talarion engine/runner code; collect actual exported Web/Android replay/state/visual evidence. Ruins Lite fixtures cannot satisfy P1 acceptance.
-3. **P2 — Reproducible onboarding and agent diagnostics:** generalize only demonstrated integration boundaries, publish an executable project-adoption example and focused failures, and maintain TL00 acceptance regression.
+## New prioritized implementation slices
 
-## Immutable boundaries
+### WF01 — Browser-native playable reference and QA (NEXT)
 
-- Preserve Web/Android 15/15 state, 3/3 strict spatial visual threshold 2% and TL00 9/9 for the canonical sample.
-- Capability declarations and source binding are **not** runtime or physical hardware proof.
-- iOS stays deferred. Do not require Apple credentials, macOS, paid cloud services, new engine backends or physical-device verification for infrastructure CI.
-- Keep [QA screenshot race issue #4](https://github.com/ictseoyoungmin/talarion/issues/4) separately open until raw before/after image diff review.
-- Dependency lockfile generation and `npm ci` reproducibility remain a separate verified maintenance slice; do not fabricate an offline lockfile.
+- Select a small independent Web-native 3D game (Babylon.js is a candidate), built in its native library; support developer-facing interactive browser run and inspectable errors, without Godot project generation.
+- Integrate minimal adapter/runtime evidence: developer-owned source, semantic replay, authoritative game state, named screenshots, performance capture and explicit runtime capabilities. Do not make existing `talarion test web` silently accept unknown engines.
+- Persist project-source/build/replay/runtime hashes and separate run outputs. Negative test untrusted projects, missing capabilities and invalid evidence.
+- **Exit:** executable original browser game and independent runtime evidence **from that game**, plus unchanged Godot exported Web/Android CI and TL00 QA.
+
+### WF02 — Runtime-preserving Android Debug APK
+
+- Package the same original Web-native source as an installable Android app via a deliberately isolated and secure WebView host; handle offline assets, asset origins, bridge/permissions, touch/lifecycle and navigation.
+- Test Android emulator installation, launch, native container identity, state replay and named screenshots against the browser run. Record exact artifact/source provenance and portability class `same-runtime`.
+- **Exit:** independently produced Debug APK and Android runtime proof; do not claim native GPU engine or physical-device certification.
+
+### WF03 — Google Play Release AAB preflight
+
+- Generate an isolated **release AAB** for the same Web-native game and independently validate package structure, signing/upload-key custody, package/version, effective target/API policies, 64-bit ABI where applicable, device extraction/install via bundle tooling, permissions and store readiness.
+- Prefer current official policy at gate execution; version the policy snapshot. No embedded keys, no auto-publishing, no inferred Play approval.
+- **Exit:** independently inspectable signed release AAB and a release-preflight report distinct from build/runtime pass; publication unverified until Play confirms.
+
+### WF04 — Portable-subset feasibility (research, optional after WF01–03)
+
+- Specify a tiny operator set only after behavior semantics are normative. Test the same gameplay in Web-native and a Godot implementation; compare source/state/event/visual evidence without assuming physics equivalence.
+- **Exit:** either measured portable-conformance proof or an explicit limitation/rejection of the IR hypothesis. No general Three.js -> Godot conversion claim.
+
+## Execution and scope guards
+
+1. **Do not add code to implementation simply to satisfy accepted ADRs.** Deliver one visible, tested slice at a time; do not weaken Godot reference CI.
+2. Keep TL05-P1 in the backlog rather than deleting it or falsely marking it complete; reassess its priority against WF01–03.
+3. Fail closed for cross-project source mutation, symlink/staging collisions, malicious plugins, stale provenance and unsupported required capabilities.
+4. Issue [#4](https://github.com/ictseoyoungmin/talarion/issues/4) remains open for independent raw screenshot review; lockfile generation needs real dependency resolution, not a fabricated offline lock.
+5. Actual device-class FPS, thermal, memory and certification are separate from emulator CI; iOS is still deferred.

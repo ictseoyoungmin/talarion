@@ -322,8 +322,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          SDK="$ANDROID_SDK_ROOT"
-          if [ -z "$SDK" ]; then SDK="$ANDROID_HOME"; fi
+          SDK="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-/usr/local/lib/android/sdk}}"
           echo "ANDROID_HOME=$SDK" >> "$GITHUB_ENV"
           echo "ANDROID_SDK_ROOT=$SDK" >> "$GITHUB_ENV"
           SDKMANAGER="$SDK/cmdline-tools/latest/bin/sdkmanager"

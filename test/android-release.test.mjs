@@ -6,7 +6,7 @@ import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { planReleaseAab,buildReleaseAab,verifyReleaseAab,testReleaseAab } from "../src/android-webview/release.mjs";
 import { testWebView } from "../src/android-webview/runtime.mjs";
-import { smokeInteractiveWebView } from "../src/android-webview/interactive.mjs";
+import { smokeInteractiveWebView, landscapeResumeEvidence } from "../src/android-webview/interactive.mjs";
 
 const project=path.resolve("examples/web-native");
 const env=["TALARION_RELEASE_KEYSTORE","TALARION_RELEASE_ALIAS",
@@ -103,4 +103,25 @@ test("WF03-P1 released APK QA is a separate fail-closed emulator gate",async()=>
   // Without an independently generated exact-source signed AAB this MUST fail,
   // and may never generate or install the legacy Debug APK as a fallback.
   await assert.rejects(testReleaseAab(project),/ENOENT|untrusted|stale|WR10/);
+});
+
+test("WF03-P1 regression: HOME portrait surface cannot be certified before two landscape frames",()=>{
+  const portrait={width:1080,height:2340};
+  const landscape={width:2340,height:1080};
+  assert.equal(landscapeResumeEvidence([portrait]),false);
+  assert.equal(landscapeResumeEvidence([landscape,portrait]),false);
+  assert.equal(landscapeResumeEvidence([portrait,landscape]),false);
+  assert.equal(landscapeResumeEvidence([portrait,landscape,portrait,landscape]),false);
+  assert.equal(landscapeResumeEvidence([portrait,landscape,landscape]),true);
+  assert.equal(landscapeResumeEvidence([portrait,{width:NaN,height:1080},landscape]),false);
+  assert.equal(landscapeResumeEvidence([portrait,{width:0,height:0},landscape]),false);
+});
+
+test("WF03-P1 retains raw portrait evidence and fails closed if no real landscape resume",async()=>{
+  const src=await fs.readFile("src/android-webview/interactive.mjs","utf8");
+  assert.match(src,/04-resume-orientation-probe\.png/);
+  assert.match(src,/orientationObservations/);
+  assert.match(src,/awaitLandscapeResume\(dir,orientationObservations\)/);
+  assert.match(src,/assert\("WI017",false/);
+  assert.doesNotMatch(src,/sleep\(\d+\).*post-resume trusted tap/);
 });

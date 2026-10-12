@@ -18,7 +18,7 @@ Talarion connects those workflows around three capabilities:
 
 ## Project status
 
-Talarion is in early development. **Godot Web and Android are the currently maintained and CI-verified targets**, backed by exported runtime state, strict visual and telemetry evidence. The Godot adapter manifest, audited Web/Android execution binding and read-only candidate conformance workflow are implemented; onboarding an independent Godot game is a proposed next focus. iOS remains an optional, **deferred experimental export capability**, not a prerequisite for using or developing Talarion. This is not a certification of all Android devices or production-game performance.
+Talarion is in early development. **Godot Web and Android are the currently maintained and CI-verified targets**, backed by exported runtime state, strict visual and telemetry evidence. The Godot adapter manifest, audited Web/Android execution binding and read-only candidate conformance workflow are implemented. A read-only Godot project adoption preflight is available, but fully automated onboarding of a second independent game is **not yet proven**. iOS remains an optional, **deferred experimental export capability**, not a prerequisite for using or developing Talarion. This is not a certification of all Android devices or production-game performance.
 
 Available in the repository:
 
@@ -68,6 +68,7 @@ Inspect the project:
 ```bash
 node bin/talarion.mjs doctor
 node bin/talarion.mjs plan
+node bin/talarion.mjs project inspect --json
 ```
 
 Validate a replay:
@@ -266,3 +267,14 @@ MIT License. See [LICENSE](LICENSE).
 ## Runtime telemetry
 
 Web and Android runners emit `performance.jsonl` and a `talarion.performance/v1` summary in `runner-result.json`. These are observational CI diagnostics, not physical-device performance certification.
+
+## Trying another Godot project (experimental)
+
+The current checkout can statically inspect an alternate Godot project stored in a subdirectory by changing the project path, replay and preset/package fields in `talarion.config.json`. Then run:
+
+~~~bash
+node bin/talarion.mjs project inspect --json
+node bin/talarion.mjs adapter inspect --json
+~~~
+
+The project inspector does **not** install a bridge, rewrite project files or prove runtime parity. Before trying an actual build, review [TL05-P0 prerequisites and known limitations](docs/development/tl05-p0.md). The CI-tested reference path remains Ruins Lite; an independent game's Web/Android acceptance is P1 work.

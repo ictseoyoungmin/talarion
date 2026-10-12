@@ -24,6 +24,7 @@ This directory contains the engineering specification for Talarion.
 - [TL04-P0](tl04-p0.md) — versioned Godot manifest, static adapter CLI inspection and negative conformance contract.
 - [TL04-P1](tl04-p1.md) — actual Godot build/runner dispatch behind immutable reference bindings and fail-closed source authority.
 - [TL04-P2](tl04-p2.md) — read-only candidate manifest verification, negative fixtures and contributor guidance; TL04 P0–P2 completed.
+- [TL05-P0](tl05-p0.md) — independent Godot project integration prerequisite inspection, sample-coupling audit and readiness boundaries.
 - [Next Slice](next-slice.md) — completed TL04 baseline and proposed next independent-project adoption proof.
 - [Roadmap](roadmap.md) — TL00 through adapter ecosystem milestones.
 - [OSS Strategy](oss-strategy.md) — repository positioning, local-first requirements, and contributor-facing product constraints.

@@ -22,7 +22,7 @@ P0 [versioned reference manifest and source-only inspection](tl04-p0.md), P1 [al
 
 ## TL05 — External Godot Project Adoption — PROPOSED
 
-Demonstrate that an independent Godot game, beyond Ruins Lite, can use the same export/replay/evidence contract without changes to Talarion core. Begin with a project-coupling audit, then one flagship-quality end-to-end adoption proof. [Next implementation slice](next-slice.md). No additional engine or iOS work is assumed.
+Demonstrate that an independent Godot game, beyond Ruins Lite, can use the same export/replay/evidence contract without changes to Talarion core. First audit project coupling and add a non-destructive read-only adoption preflight (TL05-P0). Then require a separate genuinely independent Godot game and exported Web/Android proof (P1) before broad adoption claims. [Next implementation slice](next-slice.md). No additional engine or iOS work is assumed.
 
 ## Release Certification (separate gate)
 

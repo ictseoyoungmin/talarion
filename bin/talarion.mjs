@@ -18,6 +18,7 @@ import { iosPreflightCommand } from "../src/ios/preflight.mjs";
 import { iosExportCommand } from "../src/ios/export.mjs";
 import { inspectAdapterCommand } from "../src/adapters/manifest.mjs";
 import { validateCandidateAdapter } from "../src/adapters/candidate.mjs";
+import { inspectProjectAdoption } from "../src/commands/project-inspect.mjs";
 
 const argv = process.argv.slice(2);
 const jsonMode = argv.includes("--json");
@@ -31,6 +32,7 @@ Usage:
   talarion doctor [--json]
   talarion doctor report <output-dir> [--json]
   talarion plan [--json]
+  talarion project inspect [--json]
   talarion adapter inspect [web|android|ios] [--json]
   talarion adapter validate <candidate.json> [target] [--json]
   talarion build <web|android> [--json]
@@ -75,6 +77,12 @@ try {
       } else {
         fail("Usage: talarion adapter inspect [target] | adapter validate <candidate.json> [target]");
       }
+      break;
+    case "project":
+      if (args[1] !== "inspect" || args[2]) {
+        fail("Usage: talarion project inspect [--json]");
+      }
+      result = await inspectProjectAdoption(config);
       break;
     case "plan":
       result = await plan(config);

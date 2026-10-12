@@ -3,6 +3,7 @@ import path from "node:path";
 import { summarizePerformance } from "./performance.mjs";
 import { sha256File } from "./provenance.mjs";
 import { resolveFromRoot } from "../core/config.mjs";
+import { analyzeBudgetProfile } from "./budget-profile.mjs";
 
 export const AUTHORITY_SCHEMA = "talarion.performance-authority/v1";
 const RUNNER_SCHEMA = "talarion.runner-result/v1";
@@ -71,10 +72,20 @@ export function assessPerformanceAuthority({ config, manifests, samples, replayS
     "Recomputed raw samples must exactly agree with the runner summary and declared FPS.");
     check("PA06", validHash(sampleHashes[target]),
       "Raw performance samples have a SHA-256 content fingerprint.");
+    const sourceTrusted = checks.every(c => c.ok);
+    const coverage = analyzeBudgetProfile(profile, {
+      fpsP10: recomputed.fpsP10,
+      processMsP95: recomputed.processMsP95,
+      peakMemoryBytes: recomputed.peakMemoryBytes
+    }, sourceTrusted);
+    check("PA07", coverage.errors.every(e => e.code !== "BP01" && e.code !== "BP02"),
+      "Target profile exists and budget values use positive, type-correct quantities.");
+    check("PA08", coverage.errors.every(e => e.code !== "BP03" && e.code !== "BP04"),
+      "Optional explicit budget units agree with the fixed metric units.");
     const ok = checks.every(c => c.ok);
     targets.push({
       target, ok, runtimeKind,
-      declared,
+      declared, budgetCoverage: coverage,
       observation: {
         status: ok ? "validated-runner-observation" : "unverified",
         source: "engine-protocol-jsonl",

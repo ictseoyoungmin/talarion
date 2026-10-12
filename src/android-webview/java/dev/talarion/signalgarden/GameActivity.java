@@ -127,11 +127,13 @@ public final class GameActivity extends Activity {
         game.loadUrl(URL + (replay ? "?talarionReplay=1" : ""));
     }
     @Override protected void onPause() {
+        Log.i(TAG, "TALARION_LIFECYCLE {\"phase\":\"pause\"}");
         super.onPause();
         if (game != null) game.onPause();
     }
     @Override protected void onResume() {
         super.onResume();
+        Log.i(TAG, "TALARION_LIFECYCLE {\"phase\":\"resume\"}");
         if (game != null) game.onResume();
     }
     @Override public void onConfigurationChanged(Configuration config) {

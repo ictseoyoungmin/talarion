@@ -13,8 +13,8 @@ Distinguish declared goals from engine-measured Web/Android telemetry with repro
 ### Vertical-slice plan
 
 1. **TL02-P0 — CLOSED:** raw sample recomputation, provenance, target identity, evidence authority. Merged PR #8. [Contract](tl02-p0.md).
-2. **TL02-P1 — ACTIVE:** fixed-unit metric vocabulary, strict profile validation, explicit comparable/unobserved/unknown coverage and no automatic budget grading. [Contract](tl02-p1.md).
-3. **TL02-P2:** stable replay measurement windows, performance distributions, warm-up exclusion and noise-sensitive regression policy with negative controls.
+2. **TL02-P1 — CLOSED:** fixed-unit metric vocabulary, strict target profiles, explicit budget coverage with no automatic PASS, merged PR #9. [Contract](tl02-p1.md).
+3. **TL02-P2 — ACTIVE:** canonical warmup and sample ticks, guarded engine-reported distributions and multi-run noise-aware observational regressions (no auto-certified FPS). [Contract](tl02-p2.md).
 4. **TL02-P3:** reproducible CI decisions and reports, with observational emulator outcomes clearly separated from physical-device Release Certification.
 
 ## Invariants

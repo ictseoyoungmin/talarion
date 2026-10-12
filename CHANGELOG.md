@@ -12,6 +12,10 @@
 
 ### Added
 
+- TL02-P2 replay-anchored warmup and exact-tick performance windows with fail-closed incomplete/invalid observations and descriptive FPS/process/memory distributions (no target-FPS verdict).
+- Noise-aware observational regression helper requiring three independent complete runs per cohort, identical replay/host class/profile and explicit degradation thresholds; inconclusive/noisy/insufficient results never produce false PASS.
+- CI asserts complete P2 windows for both actual exported Web and Android runs, while preserving TL00 visual/state parity and the physical-device certification boundary.
+
 - TL02-P1 fixed metric units and target profile checks: FPS, process P95 milliseconds, peak process memory bytes and unobserved draw-call counts, with optional validated explicit `performanceUnits`.
 - `talarion.budget-coverage/v1` per-target coverage, `PA07` / `PA08` validation and fail-closed incorrect/missing profile handling. No automatic FPS/device performance PASS; evidence comparability is not compliance.
 - Regression tests and exported-runner CI assertions for unobserved metrics, invalid units and always-ungraded budgets.

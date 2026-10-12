@@ -31,6 +31,7 @@ This directory contains the engineering specification for Talarion.
 - [WF02-P1](wf02-p1.md) — installed APK real ADB touch, HOME/resume lifecycle smoke and original Android before/after screenshots.
 - [WF03-P0](wf03-p0.md) — observed independent API36 signed Release AAB build/verify gate (PR #30 closed).
 - [WF03-P1](wf03-p1.md) — release AAB→APK extraction, signed package provenance, actual WebView emulator replay/touch/HOME and browser parity.
-- [Next Slice](next-slice.md) — WF01 and WF02 complete; WF03-P0 complete, P1 next; TL05-P1/P2 backlog.
+- [WF03-P2](wf03-p2.md) — proposed Google Play submission-readiness and user-owned signing boundaries (not implemented).
+- [Next Slice](next-slice.md) — WF01/WF02 and WF03-P0/P1 completed for constrained references; WF03-P2 next; TL05-P1/P2 backlog.
 - [Roadmap](roadmap.md) — retained TL00–TL05 history and gated Web-first delivery milestones.
 - [OSS Strategy](oss-strategy.md) — repository positioning, local-first requirements, and contributor-facing product constraints.

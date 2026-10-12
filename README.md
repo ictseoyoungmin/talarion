@@ -2,7 +2,7 @@
 
 **One game. Many runtimes.**
 
-Talarion is an open-source portability and cross-runtime QA toolchain for 3D games. It is designed for a web-first development loop while keeping native mobile targets continuously verifiable.
+Talarion is an open-source portability and cross-runtime QA toolchain for games. Its long-term direction is Web-first game development with verifiable Android APK/AAB delivery, while retaining the already-tested Godot Web/Android pipeline.
 
 Talarion does not replace a game engine. It adds a portability layer around an existing project so the same game can be built, replayed, measured, and compared across runtimes.
 
@@ -36,6 +36,8 @@ Available in the repository:
 - ADB Android runner implementation
 - machine-readable `--json` output
 - a minimal Godot 3D sample project
+
+The [Web-first architecture decisions](docs/development/adr/README.md) and [implementation plan](docs/development/next-slice.md) separate Web-native source, runtime provider, Android APK/AAB packaging and release gates. **Web-native-to-Android packaging and Play-ready AAB generation are not implemented yet.** They are documented design targets, not current CLI capabilities.
 
 The first Web/Android vertical slice is CI-verified using exported Godot Web and Android emulator runtimes. Physical Android hardware is **not required for baseline portability QA**; hardware performance and device compatibility claims require a separate [release certification](docs/development/release-certification.md). The runners require a working Godot toolchain and an authorized Android device **or emulator**.
 

@@ -1,46 +1,52 @@
 # Roadmap
 
-## TL00 — One Game, Two Runtimes
+## Current verified foundation
 
-Web ↔ Android deterministic exported replay, state/visual parity, observed runtime telemetry and machine-readable acceptance. Emulator-backed CI closes TL00 without requiring a physical Android device.
+- **TL00 CLOSED:** one Godot game, two real exported Web/Android emulator runtimes; 15/15 state, strict visual 3/3 and machine TL00 acceptance 9/9.
+- **TL01 CLOSED:** Portability Doctor source/static diagnostics (PR #3, #5–#7).
+- **TL02 CLOSED:** performance evidence authority and cohort/report contracts (PR #8–#11). Hardware performance is not certified.
+- **TL03 DEFERRED:** experimental iOS preflight/export preserved but native runtime not verified.
+- **TL04 CLOSED:** adapter SDK reference manifest, explicit Godot Web/Android dispatch and candidate conformance (PR #17–#19).
+- **TL05-P0 CLOSED:** read-only in-repository Godot project adoption preflight and source coupling audit (PR #21), not an independent-game runtime proof.
+- **TL05-P1/P2 PAUSED / BACKLOG:** independently running a second Godot game remains an unfulfilled validation, not an active prerequisite for Web-native adoption.
 
-## TL01 — Portability Doctor — CLOSED
+## Architecture boundary — accepted design, unimplemented routes
 
-Static project, platform API, asset profile and deterministic JSON/HTML reporting implemented in P0–P3; merged via PR #3, #5, #6 and #7.
+Five [architecture decision records](adr/README.md) lock product direction, independent source/runtime/package identities, authoritative gameplay semantics, evidence/release gates and external-project isolation. These decisions do **not** constitute support for Babylon.js, Three.js, Android WebView packaging, release AAB or an ONNX-like game IR.
 
-## TL02 — Performance Budget — CLOSED
+## Prioritized Web-first route
 
-Implemented P0–P3 measured-versus-declared runtime authority, strict units, deterministic replay windows and independent observational cohort reports (PR #8–#11). GPU residency, draw calls and physical-device certification remain explicitly unavailable without trusted hardware evidence.
+1. **WF01 NEXT — Web-native game & interactive development QA.** First independent browser game and versioned evidence with unchanged Godot reference gates.
+2. **WF02 — Android Debug APK using runtime preservation.** Real installed Android WebView game, safe native bridge, lifecycle/input/visual/state proof.
+3. **WF03 — Release AAB and Play readiness.** Separate signed artifact, bundle inspection, current Play policy and user-controlled credentials; no claim of Play listing without actual publication.
+4. **WF04 RESEARCH — Cross-engine portable subset.** Tested limited behavior semantics across providers; do not require IR for WF01–03.
+5. **TL05-P1/P2 BACKLOG:** independent Godot-game adoption remains valuable after the highest Web-native developer workflow risk is addressed.
 
-## TL03 — iOS Target — DEFERRED
+## Gate discipline
 
-iOS is outside the currently supported and validated Web/Android scope. P0 macOS/Xcode preflight and P1 Godot Xcode-project ZIP export implementation are merged, preserved and tested for fail-closed behavior, but **real native macOS export, iOS runtime, parity and signing are not certified**. No iOS CI job, Apple developer account, macOS host or paid third-party service is required for baseline development or release. Resume only on an explicit target decision after actual Apple Team/developer identity and macOS/Xcode/Godot export prerequisites are available. [TL03-P0](tl03-p0.md) · [TL03-P1](tl03-p1.md).
+Android `debug APK`, `release AAB` and `Google Play published` are three different statuses. WebView and native host are also distinct even if both produce an APK/AAB. The separately reviewed [physical-device certification](release-certification.md) applies only to claims about actual hardware/device-class reliability, not baseline CI. Do not upgrade statuses from declarative adapter manifests or fixture comparisons.
 
-## TL04 — Adapter SDK — CLOSED
+## Target architecture (not an implemented DAG)
 
-P0 [versioned reference manifest and source-only inspection](tl04-p0.md), P1 [allowlisted Godot Web/Android execution binding](tl04-p1.md), and P2 [candidate JSON conformance and extension guidance](tl04-p2.md) merged in PR #17–#19. Every PR passed actual exported Web/Android runtime replay and the unchanged 15/15 state, 3/3 strict spatial visual and TL00 9/9 acceptance. SDK source binding cannot self-certify a device, engine runtime or unsupported platform.
+~~~text
+Developer-owned source (Babylon / Three / 2D / Godot)
+                       |
+              capability inspection
+                       |
+               source/runtime provider
+             +---------+------------+
+             |                      |
+         Browser                 Android
+             |               +------+------+
+       Web runtime         WebView     Godot native
+             |               |             |
+         Web bundle       APK/AAB      APK/AAB (planned release)
+             +---------------+-------------+
+                             |
+                    game-specific evidence
+                             |
+                build / runtime / parity /
+                performance / release gates
+~~~
 
-## TL05 — External Godot Project Adoption — ACTIVE (P0 CLOSED)
-
-Demonstrate that an independent Godot game, beyond Ruins Lite, can use the same export/replay/evidence contract without changes to Talarion core. P0 source-only adoption preflight and Ruins Lite coupling inventory merged via PR #21 (CI 6/6; no independent-game runtime certification). P1 must prove a genuinely different Godot game on exported Web/Android with independent replay/state/visual provenance and no Talarion-core rewrite. P2 generalization must follow proven integration. [Next implementation slice](next-slice.md). No additional engine or iOS work is assumed.
-
-## Release Certification (separate gate)
-
-Actual device compatibility, thermal, lifecycle and device-class FPS/memory claims require the separately reviewed [Release Certification](release-certification.md) process. These are not TL00/feature-development prerequisites.
-
-## Long-term shape
-
-```text
-              Talarion
-                 |
-        +--------+--------+
-        |                 |
-Portability Doctor   Parity Test
-        \                 /
-         +------Build-----+
-                Graph
-         /        |        \
-       Web     Android     iOS (deferred)
-```
-
-The roadmap prioritizes contract quality and reproducible evidence before backend breadth.
+No new engine, cloud farm, hosted SaaS, physical Android device or Apple subscription is required merely to develop and validate the existing reference toolchain.

@@ -2,52 +2,22 @@
 
 ## Positioning
 
-Talarion should remain focused on continuous portability proof rather than becoming a general-purpose game engine.
+**Web-first game development -> verifiable Android game release**, without forcing source translation into a specific native game engine. Talarion provides portability planning, integration, build orchestration, runtime evidence and release preflight; it is not a replacement for game engines.
 
-Product promise:
+The first user-facing workflow should be a genuine small playable **Web-native game** followed by the same source packaged as an Android Debug APK, then an independently verified release AAB. The existing Godot Ruins Lite reference is a maintained separate regression path, not evidence that Web-native adoption already works.
 
-> Build on the web. Know it will survive mobile.
+## Success criteria
 
-## First-run experience
+- User can work in a preferred Web engine and run the game interactively during iteration.
+- Same project produces inspectable browser and Android game evidence without silent gameplay-source rewrites.
+- Packaging mechanism is transparent: embedded WebView vs Godot-native/other native host.
+- Every claim identifies observed build, runtime, game-state/visual parity, performance budget and independent Play-readiness status.
+- Acceptance gates are based on reproducible artifacts, not the number of supported adapters or nominal conversions.
 
-The repository should make the product value visible quickly:
+## Local-first / OSS rules
 
-1. run a small polished Web sample;
-2. execute the same replay on Android;
-3. inspect a parity report;
-4. reproduce the workflow from a short CLI sequence.
+Core workflows must work locally or in self-hosted CI with no paid service, vendor API key or background AI dependency. Optional hosted device labs or Play upload integrations require explicit user action and permissions. Games retain their original licenses and asset rights; third-party runtime/provider licenses must be reviewed before packaging.
 
-A representative sample should resemble a small finished game slice rather than a renderer test scene.
+Prefer versioned machine-readable contracts, fail-closed unknowns, scoped file operations and independent evidence provenance. Never imply real-device performance or Google Play publication from emulator runs. Retain MIT project licensing.
 
-## Local-first requirement
-
-Core workflows must work locally and in self-hosted CI:
-
-- build
-- replay
-- state comparison
-- visual comparison
-- report generation
-
-Optional hosted services can later provide device farms, remote builds, team dashboards, or long-term evidence storage. Core functionality must not require them.
-
-## Machine-readable interfaces
-
-Primary commands should support structured output suitable for CI and coding agents:
-
-```bash
-talarion doctor --json
-talarion plan --json
-talarion compare ... --json
-talarion verify --json
-```
-
-Automation should operate on deterministic tool outputs. AI is not a runtime dependency.
-
-## Scope discipline
-
-The initial public scope is Godot + Web + Android. Additional engines and targets should be added only when the portability and runner contracts are stable.
-
-## Licensing
-
-The repository uses the MIT License. A game's licensing remains independent from its use of the Talarion toolchain.
+See [ADR decisions](adr/README.md), [next slices](next-slice.md) and [release certification](release-certification.md).

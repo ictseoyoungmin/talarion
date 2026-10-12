@@ -129,6 +129,14 @@ node bin/talarion.mjs verify --json
 node bin/talarion.mjs test web --json
 ```
 
+## Portability Doctor
+
+Doctor scans portable gameplay for Web/Android dependencies and reports rule ID, affected target, capability, source position and a suggested remediation. Warnings require review and are not proof that a game will fail. Optional adapter declarations and their limitations are documented in [TL01-P1](docs/development/tl01-p1.md).
+
+```bash
+node bin/talarion.mjs doctor --json
+```
+
 ## TL00 automated acceptance
 
 The CI baseline requires real exported Web/Android replay, state and visual parity, valid engine telemetry and source fingerprints. It does **not** grade emulator FPS against physical-device targets. Reproduce the final acceptance result after capturing both runtimes:

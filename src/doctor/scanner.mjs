@@ -2,7 +2,7 @@ import path from "node:path";
 import { DOCTOR_RULES, diagnosticFor } from "./rules.mjs";
 
 const EXTS = new Set([".gd", ".js", ".mjs", ".ts"]);
-const MATCH_RULES = DOCTOR_RULES.filter(rule => rule.pattern);
+const MATCH_RULES = DOCTOR_RULES.filter(rule => rule.pattern || rule.literalCall);
 
 // Conservative lexical analysis, not a full GDScript/JS/TS parser.
 // Mask comments and quoted literals without shifting source offsets or newlines.
@@ -74,10 +74,27 @@ export function scanPortabilitySource({ file, source }) {
     return { line, column: pos - lineStarts[line - 1] + 1 };
   };
   const findings = [];
+  // Literal-first-argument matching reuses the masked callee but reads only a
+  // directly quoted first argument. Computed event names remain unknown.
+  const firstStringArgument = start => {
+    const rest = source.slice(start);
+    const literal = /^\s*(['"])([^'"\\\r\n]*)\1\s*(?=[,)])/.exec(rest);
+    return literal ? literal[2] : null;
+  };
   for (const rule of MATCH_RULES) {
-    const re = new RegExp(rule.pattern, "g");
-    for (const m of code.matchAll(re)) {
-      findings.push(diagnosticFor(rule.id, { file, ...locate(m.index) }));
+    if (rule.extensions && !rule.extensions.includes(ext)) continue;
+    if (rule.pattern) {
+      for (const m of code.matchAll(new RegExp(rule.pattern, "g"))) {
+        findings.push(diagnosticFor(rule.id, { file, ...locate(m.index) }));
+      }
+    }
+    if (rule.literalCall) {
+      for (const m of code.matchAll(new RegExp(rule.literalCall.pattern, "g"))) {
+        const name = firstStringArgument(m.index + m[0].length);
+        if (name && rule.literalCall.names.includes(name)) {
+          findings.push(diagnosticFor(rule.id, { file, ...locate(m.index) }));
+        }
+      }
     }
   }
   return findings.sort((a, b) =>

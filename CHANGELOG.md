@@ -12,6 +12,10 @@
 
 ### Added
 
+- TL01-P1 static diagnostics for Web/Android-native bridges, browser storage, audio, lifecycle events, keyboard events, Godot subprocesses and physical-key polling.
+- Optional target adapter declaration verification with safe repository-relative paths, target ownership and wrong-target API auditing; general action-map advice is not mistaken for a missing adapter.
+- Positive/negative tests for direct platform APIs, literal event names and invalid/missing adapter files.
+
 - TL01-P0 stable Portability Doctor catalog (talarion.doctor/v1) with capability/target/severity/remediation metadata, deterministic source coordinates and warning/error contract.
 - Fixture-backed detection tests that ignore comments, strings and generated .godot content, plus bounded lexical-scanner limitations.
 

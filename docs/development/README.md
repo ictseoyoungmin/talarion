@@ -12,6 +12,7 @@ This directory contains the engineering specification for Talarion.
 - [TL00](tl00.md) — emulator-backed Web/Android automated-acceptance contract and closure criteria.
 - [Release Certification](release-certification.md) — optional separate physical-device hardware/compatibility gate.
 - [TL01-P0](tl01-p0.md) — Portability Doctor rule classes, findings and fixture contract.
+- [TL01-P1](tl01-p1.md) — direct target APIs, lifecycle/input event signatures and adapter ownership checks.
 - [Next Slice](next-slice.md) — immediate implementation target.
 - [Roadmap](roadmap.md) — TL00 through adapter ecosystem milestones.
 - [OSS Strategy](oss-strategy.md) — repository positioning, local-first requirements, and contributor-facing product constraints.

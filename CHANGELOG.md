@@ -12,6 +12,10 @@
 
 ### Added
 
+- TL02-P0 runtime performance evidence authority: recompute raw Web/Android engine JSONL telemetry, compare runner summaries and replay/APK provenance, and distinguish headless Web, Android emulator and unreviewed physical hardware classes.
+- `talarion budget authority <web-dir> <android-dir> <out.json>` exports versioned machine-readable checks and preserves a `not-evaluated` budget decision and `hardwareCertified: false` evidence scope.
+- CI recomputes the performance authority result from downloaded actual runtime artifacts after TL00 parity acceptance; tests reject mismatched summaries, tampered replays and incomplete data.
+
 - TL01-P3 portable Doctor report schema with deterministic per-finding identifiers and actionable severity/target/remediation summaries, while preserving `talarion.doctor/v1`.
 - `talarion doctor report <output-dir>` produces offline escaped HTML and byte-reproducible JSON, with safe in-repository output paths and nonzero exit status on error-level findings.
 - Node CI publishes Doctor report artifacts; tests cover deterministic ordering, missing/invalid target states, HTML escaping, repeat exports, symlink escape attempts and fail-closed report exit semantics.

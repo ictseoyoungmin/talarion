@@ -137,6 +137,9 @@ jobs:
           script: |
             adb shell settings put secure immersive_mode_confirmations confirmed || true
             adb shell wm dismiss-keyguard || true
+            # Android emulator runner executes each script line independently.
+            # Verify service readiness in one shell, not by replay retries.
+            sh -c 'ready=0; for attempt in $(seq 1 45); do if adb shell am get-current-user >/dev/null 2>&1 && adb shell pm path android >/dev/null 2>&1; then ready=1; break; fi; sleep 2; done; if [ "$ready" -ne 1 ]; then echo "Android ActivityManager/PackageManager never became ready" >&2; exit 1; fi'
             node bin/talarion.mjs test android --json
 
       - name: Upload Android evidence
@@ -181,6 +184,10 @@ jobs:
       - name: TL00 acceptance gate
         run: |
           node bin/talarion.mjs gate tl00 .evidence/web .evidence/android artifacts/parity/visual/result.json artifacts/parity/tl00-acceptance.json --json
+
+      - name: TL02-P0 measured-versus-declared evidence authority
+        run: |
+          node bin/talarion.mjs budget authority .evidence/web .evidence/android artifacts/parity/performance-authority.json --json
 
       - name: Generate parity report
         if: always()

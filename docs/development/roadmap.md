@@ -8,13 +8,13 @@ Web ↔ Android deterministic exported replay, state/visual parity, observed run
 
 Static project, platform API, asset profile and deterministic JSON/HTML reporting implemented in P0–P3; merged via PR #3, #5, #6 and #7.
 
-## TL02 — Performance Budget — ACTIVE
+## TL02 — Performance Budget — CLOSED
 
-Begin with trusted-runner sample provenance (P0), then add declared target profiles and statistically sound regressions for FPS, frame time, memory, draw calls, texture pressure and device constraints. Distinguish synthetic/emulator observations from hardware measurements; do not infer device certification from CI.
+Implemented P0–P3 measured-versus-declared runtime authority, strict units, deterministic replay windows and independent observational cohort reports (PR #8–#11). GPU residency, draw calls and physical-device certification remain explicitly unavailable without trusted hardware evidence.
 
-## TL03 — iOS Target
+## TL03 — iOS Target — ACTIVE
 
-Extend the same replay, evidence, and parity contract to iOS without introducing a separate gameplay implementation.
+Extend the same replay, evidence, and parity contract to iOS without introducing a separate gameplay implementation. P0 adds a macOS/Xcode/SDK preflight that reports unsupported Linux export as blocked, never certified. [TL03-P0](tl03-p0.md).
 
 ## TL04 — Adapter SDK
 

@@ -1,0 +1,77 @@
+{
+  "schema": "talarion.replay/v1",
+  "gameId": "signal-garden",
+  "tickRate": 60,
+  "seed": 20261013,
+  "events": [
+    {
+      "tick": 30,
+      "type": "move",
+      "dx": 1,
+      "dz": 0
+    },
+    {
+      "tick": 60,
+      "type": "move",
+      "dx": 1,
+      "dz": 0
+    },
+    {
+      "tick": 75,
+      "type": "capture",
+      "name": "arrival"
+    },
+    {
+      "tick": 90,
+      "type": "move",
+      "dx": 0,
+      "dz": 1
+    },
+    {
+      "tick": 120,
+      "type": "move",
+      "dx": 0,
+      "dz": 1
+    },
+    {
+      "tick": 150,
+      "type": "move",
+      "dx": 1,
+      "dz": 0
+    },
+    {
+      "tick": 180,
+      "type": "move",
+      "dx": 1,
+      "dz": 0
+    },
+    {
+      "tick": 195,
+      "type": "capture",
+      "name": "crossing"
+    },
+    {
+      "tick": 210,
+      "type": "move",
+      "dx": 0,
+      "dz": 1
+    },
+    {
+      "tick": 240,
+      "type": "move",
+      "dx": 0,
+      "dz": 1
+    },
+    {
+      "tick": 270,
+      "type": "move",
+      "dx": 1,
+      "dz": 0
+    },
+    {
+      "tick": 285,
+      "type": "capture",
+      "name": "completion"
+    }
+  ]
+}

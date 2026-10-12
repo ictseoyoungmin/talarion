@@ -1,0 +1,9 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Signal Garden · Web-native Talarion Reference</title><link rel="stylesheet" href="./style.css"></head>
+<body><canvas id="stage" aria-label="Three-dimensional Signal Garden game"></canvas>
+<main class="interface"><div class="brand"><span class="symbol">✦</span><div><small>TALARION / WEB-NATIVE</small><strong>SIGNAL GARDEN</strong></div></div>
+<section class="mission"><div class="eyebrow">THE LAST LIGHTS</div><h1>Find the three<br><em>silent beacons.</em></h1><p>Restore the island’s hidden signal.</p><div class="progress" id="progress"><span></span><span></span><span></span></div><div id="mission" class="status">0 / 3 SIGNALS RECOVERED</div></section>
+<footer><div class="control"><strong>W A S D</strong><span>MOVE</span></div><div class="control"><strong>↑ ← ↓ →</strong><span>OR ARROW KEYS</span></div><div class="control" id="mode">FREE PLAY</div></footer>
+</main><div class="touch" aria-label="Touch movement controls"><button data-dir="0,-1" aria-label="Move forward">↑</button><div><button data-dir="-1,0" aria-label="Move left">←</button><button data-dir="0,1" aria-label="Move back">↓</button><button data-dir="1,0" aria-label="Move right">→</button></div></div>
+<script type="module" src="./game.mjs"></script></body></html>

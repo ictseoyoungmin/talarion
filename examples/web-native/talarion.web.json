@@ -1,0 +1,31 @@
+{
+  "schema": "talarion.web-native-project/v1",
+  "id": "signal-garden",
+  "engine": "three",
+  "renderer": "webgl2",
+  "entry": "index.html",
+  "replay": "replay.json",
+  "sources": [
+    "index.html",
+    "style.css",
+    "simulation.mjs",
+    "game.mjs",
+    "replay.json",
+    "talarion.web.json"
+  ],
+  "requirements": [
+    "webgl2",
+    "keyboard",
+    "fixed-tick-replay"
+  ],
+  "threeVersion": "0.180.0",
+  "evidence": {
+    "minSnapshots": 8,
+    "checkpoints": [
+      "arrival",
+      "crossing",
+      "completion"
+    ],
+    "finishedTick": 320
+  }
+}

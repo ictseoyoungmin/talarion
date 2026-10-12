@@ -12,7 +12,7 @@
 
 - TL00 runtime acceptance now requires full exported Web/Android emulator evidence, not physical Android hardware; added machine-verifiable `talarion gate tl00` result and CI check.
 - Physical device performance, thermal, compatibility and lifecycle certification moved into a separate optional release gate; emulator FPS is explicitly observational only.
-- TL01 Portability Doctor followed TL00 acceptance; TL01 and TL02 are now closed, TL03 iOS is deferred and TL04 Adapter SDK is next.
+- TL01 and TL02 closed after TL00; TL03 iOS is deferred. TL04 Adapter SDK P0–P2 is now merged; independent Godot project adoption is the next proposed proof.
 
 ### Added
 

@@ -18,7 +18,7 @@ Talarion connects those workflows around three capabilities:
 
 ## Project status
 
-Talarion is in early development. **Godot Web and Android are the currently maintained and CI-verified targets**, backed by exported runtime state, strict visual and telemetry evidence. The adapter interface is the next development focus. iOS remains an optional, **deferred experimental export capability**, not a prerequisite for using or developing Talarion. This is not a certification of all Android devices or production-game performance.
+Talarion is in early development. **Godot Web and Android are the currently maintained and CI-verified targets**, backed by exported runtime state, strict visual and telemetry evidence. The Godot adapter manifest, audited Web/Android execution binding and read-only candidate conformance workflow are implemented; onboarding an independent Godot game is a proposed next focus. iOS remains an optional, **deferred experimental export capability**, not a prerequisite for using or developing Talarion. This is not a certification of all Android devices or production-game performance.
 
 Available in the repository:
 

@@ -73,6 +73,9 @@ test("the Web-native server allows explicitly listed game assets only",async(t)=
     const vendor=await fetch(server.url+"__talarion/three.module.js");
     assert.equal(vendor.status,200);
     assert.ok((await vendor.text()).length>100000);
+    const core=await fetch(server.url+"__talarion/three.core.js");
+    assert.equal(core.status,200);
+    assert.ok((await core.text()).length>100000);
     assert.equal((await fetch(server.url+"../../package.json")).status,404);
     assert.equal((await fetch(server.url+"talarion.web.json")).status,200);
     assert.equal((await fetch(server.url+"no-such-file.txt")).status,404);

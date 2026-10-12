@@ -121,11 +121,14 @@ export async function createWebNativeServer(inspection,{port=0}={}){
   const files=new Map(inspection.manifest.sources.map(p=>["/"+p,path.join(inspection.project,p)]));
   files.set("/",path.join(inspection.project,inspection.manifest.entry));
   const vendor=await vendorFile(inspection.manifest.threeVersion);
+  const vendorCore=path.join(path.dirname(vendor),"three.core.js");
+  if(!(await noLink(vendorCore)))throw new Error("Pinned Three.js internal core module is missing; run npm install");
   const server=http.createServer(async(req,res)=>{
     try{
       const url=new URL(req.url??"/","http://127.0.0.1");
       if(req.method!=="GET"||url.pathname.startsWith("//")){res.writeHead(405);res.end();return}
-      const file=url.pathname==="/__talarion/three.module.js" ? vendor : files.get(url.pathname);
+      const file=url.pathname==="/__talarion/three.module.js" ? vendor :
+        url.pathname==="/__talarion/three.core.js" ? vendorCore : files.get(url.pathname);
       if(!file){res.writeHead(404);res.end("Not found");return}
       const bytes=await fs.readFile(file);
       res.writeHead(200,{
@@ -158,6 +161,7 @@ export async function testWebNative(projectRef=DEFAULT_PROJECT,{timeoutMs=35000}
   })));
   const sourceSha256=sha(Buffer.from(sourceFiles.map(x=>x.path+":"+x.sha256).join("\n")));
   const vendorSha256=await shaFile(vendor);
+  const vendorCoreSha256=await shaFile(path.join(path.dirname(vendor),"three.core.js"));
   const replaySha256=await shaFile(path.join(inspection.project,inspection.manifest.replay));
   const base=path.join(TOOL_ROOT,"artifacts/run/web-native");
   await fs.mkdir(base,{recursive:true});
@@ -173,7 +177,9 @@ export async function testWebNative(projectRef=DEFAULT_PROJECT,{timeoutMs=35000}
     let resolved=null;
     let rejectDone;
     const done=new Promise((resolve,reject)=>{resolved=resolve;rejectDone=reject});
-    const timer=setTimeout(()=>rejectDone(new Error("Web-native replay timed out")),timeoutMs);
+    const timer=setTimeout(()=>rejectDone(new Error("Web-native replay timed out; ready="+
+      ready.length+"; states="+states.length+"; captures="+captures.length+
+      "; browser errors="+JSON.stringify(issues.slice(0,8)))),timeoutMs);
     const captureTasks=[];
     try{
       page.on("pageerror",error=>issues.push(String(error.message)));
@@ -226,7 +232,7 @@ export async function testWebNative(projectRef=DEFAULT_PROJECT,{timeoutMs=35000}
         runtime:"browser-js",renderBackend:"webgl2",portingClass:"same-runtime",
         runtimeObserved:true,androidRuntimeObserved:false,releaseCertified:false,
         provenance:{sourceSha256,sourceFiles,vendorVersion:inspection.manifest.threeVersion,
-          vendorSha256,replaySha256},
+          vendorSha256,vendorCoreSha256,replaySha256},
         evidence:{stateFile:path.join(evidenceDir,"state.jsonl"),screenshots:captures,
           performanceFile:path.join(evidenceDir,"performance.jsonl"),finished},
         observed:{webgl2:webgl,readyCount:ready.length,snapshots:states.length,

@@ -173,6 +173,17 @@ node bin/talarion.mjs ios preflight artifacts/ios/ios-preflight.json --json
 
 The output deliberately reports `status: "blocked"` on Linux CI; `ok: true` means the preflight audit ran, **not** that iOS export or simulator/device replay succeeded. The tool checks Apple Xcode/SDK prerequisites, bundle/team/preset and simulator renderer constraints. See [TL03-P0](docs/development/tl03-p0.md).
 
+## iOS Xcode project export (TL03-P1)
+
+On a provisioned **macOS** host with full Xcode, both iPhoneOS/iPhoneSimulator SDKs, Godot and matching iOS export templates, configure the real nonsecret Apple Team ID in both `talarion.config.json` and the `iOS` preset's `application/app_store_team_id` field. The sample deliberately leaves these unset; no dummy Team ID is shipped.
+
+```bash
+node bin/talarion.mjs ios preflight artifacts/ios/preflight.json --json
+node bin/talarion.mjs ios export artifacts/build/ios --json
+```
+
+A successful export produces `ios-export.json`, `ios-preflight.json` and a SHA-256-fingerprinted Godot iOS ZIP containing an Xcode `.xcodeproj/project.pbxproj`. Export fails closed on Linux/Windows, missing prerequisites, mismatched bundle/team identifiers, unsafe output paths, existing ZIPs, Godot failure or invalid archives. This **does not** certify an Xcode compilation, Apple signing, simulator/device execution or iOS parity. Real macOS export evidence is pending; see [TL03-P1](docs/development/tl03-p1.md).
+
 ## TL00 automated acceptance
 
 The CI baseline requires real exported Web/Android replay, state and visual parity, valid engine telemetry and source fingerprints. It does **not** grade emulator FPS against physical-device targets. Reproduce the final acceptance result after capturing both runtimes:

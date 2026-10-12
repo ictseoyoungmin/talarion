@@ -8,8 +8,8 @@
 
 ## TL03 plan
 
-1. **TL03-P0 — ACTIVE:** iOS macOS/Xcode/SDK/preset/team ID and renderer preflight with explicit evidence boundary. [Contract](tl03-p0.md).
-2. **TL03-P1:** real iOS Xcode project export adapter and reproducible provenance on supported macOS host.
+1. **TL03-P0 — CLOSED:** host, platform, toolchain and iOS identity preflight. [Contract](tl03-p0.md).
+2. **TL03-P1 — IMPLEMENTATION:** macOS-only Godot iOS ZIP export adapter and reproducible archive/replay provenance. [Contract](tl03-p1.md). Native macOS export evidence remains pending.
 3. **TL03-P2:** iOS simulator/physical runtime replay evidence, screenshots and verified target identity.
 4. **TL03-P3:** cross-target replay/visual comparison and distinct release certification handoff.
 

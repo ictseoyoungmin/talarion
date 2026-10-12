@@ -29,8 +29,8 @@ function team(id) {
 function simulatorCompatible(text) {
   if(typeof text!=="string")return false;
   const section=text.split(/^\[rendering\]\s*$/m)[1]?.split(/^\[/m)[0];
-  return option(section,"renderer/rendering_method.mobile")==="gl_compatibility" ||
-    option(section,"renderer/rendering_method")==="gl_compatibility";
+  const mobile=option(section,"renderer/rendering_method.mobile");
+  return (mobile??option(section,"renderer/rendering_method"))==="gl_compatibility";
 }
 export function assessIosPreflight({
   config,hostPlatform,tools={},presetText,projectText

@@ -1,6 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { writeJson } from "../runtime/evidence.mjs";
+import { decodePng } from "../visual/png.mjs";
 
 const isObject=x=>x!==null&&typeof x==="object"&&!Array.isArray(x);
 async function findEvidence(dir,filename){
@@ -60,11 +61,39 @@ export async function compareWebAndWebView(webDir,androidDir,output){
   const win=JSON.stringify(w.evidence?.finished?.finalState)===JSON.stringify(a.evidence?.finished?.finalState);
   check(checks,"WP006",win&&a.evidence?.finished?.finalState?.state==="VICTORY",
     "Final independently observed gameplay state/score is equivalent");
+  // Fixture-specific visual semantic barrier: an unchanged Signal Garden
+  // progress HUD must visibly show 1, 2, then 3 amber segments at capture time.
+  // This is NOT a general pixel-fidelity claim or OCR.
+  const hud={};let hudValid=comparable;
+  for(const [name,expectedSegments] of [["arrival",1],["crossing",2],["completion",3]]){
+    try{
+      const bytes=await fs.readFile(path.join(path.dirname(androidFile),name+".png"));
+      const im=decodePng(bytes);
+      let count=0;
+      for(let y=Math.floor(im.height*.72);y<Math.floor(im.height*.84);y++){
+        for(let x=Math.floor(im.width*.06);x<Math.floor(im.width*.26);x++){
+          const i=(y*im.width+x)*4,r=im.data[i],g=im.data[i+1],b=im.data[i+2];
+          if(r>170&&g>110&&b>55&&b<210&&r>g*1.12&&g>b*1.07)count++;
+        }
+      }
+      const normalized=count/(im.width*im.height);
+      const nominalPerSegment=.00043;
+      const aligned=normalized>(expectedSegments-.35)*nominalPerSegment &&
+        normalized<(expectedSegments+.35)*nominalPerSegment;
+      hud[name]={expectedSegments,normalizedAmberArea:normalized,aligned};
+      if(!aligned)hudValid=false;
+    }catch(error){
+      hud[name]={expectedSegments,error:String(error.message??error),aligned:false};
+      hudValid=false;
+    }
+  }
+  check(checks,"WP007",hudValid,
+    "Real Android capture displays the expected 1/2/3 Signal Garden HUD progression at named checkpoints");
   const ok=checks.every(c=>c.status==="pass");
   const report={schema:"talarion.webview-parity/v1",ok,
     gameId:"signal-garden",portabilityClass:"same-runtime",
     authority:"observed-independent-browser-and-android-webview",
-    stateParityCertified:ok,visualCapturePresenceVerified:imagesOkay,
+    stateParityCertified:ok,visualCapturePresenceVerified:imagesOkay,fixtureHudProgressVerified:hudValid,hud,
     visualPixelSimilarityCertified:false,physicalDeviceCertified:false,
     releaseCertified:false,storePublished:false,checks,
     observed:{webStateCount:sWeb.length,androidStateCount:sAndroid.length,

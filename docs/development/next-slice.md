@@ -29,10 +29,11 @@
 - **WF02-P1 CLOSED (reference game/emulator):** `web-native android smoke` reinstalls the existing SHA-256 verified Debug APK; 3 real ADB taps change authoritative game positions [-3,-3] → [-2,-3] → [-1,-3] → [-1,-2], collecting beacon 1; HOME triggers Activity.pause and WebView visibility hidden, then resume without reload retains source state. Five raw Android captures, 21 passed check instances and provenance are recorded. [WF02-P1 QA contract](wf02-p1.md). PR #29 exact-head CI [#38303167847](https://github.com/ictseoyoungmin/talarion/actions/runs/38303167847) **8/8 PASS**, original P0 Replay and legacy Godot gates unchanged.
 - **P1 exit satisfied for constrained reference/emulator:** the original actual Android game preserved gameplay state through HOME/resume. Not proven: orientation-change recovery, Android process death/persistence, real physical-device performance, all Android OEM skins or app-store release readiness.
 
-### WF03 — Google Play Release AAB preflight (P0 implementation candidate)
+### WF03 — Google Play Release AAB preflight (P0 CLOSED; P1 implementation candidate)
 
-- **WF03-P0 (IN REVIEW):** An isolated API36 release AAB candidate now builds a protobuf base module via aapt2/bundletool, uses an external user-controlled upload key, independently checks signing/package/module/provenance, and optionally extracts/installs a universal APK. [WF03-P0 contract](wf03-p0.md). Do not mark completed until exact-head CI and independent evidence pass.
-- Independent device extraction/install evidence, package/version policies, native ABI applicability, and release/Play readiness remain separate from mere build success.
+- **WF03-P0 CLOSED:** PR #30 merged main da721c34518c4772b23315964beb22b12dc8e9b2 with exact-head CI #38310730950 and main CI #38311126082 **9/9 SUCCESS**. The original Three.js source builds an isolated API36 signed AAB, independently validated with pinned bundletool/JAR cert, manifest, ABI applicability and source SHA-256. [Contract](wf03-p0.md).
+- **WF03-P1 IN REVIEW:** Extract *that actual signed AAB* into APK, verify matching signer and API36 package, run real emulator WebView replay plus three trusted touch inputs, HOME/resume with raw PNGs, and independently compare browser↔Release gameplay/HUD. Do not reuse a Debug APK result as a Release result. [Implementation and acceptance](wf03-p1.md).
+- Real Release APK runtime is an independent gate; Play Console submission, upload-key custody, package ownership, distribution policies, physical-device QA and publication belong to later WF03-P2/release certification.
 - Prefer current official policy at gate execution; version the policy snapshot. No embedded keys, no auto-publishing, no inferred Play approval.
 - **Exit:** independently inspectable signed release AAB and a release-preflight report distinct from build/runtime pass; publication unverified until Play confirms.
 

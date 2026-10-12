@@ -75,8 +75,10 @@ export async function inspectAdapterRegistry(config, projectDir) {
 export function missingAdapterDiagnostics(findings, registry) {
   const required = new Map();
   for (const finding of findings) {
+    // Raw keyboard polling is fixable with Godot action maps; it does not
+    // imply a missing platform-specific adapter implementation.
     if (!finding.file || !finding.capability?.startsWith("platform.") ||
-        finding.id === "PF405") continue;
+        ["PF104", "PF403", "PF405"].includes(finding.id)) continue;
     for (const target of finding.targets ?? []) {
       const key = finding.capability + ":" + target;
       if (!required.has(key)) required.set(key, { finding, target });

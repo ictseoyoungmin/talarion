@@ -253,6 +253,7 @@ test("P1 wrong units and invalid numeric profiles fail closed", () => {
   assert.equal(bad.ok, false);
   assert.equal(bad.checks.find(x => x.id === "PA08").ok, false);
   assert.equal(bad.budgetCoverage.metrics[0].status, "invalid-profile");
+  assert.equal(bad.budgetCoverage.metrics[0].unitSource, "explicit-invalid");
   assert.equal(bad.observation.metrics, null);
   const t = make(); t.config = structuredClone(config);
   t.config.profiles["android-low"].drawCallBudget = 0.2;

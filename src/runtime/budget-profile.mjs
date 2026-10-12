@@ -65,7 +65,8 @@ export function analyzeBudgetProfile(profile, observedMetrics = null, evidenceVe
       budgetField: def.field,
       observedMetric: def.metric,
       unit: def.unit, unitSource: Object.hasOwn(declaredUnits, def.field)
-        ? "explicit-validated" : "schema-fixed",
+        ? declaredUnits[def.field] === def.unit ? "explicit-validated" : "explicit-invalid"
+        : "schema-fixed",
       direction: def.direction,
       required: def.required,
       declaredLimit: declared,

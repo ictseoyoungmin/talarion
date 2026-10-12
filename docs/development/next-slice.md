@@ -15,8 +15,8 @@ Extend static and project-level portability checks without inventing target-spec
 ### Candidate vertical-slice order
 
 1. **TL01-P0 — CLOSED:** portable API classes, severity, deterministic locations and positive/negative fixtures, accepted in PR #3. See [P0 contract](tl01-p0.md).
-2. **TL01-P1:** detect Web/Android-only APIs, lifecycle/storage/audio/input assumptions, and missing or invalid target adapter declarations. See [P1 engineering contract](tl01-p1.md).
-3. **TL01-P2:** validate asset/mobile quality-profile constraints separately from actual hardware performance, including explicit unknowns.
+2. **TL01-P1 — CLOSED:** target-only APIs, lifecycle/input assumptions and adapter boundaries, merged in PR #5. [P1 contract](tl01-p1.md).
+3. **TL01-P2 — ACTIVE:** inspect source raster dimensions against Web/Android textureMax and surface explicit unknowns, independently of device performance. [P2 contract](tl01-p2.md).
 4. **TL01-P3:** integrate doctor findings into CLI JSON and human-facing reports with reproducible file/rule identifiers.
 
 ## Quality gates

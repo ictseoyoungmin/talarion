@@ -131,7 +131,7 @@ node bin/talarion.mjs test web --json
 
 ## Portability Doctor
 
-Doctor scans portable gameplay for Web/Android dependencies and reports rule ID, affected target, capability, source position and a suggested remediation. Warnings require review and are not proof that a game will fail. Optional adapter declarations and their limitations are documented in [TL01-P1](docs/development/tl01-p1.md).
+Doctor scans portable gameplay for Web/Android dependencies and reports rule ID, affected target, capability, source position and a suggested remediation. Warnings require review and are not proof that a game will fail. Optional adapter declarations and their limitations are documented in [TL01-P1](docs/development/tl01-p1.md). Source image and mobile profile limitations are described in [TL01-P2](docs/development/tl01-p2.md); they do not certify GPU memory, draw calls or physical-device FPS.
 
 ```bash
 node bin/talarion.mjs doctor --json

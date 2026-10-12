@@ -56,6 +56,8 @@ Raw keyboard, pointer, touch, and controller emulation belongs to a separate end
 
 The stable [TL01-P0 diagnostic catalog](tl01-p0.md) defines IDs, capabilities, severity, target scope, remediation and source locations. [TL01-P1](tl01-p1.md) adds platform-native API checks, browser lifecycle and DOM keyboard events, and validation of optional target adapter declarations.
 
+[TL01-P2](tl01-p2.md) distinguishes directly observed source raster dimensions from unmeasured hardware and GPU performance budgets.
+
 ## Replay v1
 
 A replay contains a deterministic tick rate, RNG seed, and ordered semantic actions.

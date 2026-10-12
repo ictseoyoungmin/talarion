@@ -14,7 +14,7 @@ export const PORTABLE_CAPABILITIES = Object.freeze([
   "engine.project", "engine.export", "toolchain.godot",
   "platform.input", "platform.storage", "platform.audio",
   "platform.haptics", "platform.lifecycle", "platform.purchase",
-  "platform.adapter"
+  "platform.adapter", "asset.texture", "asset.profile"
 ]);
 
 const JS_EXTS = Object.freeze([".js", ".mjs", ".ts"]);
@@ -132,6 +132,30 @@ const specs = [
     targets: ["web", "android"],
     message: "Portable capability needs a declared, existing target adapter.",
     remediation: "Declare an actual target adapter source under project/adapters/<target>/ and review its implementation."
+  },
+  {
+    id: "PF201", severity: "warning", capability: "asset.texture",
+    targets: ["web", "android"],
+    message: "Source texture exceeds the declared textureMax dimension.",
+    remediation: "Reduce the source raster resolution or select an appropriate, reviewed target texture profile."
+  },
+  {
+    id: "PF202", severity: "warning", capability: "asset.texture",
+    targets: ["web", "android"],
+    message: "Texture header is invalid or truncated; dimensions cannot be verified.",
+    remediation: "Repair or replace the image and rerun static asset inspection."
+  },
+  {
+    id: "PF203", severity: "error", capability: "asset.profile",
+    targets: ["web", "android"],
+    message: "Target textureMax is missing or not a positive integer.",
+    remediation: "Declare a positive integer profiles[targets[target].profile].textureMax."
+  },
+  {
+    id: "PF204", severity: "info", capability: "asset.texture",
+    targets: ["web", "android"],
+    message: "Texture dimensions are unknown to the static inspector.",
+    remediation: "Provide a supported raster source or validate this asset with engine import/render evidence."
   }
 ];
 

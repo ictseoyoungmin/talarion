@@ -22,6 +22,7 @@ import { inspectProjectAdoption } from "../src/commands/project-inspect.mjs";
 import { inspectWebNative, devWebNative, testWebNative, defaultWebNativeProject } from "../src/web-native/runtime.mjs";
 import { planWebView, buildWebView, testWebView } from "../src/android-webview/runtime.mjs";
 import { smokeInteractiveWebView } from "../src/android-webview/interactive.mjs";
+import { planReleaseAab, buildReleaseAab, verifyReleaseAab, testReleaseAab } from "../src/android-webview/release.mjs";
 
 const argv = process.argv.slice(2);
 const jsonMode = argv.includes("--json");
@@ -40,6 +41,7 @@ Usage:
   talarion web-native dev [project-directory] [--json]
   talarion web-native test [project-directory] [--json]
   talarion web-native android <plan|build|test|smoke> [project-directory] [--json]
+  talarion web-native android release <plan|build|verify|test> [project-directory] [--json]
   talarion adapter inspect [web|android|ios] [--json]
   talarion adapter validate <candidate.json> [target] [--json]
   talarion build <web|android> [--json]
@@ -87,6 +89,16 @@ try {
       break;
     case "web-native": {
       if (args[1] === "android") {
+        if (args[2] === "release") {
+          if (!["plan","build","verify","test"].includes(args[3]) || args[5])
+            fail("Usage: talarion web-native android release <plan|build|verify|test> [project-directory] [--json]");
+          const gameRoot = args[4] ?? defaultWebNativeProject();
+          if (args[3] === "plan") result = await planReleaseAab(gameRoot);
+          if (args[3] === "build") result = await buildReleaseAab(gameRoot);
+          if (args[3] === "verify") result = await verifyReleaseAab(gameRoot);
+          if (args[3] === "test") result = await testReleaseAab(gameRoot);
+          break;
+        }
         if (!["plan","build","test","smoke"].includes(args[2]) || args[4])
           fail("Usage: talarion web-native android <plan|build|test|smoke> [project-directory] [--json]");
         const gameRoot = args[3] ?? defaultWebNativeProject();

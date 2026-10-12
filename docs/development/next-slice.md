@@ -12,8 +12,8 @@
 The first public support boundary remains **Godot → Web/Android**. Stabilize the adapter contract before adding new engines or targets.
 
 1. **TL04-P0 — CLOSED:** versioned Godot manifest, source-only capability inspection, fail-closed tests and static verify integration, merged via PR #17 (CI #38255512684 6/6). [Contract](tl04-p0.md).
-2. **TL04-P1 — implementation review:** route existing Godot build and Web/Android runtime execution through the audited manifest and immutable built-in registry. Preserve exact replay and all exported parity gates. [Contract](tl04-p1.md).
-3. **TL04-P2:** publish compact reference adapter fixtures and extension guidance; never imply a second engine/target is supported without observed execution.
+2. **TL04-P1 — CLOSED:** Godot build/test uses reviewed Web/Android dispatch; PR #18 merged, exact-head CI #38261527177 6/6 PASS. [Contract](tl04-p1.md).
+3. **TL04-P2 — in review:** read-only candidate manifest validation, source SHA-256, negative fixtures and contributor guidance, pending PR exported-runtime CI. [Contract](tl04-p2.md).
 
 ## Non-negotiable gates
 

@@ -23,6 +23,7 @@ This directory contains the engineering specification for Talarion.
 - [TL03-P1](tl03-p1.md) — retained experimental iOS Xcode ZIP export and provenance code; native macOS evidence uncollected.
 - [TL04-P0](tl04-p0.md) — versioned Godot manifest, static adapter CLI inspection and negative conformance contract.
 - [TL04-P1](tl04-p1.md) — actual Godot build/runner dispatch behind immutable reference bindings and fail-closed source authority.
+- [TL04-P2](tl04-p2.md) — read-only candidate manifest verification, negative fixtures and contributor guidance.
 - [Next Slice](next-slice.md) — immediate implementation target.
 - [Roadmap](roadmap.md) — TL00 through adapter ecosystem milestones.
 - [OSS Strategy](oss-strategy.md) — repository positioning, local-first requirements, and contributor-facing product constraints.

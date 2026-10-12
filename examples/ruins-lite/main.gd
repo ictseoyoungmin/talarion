@@ -108,10 +108,22 @@ func _on_tick(tick: int) -> void:
         }))
 
 func _on_capture_checkpoint(name: String, tick: int) -> void:
+    # The authoritative state is finalized at the replay tick. The external
+    # screenshot signal must wait until that material/camera state is rendered.
     _emit_state(tick, name)
+    _emit_capture_after_render(name, tick)
+
+
+func _emit_capture_after_render(name: String, tick: int) -> void:
+    # Waiting for two completed render frames avoids interpreting a physics
+    # commit as a GPU-visible frame on Android's asynchronous compositor.
+    # The canonical replay is held while both external runners capture.
+    await RenderingServer.frame_post_draw
+    await RenderingServer.frame_post_draw
     print("TALARION_CAPTURE " + JSON.stringify({
         "tick": tick,
-        "name": name
+        "name": name,
+        "renderBarrier": "frame-post-draw-2"
     }))
 
 func _on_replay_finished(tick: int) -> void:

@@ -16,7 +16,7 @@ Five [architecture decision records](adr/README.md) lock product direction, inde
 
 ## Prioritized Web-first route
 
-1. **WF01 NEXT — Web-native game & interactive development QA.** First independent browser game and versioned evidence with unchanged Godot reference gates.
+1. **WF01 IN PROGRESS — Web-native game & interactive development QA.** Three.js Signal Garden implementation and isolated browser evidence added in WF01-P0; exact-head real Chromium CI must pass before declaring browser proof. Godot reference gates unchanged.
 2. **WF02 — Android Debug APK using runtime preservation.** Real installed Android WebView game, safe native bridge, lifecycle/input/visual/state proof.
 3. **WF03 — Release AAB and Play readiness.** Separate signed artifact, bundle inspection, current Play policy and user-controlled credentials; no claim of Play listing without actual publication.
 4. **WF04 RESEARCH — Cross-engine portable subset.** Tested limited behavior semantics across providers; do not require IR for WF01–03.

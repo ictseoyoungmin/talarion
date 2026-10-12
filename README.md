@@ -106,6 +106,25 @@ node bin/talarion.mjs report \
 
 The optional final argument adds screenshot comparison cards to the HTML report. The visual command requires actual Web and Android runtime evidence; fixture-only tests do not prove visual parity.
 
+## Web-native Three.js game (WF01)
+
+An original independent Web-native Three.js reference game lives in `examples/web-native`. It uses a separate explicit project manifest; the Godot `build web` and `test web` CLI retain their existing meaning.
+
+~~~bash
+npm install
+npx playwright install chromium
+node bin/talarion.mjs web-native inspect examples/web-native --json
+node bin/talarion.mjs web-native dev examples/web-native
+~~~
+
+Open the printed local URL to play with WASD/arrow keys or touch controls. In another terminal, collect actual Chromium replay, state, checkpoint screenshots and source/version hashes:
+
+~~~bash
+node bin/talarion.mjs web-native test examples/web-native --json
+~~~
+
+The game serves its pinned local Three.js module and does not require Godot. Web-native game QA is separate from Godot's Web/Android parity. **Android WebView APK and Play release AAB are not implemented by WF01.** See [WF01-P0](docs/development/wf01-p0.md).
+
 Build target exports:
 
 ```bash

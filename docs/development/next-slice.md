@@ -16,9 +16,9 @@
 
 ## New prioritized implementation slices
 
-### WF01 — Browser-native playable reference and QA (NEXT)
+### WF01 — Browser-native playable reference and QA (P0 in implementation)
 
-- Select a small independent Web-native 3D game (Babylon.js is a candidate), built in its native library; support developer-facing interactive browser run and inspectable errors, without Godot project generation.
+- WF01-P0: implement an original Three.js 3D game with an independent source manifest, interactive browser run and Playwright evidence, without Godot project generation. [Implementation guide](wf01-p0.md).
 - Integrate minimal adapter/runtime evidence: developer-owned source, semantic replay, authoritative game state, named screenshots, performance capture and explicit runtime capabilities. Do not make existing `talarion test web` silently accept unknown engines.
 - Persist project-source/build/replay/runtime hashes and separate run outputs. Negative test untrusted projects, missing capabilities and invalid evidence.
 - **Exit:** executable original browser game and independent runtime evidence **from that game**, plus unchanged Godot exported Web/Android CI and TL00 QA.

@@ -13,7 +13,8 @@ function fingerprint(r) {
     r.window.warmupTicks,r.window.sampleStepTicks,r.window.expectedCount]);
 }
 function verify(entry,target) {
-  const a = entry?.authority, t = a?.targets?.find(x=>x.target===target);
+  const a = entry?.authority, t = Array.isArray(a?.targets) ?
+    a.targets.find(x=>x?.target===target) : null;
   if (!entry || typeof entry.runId!=="string" || !entry.runId.trim() ||
     typeof entry.environmentKey!=="string" || !entry.environmentKey.trim() ||
     !hash(entry.sha256) || a?.schema!=="talarion.performance-authority/v1" ||
@@ -21,8 +22,11 @@ function verify(entry,target) {
     !t || t.ok!==true || t.hardwareCertified!==false ||
     t.observation?.status!=="validated-runner-observation" ||
     !hash(t.observation?.replaySha256) || !hash(t.observation?.sampleSha256) ||
-    t.budgetCoverage?.ok!==true || t.performanceWindow?.status!=="complete-window" ||
-    t.performanceWindow?.ok!==true || t.budgetDecision!=="not-evaluated" ||
+    t.budgetCoverage?.ok!==true || !Array.isArray(t.budgetCoverage?.metrics) ||
+    !t.declared || typeof t.declared.profile!=="string" ||
+    t.performanceWindow?.status!=="complete-window" ||
+    t.performanceWindow?.ok!==true || !t.performanceWindow.metrics ||
+    t.budgetDecision!=="not-evaluated" ||
     !Array.isArray(t.checks) || t.checks.length<8 ||
     !t.checks.every(c=>c.ok===true) ||
     !t.budgetCoverage.metrics.every(m=>m.comparisonEvaluated===false &&

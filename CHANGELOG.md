@@ -12,6 +12,10 @@
 
 ### Added
 
+- TL02-P3 source-verified multi-run performance cohort reviews, explicit observational budget/relative-regression states, and deterministic standalone escaped JSON/HTML reports.
+- `talarion budget report current <authority> <output-dir>` CI artifact reports only evidence completeness; `budget report <manifest> <output-dir>` processes unique SHA-256-pinned independent cohorts and rejects duplicated artifacts, cross-environment comparisons and missing provenance.
+- Strict negative fixtures for observed degradation, missing runs, sample reuse, unsafe paths, user HTML strings and byte-repeatable reports. Physical hardware/target FPS certification always remains separate.
+
 - TL02-P2 replay-anchored warmup and exact-tick performance windows with fail-closed incomplete/invalid observations and descriptive FPS/process/memory distributions (no target-FPS verdict).
 - Noise-aware observational regression helper requiring three independent complete runs per cohort, identical replay/host class/profile and explicit degradation thresholds; inconclusive/noisy/insufficient results never produce false PASS.
 - CI asserts complete P2 windows for both actual exported Web and Android runs, while preserving TL00 visual/state parity and the physical-device certification boundary.

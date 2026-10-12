@@ -225,8 +225,9 @@ export async function testReleaseAab(project){
   if(signingIssues.length)throw new Error("WR100: release APK extraction requires external signing credentials");
   const adb=process.env.ADB||"adb";
   const devices=await safe(adb,["devices"]);
-  if(devices.split(/\r?\n/).filter(x=>/\sdevice$/.test(x)).length!==1||process.env.ANDROID_SERIAL)
-    throw new Error("WR102: release smoke QA requires exactly one explicit emulator (no ambiguous ADB_SERIAL)");
+  const connected=devices.split(/\r?\n/).map(x=>x.trim().split(/\s+/)).filter(x=>x[1]==="device");
+  if(connected.length!==1||(process.env.ANDROID_SERIAL&&connected[0][0]!==process.env.ANDROID_SERIAL))
+    throw new Error("WR102: release smoke QA requires one selected authorized emulator");
   // The fixture has the same application ID as WF02 Debug, so installation may uninstall
   // an existing Debug app. This operation is limited to an independently identified emulator.
   const qemu=(await safe(adb,["shell","getprop","ro.kernel.qemu"])).trim();

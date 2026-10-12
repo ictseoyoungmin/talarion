@@ -12,6 +12,9 @@
 
 ### Added
 
+- TL03-P0 iOS capability preflight `talarion ios preflight <out.json>`, with conservative macOS/Xcode/iOS SDK, bundle/team identity, preset and Simulator Compatibility-renderer checks; Linux explicitly BLOCKED rather than fabricated export PASS.
+- Versioned `talarion.ios-preflight/v1` diagnostics and Node 24 CI artifact. Export templates/signing and simulator/physical runtime remain UNVERIFIED; real export begins TL03-P1.
+
 - TL02-P3 source-verified multi-run performance cohort reviews, explicit observational budget/relative-regression states, and deterministic standalone escaped JSON/HTML reports.
 - `talarion budget report current <authority> <output-dir>` CI artifact reports only evidence completeness; `budget report <manifest> <output-dir>` processes unique SHA-256-pinned independent cohorts and rejects duplicated artifacts, cross-environment comparisons and missing provenance.
 - Strict negative fixtures for observed degradation, missing runs, sample reuse, unsafe paths, user HTML strings and byte-repeatable reports. Physical hardware/target FPS certification always remains separate.

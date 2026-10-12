@@ -3,66 +3,73 @@ import path from "node:path";
 import { resolveGodot, inspectGodotProject } from "../adapters/godot.mjs";
 import { resolveFromRoot } from "../core/config.mjs";
 import { exists } from "../core/io.mjs";
+import { DOCTOR_SCHEMA, DOCTOR_RULES, diagnosticFor } from "../doctor/rules.mjs";
+import { scanPortabilitySource } from "../doctor/scanner.mjs";
 
-async function walk(dir, out = []) {
-  if (!(await exists(dir))) return out;
-  for (const ent of await fs.readdir(dir, { withFileTypes: true })) {
-    const p = path.join(dir, ent.name);
-    if (ent.isDirectory()) await walk(p, out);
-    else out.push(p);
+const IGNORE_DIRS = new Set([
+  ".git", ".godot", ".import", ".talarion",
+  "node_modules", "artifacts", "build", "dist"
+]);
+
+async function sourceFiles(dir) {
+  if (!(await exists(dir))) return [];
+  const result = [];
+  async function visit(here) {
+    const entries = (await fs.readdir(here, { withFileTypes: true }))
+      .sort((a, b) => a.name.localeCompare(b.name, "en"));
+    for (const ent of entries) {
+      const target = path.join(here, ent.name);
+      if (ent.isSymbolicLink()) continue;
+      if (ent.isDirectory() && !IGNORE_DIRS.has(ent.name)) await visit(target);
+      else if (ent.isFile() && /\.(gd|ts|js|mjs)$/.test(ent.name)) result.push(target);
+    }
   }
-  return out;
+  await visit(dir);
+  return result;
 }
 
 export async function doctor(config) {
   const checks = [];
   const project = await inspectGodotProject(config);
-  checks.push({
-    id: "PF001",
-    severity: project.projectExists ? "pass" : "error",
-    message: project.projectExists ? "Godot project.godot found" : "Godot project.godot missing"
-  });
-  checks.push({
-    id: "PF002",
-    severity: project.presetsExist ? "pass" : "warning",
-    message: project.presetsExist ? "export_presets.cfg found" : "export_presets.cfg missing; build commands cannot export yet"
-  });
+  function projectCheck(id, passed, passedMessage) {
+    const item = diagnosticFor(id);
+    checks.push({ ...item, severity: passed ? "pass" : item.severity,
+      message: passed ? passedMessage : item.message });
+  }
+  projectCheck("PF001", project.projectExists, "Godot project.godot found");
+  projectCheck("PF002", project.presetsExist, "export_presets.cfg found");
 
   const godot = await resolveGodot(config);
-  checks.push({
-    id: "PF003",
-    severity: godot.ok ? "pass" : "warning",
-    message: godot.ok ? `Godot found: ${godot.version}` : "Godot executable not found; static checks still available"
-  });
+  const item = diagnosticFor("PF003");
+  checks.push({ ...item, severity: godot.ok ? "pass" : item.severity,
+    message: godot.ok ? "Godot found: " + godot.version : item.message });
 
   const projectDir = resolveFromRoot(config, config.project.path);
-  const sourceFiles = (await walk(projectDir)).filter(p => /\.(gd|ts|js|mjs)$/.test(p));
-  const rules = [
-    { id: "PF102", re: /window\.localStorage|localStorage\./, message: "Direct web storage API; use a Talarion platform storage adapter." },
-    { id: "PF103", re: /navigator\.vibrate\s*\(/, message: "Direct browser haptics API; use a Talarion haptics adapter." },
-    { id: "PF104", re: /Input\.is_key_pressed\s*\(/, message: "Raw key polling found; prefer action-mapped portable input for gameplay." }
-  ];
-  for (const file of sourceFiles) {
-    const text = await fs.readFile(file, "utf8");
-    for (const rule of rules) {
-      if (rule.re.test(text)) {
-        checks.push({
-          id: rule.id, severity: "warning",
-          file: path.relative(config.root, file),
-          message: rule.message
-        });
-      }
-    }
+  for (const file of await sourceFiles(projectDir)) {
+    const relative = path.relative(config.root, file).split(path.sep).join("/");
+    const source = await fs.readFile(file, "utf8");
+    checks.push(...scanPortabilitySource({ file: relative, source }));
   }
 
-  const errors = checks.filter(c => c.severity === "error").length;
-  const warnings = checks.filter(c => c.severity === "warning").length;
+  const diagnostics = checks.filter(c => c.severity !== "pass");
+  const errors = diagnostics.filter(c => c.severity === "error").length;
+  const warnings = diagnostics.filter(c => c.severity === "warning").length;
+  const infos = diagnostics.filter(c => c.severity === "info").length;
   const ok = errors === 0;
   const lines = [
     "TALARION DOCTOR",
-    ...checks.map(c => `${c.severity === "pass" ? "✓" : c.severity === "warning" ? "△" : "✗"} ${c.id} ${c.message}${c.file ? ` (${c.file})` : ""}`),
+    ...checks.map(c => (c.severity === "pass" ? "✓" :
+      c.severity === "warning" ? "△" : c.severity === "info" ? "i" : "✗") +
+      " " + c.id + " " + c.message +
+      (c.file ? " (" + c.file +
+        (c.line ? ":" + c.line + ":" + c.column : "") + ")" : "")),
     "",
-    `${ok ? "PASS" : "FAIL"} — ${warnings} warning(s), ${errors} error(s)`
+    (ok ? "PASS" : "FAIL") + " — " + warnings + " warning(s), " +
+      errors + " error(s), " + infos + " info notice(s)"
   ];
-  return { ok, warnings, errors, checks, text: lines.join("\n") };
+  return {
+    schema: DOCTOR_SCHEMA, ok, warnings, errors, infos,
+    checks, diagnostics, rulesEvaluated: DOCTOR_RULES.map(r => r.id),
+    text: lines.join("\n")
+  };
 }

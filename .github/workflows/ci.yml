@@ -137,6 +137,20 @@ jobs:
           script: |
             adb shell settings put secure immersive_mode_confirmations confirmed || true
             adb shell wm dismiss-keyguard || true
+            # sys.boot_completed may precede ActivityManager/PackageManager readiness.
+            # Gate once on OS service readiness; never retry a failed game replay.
+            ready=0
+            for attempt in $(seq 1 45); do
+              if adb shell am get-current-user >/dev/null 2>&1 && adb shell pm path android >/dev/null 2>&1; then
+                ready=1
+                break
+              fi
+              sleep 2
+            done
+            if [ "$ready" -ne 1 ]; then
+              echo "Android system services unavailable after boot; aborting without replay" >&2
+              exit 1
+            fi
             node bin/talarion.mjs test android --json
 
       - name: Upload Android evidence

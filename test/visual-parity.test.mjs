@@ -4,6 +4,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import os from "node:os";
 import { encodePng } from "../src/visual/png.mjs";
+import { detectRuinsLiteSystemBarPng } from "../src/visual/android-system-ui.mjs";
 import { compareNormalizedImages, normalizeImage, compareVisualRuns } from "../src/visual/parity.mjs";
 
 function image(width = 16, height = 9, black = false) {
@@ -155,4 +156,40 @@ test("cross-runtime replay provenance must be identical", async () => {
   } finally {
     await fs.rm(root, { recursive: true, force: true });
   }
+});
+
+
+test("TL00 system status-bar contamination rejects OS pixels without cropping", () => {
+  const width=320,height=180,rgba=new Uint8Array(width*height*4);
+  for(let i=0;i<rgba.length;i+=4){
+    rgba[i]=77;rgba[i+1]=77;rgba[i+2]=77;rgba[i+3]=255;
+  }
+  const screen=()=>encodePng({width,height,data:rgba});
+  const clean=detectRuinsLiteSystemBarPng(screen());
+  assert.equal(clean.suspectedStatusBar,false);
+  assert.equal(clean.changesPixelData,false);
+  // The visually tiny top glyphs would barely change whole-frame similarity.
+  // One group resembles a clock on the left, another status icons on the right.
+  for(const [x0,x1] of [[20,34],[274,288]])
+    for(let y=4;y<10;y++)for(let x=x0;x<x1;x++){
+      const i=(y*width+x)*4;rgba[i]=255;rgba[i+1]=255;rgba[i+2]=255;
+    }
+  const bad=detectRuinsLiteSystemBarPng(screen());
+  assert.equal(bad.suspectedStatusBar,true);
+  assert.ok(bad.regions.leftBrightPixels>=bad.threshold);
+  assert.ok(bad.regions.rightBrightPixels>=bad.threshold);
+  // A bright game-colored region alone or just one side is not sufficient.
+  for(let y=4;y<10;y++)for(let x=274;x<288;x++){
+    const i=(y*width+x)*4;rgba[i]=77;rgba[i+1]=77;rgba[i+2]=77;
+  }
+  assert.equal(detectRuinsLiteSystemBarPng(screen()).suspectedStatusBar,false);
+});
+
+test("canonical TL00 Android export explicitly requests immersive fullscreen", async () => {
+  const preset=await fs.readFile("examples/ruins-lite/export_presets.cfg","utf8");
+  const android=preset.split("name=\\"Android\\"")[1].split("[preset.2]")[0];
+  assert.match(android,/screen\/immersive_mode=true/);
+  assert.match(android,/screen\/edge_to_edge=false/);
+  const main=await fs.readFile("examples/ruins-lite/main.gd","utf8");
+  assert.match(main,/DisplayServer\.WINDOW_MODE_FULLSCREEN/);
 });

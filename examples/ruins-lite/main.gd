@@ -17,6 +17,10 @@ var _interact_material: StandardMaterial3D
 var _attack_material: StandardMaterial3D
 
 func _ready() -> void:
+    # Restore immersive fullscreen on Android before any replay capture.
+    # Does not change desktop/Web windowing or the authoritative game state.
+    if OS.get_name() == "Android":
+        DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
     _idle_material = player.material_override
     _interact_material = StandardMaterial3D.new()
     _interact_material.albedo_color = Color(0.16, 0.83, 0.75, 1.0)

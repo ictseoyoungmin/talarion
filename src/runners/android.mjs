@@ -9,6 +9,7 @@ import { runnerResult } from "./contract.mjs";
 import { summarizePerformance } from "../runtime/performance.mjs";
 import { parseAndroidDeviceInfo } from "../runtime/device.mjs";
 import { sha256File } from "../runtime/provenance.mjs";
+import { detectRuinsLiteSystemBarPng } from "../visual/android-system-ui.mjs";
 
 async function resolveAdb(config) {
   const adb = config.toolchain?.adb || "adb";
@@ -63,7 +64,17 @@ async function captureAndroidPng(adb, file, packageName) {
         return;
       }
       try {
-        await fs.writeFile(file, Buffer.concat(chunks));
+        const bytes=Buffer.concat(chunks);
+        // Preserve the raw screenshot even when an OS overlay contaminates it.
+        await fs.writeFile(file, bytes);
+        if (packageName === "dev.talarion.ruinslite") {
+          const statusBar=detectRuinsLiteSystemBarPng(bytes);
+          if (statusBar.suspectedStatusBar) {
+            throw new Error("Android system status bar visible over TL00 game ("+
+              JSON.stringify(statusBar.regions)+", threshold="+statusBar.threshold+
+              "); raw contaminated capture saved at "+file);
+          }
+        }
         resolve(file);
       } catch (error) {
         reject(error);

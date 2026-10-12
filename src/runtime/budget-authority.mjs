@@ -153,7 +153,11 @@ export async function performanceAuthorityCommand(config, webDir, androidDir, ou
   }
   const replayFile = resolveFromRoot(config, config.replay.default);
   const replaySha256 = await sha256File(replayFile);
-  const replay = JSON.parse(await fs.readFile(replayFile, "utf8"));
+  // Legacy P0 callers can supply opaque replay bytes for hash-only verification.
+  // P2 windows then remain unconfigured/invalid instead of breaking P0 authority.
+  let replay = null;
+  try { replay = JSON.parse(await fs.readFile(replayFile, "utf8")); }
+  catch (error) { if (error?.code === "ENOENT") throw error; }
   const replayTickRate = replay?.tickRate;
   const replayEndTick = replay?.schema === "talarion.replay/v1" &&
     Array.isArray(replay.events) && replay.events.length &&

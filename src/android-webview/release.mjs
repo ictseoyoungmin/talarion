@@ -5,6 +5,8 @@ import crypto from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { run } from "../core/process.mjs";
 import { inspectWebNative } from "../web-native/runtime.mjs";
+import { testWebView } from "./runtime.mjs";
+import { smokeInteractiveWebView } from "./interactive.mjs";
 
 const ROOT=fileURLToPath(new URL("../../",import.meta.url));
 const GAME="signal-garden";
@@ -217,9 +219,18 @@ export async function verifyReleaseAab(project){
     text:"TALARION WF03 AAB INDEPENDENT VERIFY PASS (no Play approval or device claim)"};
 }
 export async function testReleaseAab(project){
+  // P1 never builds an AAB implicitly: it consumes an independently verified P0 artifact.
   const verified=await verifyReleaseAab(project);
   const signingIssues=await credentialsPresent();
-  if(signingIssues.length)throw new Error("WF03 device extraction requires external signing credentials");
+  if(signingIssues.length)throw new Error("WR100: release APK extraction requires external signing credentials");
+  const adb=process.env.ADB||"adb";
+  const devices=await safe(adb,["devices"]);
+  if(devices.split(/\r?\n/).filter(x=>/\sdevice$/.test(x)).length!==1||process.env.ANDROID_SERIAL)
+    throw new Error("WR102: release smoke QA requires exactly one explicit emulator (no ambiguous ADB_SERIAL)");
+  // The fixture has the same application ID as WF02 Debug, so installation may uninstall
+  // an existing Debug app. This operation is limited to an independently identified emulator.
+  const qemu=(await safe(adb,["shell","getprop","ro.kernel.qemu"])).trim();
+  if(qemu!=="1")throw new Error("WR103: destructive package swap refused on physical Android hardware");
   const apkSet=path.join(OUTPUT,"release-universal.apks");
   await fs.rm(apkSet,{force:true});
   await safe("java",bundleArgs("build-apks","--bundle="+AAB,"--output="+apkSet,
@@ -228,15 +239,61 @@ export async function testReleaseAab(project){
   await fs.rm(apkDir,{recursive:true,force:true});await fs.mkdir(apkDir,{recursive:true});
   await safe("unzip",["-j","-o",apkSet,"universal.apk","-d",apkDir]);
   const apk=path.join(apkDir,"universal.apk");
-  if(!await exists(apk))throw new Error("bundletool APK set has no universal APK");
-  const installed=await safe(process.env.ADB||"adb",["install","-r",apk]);
-  if(!/Success/.test(installed))throw new Error("Android rejected extracted release APK");
-  await safe(process.env.ADB||"adb",["shell","am","start","-n",ACTIVITY]);
-  const out={schema:"talarion.release-install/v1",ok:true,
-    sourceAabSha256:verified.artifactSha256,extractedApkSha256:await digest(apk),
-    installedPackage:PACKAGE,emulatorOrDeviceInstallObserved:true,
+  if(!await exists(apk))throw new Error("WR104: bundletool APK set has no universal APK");
+  const sdk=sdkRoot(),bt=path.join(sdk,"build-tools","36.0.0");
+  const pkg=await safe(tool(bt,"aapt2"),["dump","badging",apk]);
+  if(!pkg.includes("package: name='"+PACKAGE+"'")||
+    !pkg.includes("versionCode='2'")||!pkg.includes("versionName='0.2.0'")||
+    !pkg.includes("targetSdkVersion:'36'"))
+    throw new Error("WR105: extracted release APK has wrong package/version/target SDK");
+  const signer=await safe(tool(bt,"apksigner"),["verify","--verbose","--print-certs",apk]);
+  const apkCert=signer.match(/Signer #1 certificate SHA-256 digest:\s*([0-9a-f:]+)/i)?.[1]?.replace(/:/g,"").toLowerCase();
+  const aabCert=verified.gate.signerCertificateSha256.replace(/:/g,"").toLowerCase();
+  if(!apkCert||apkCert!==aabCert||!signer.includes("Verified using v2 scheme"))
+    throw new Error("WR106: extracted APK signer must match actual signed AAB upload signer");
+  const files=(await safe("unzip",["-Z","-1",apk])).split(/\r?\n/);
+  if(!["assets/game/index.html","classes.dex"].every(x=>files.includes(x)))
+    throw new Error("WR107: extracted release APK is missing original game or Activity");
+  const apkSha256=await digest(apk);
+  const identity=verified.sourceIdentity;
+  const releaseBuild={ok:true,projectId:GAME,package:PACKAGE,
+    runtime:"android-webview",artifactKind:"release-apk",targetSdk:36,
+    artifact:apk,artifactSha256:apkSha256,identity,hostSha256:identity.hostSha256,
+    sourceAabSha256:verified.artifactSha256};
+  // No hidden Debug APK build or Debug keystore: the same SHA-256-pinned extracted
+  // Release APK is installed in a separate emulator replay and actual ADB touch run.
+  const installed=await safe(adb,["shell","pm","path",PACKAGE]);
+  if(installed.includes("package:"))await safe(adb,["uninstall",PACKAGE]);
+  const replay=await testWebView(project,{releaseBuild});
+  if(replay.artifactKind!=="release-apk"||replay.artifactSha256!==apkSha256||
+    replay.sourceAabSha256!==verified.artifactSha256||
+    replay.observed?.runtimeObserved!==true||replay.observed.stateCount<8||
+    replay.observed.captureCount!==3)
+    throw new Error("WR108: original Release APK deterministic replay evidence missing or stale");
+  const interactive=await smokeInteractiveWebView(project,{releaseBuild});
+  if(interactive.artifactKind!=="release-apk"||
+    interactive.provenance?.apkSha256!==apkSha256||
+    interactive.sourceAabSha256!==verified.artifactSha256||
+    interactive.actions?.length!==3||interactive.captures?.length!==5||
+    interactive.checks?.some(x=>x.passed!==true)||
+    !interactive.environment?.observedInAndroidEmulator||
+    interactive.lifecycle?.filter(e=>e.kind==="LIFECYCLE"&&e.value?.phase==="resume").length<2)
+    throw new Error("WR109: original Release APK trusted touch/HOME-resume evidence invalid");
+  const out={schema:"talarion.release-runtime/v1",ok:true,
+    sourceAabSha256:verified.artifactSha256,extractedApkSha256:apkSha256,
+    certificateSha256:apkCert,installedPackage:PACKAGE,versionCode:2,targetSdk:36,
+    artifactKind:"release-apk",emulatorRuntimeObserved:true,
+    gameplayReplayObserved:true,stateSnapshots:replay.observed.stateCount,
+    replayScreenshots:replay.observed.captureCount,
+    trustedTouchActions:interactive.actions.length,touchScreenshots:interactive.captures.length,
+    homeResumeStatePreserved:true,
+    provenance:{...identity,sourceAabSha256:verified.artifactSha256,apkSha256},
+    evidence:{replay:replay.evidence?.stateFile,
+      replayResult:path.join(path.dirname(replay.evidence.stateFile),"runner-result.json"),
+      touchResult:interactive.captures[0]?.file?
+        path.join(path.dirname(interactive.captures[0].file),"runner-result.json"):null},
     gameplayParityCertified:false,releaseCertified:false,playApproved:false,hardwareCertified:false,
-    text:"TALARION WF03 BUNDLETOOL EXTRACTION + ADB INSTALL/LAUNCH PASS; gameplay/store NOT CERTIFIED"};
+    text:"TALARION WF03-P1 REAL EXTRACTED API36 RELEASE APK RUNTIME PASS\nOriginal emulator game replay, trusted touch + HOME/resume observed; Google Play: NOT CERTIFIED"};
   await fs.writeFile(path.join(OUTPUT,"install-evidence.json"),JSON.stringify(out,null,2)+"\n");
   return out;
 }

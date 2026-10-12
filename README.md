@@ -163,6 +163,16 @@ node bin/talarion.mjs budget report evidence/cohorts.json artifacts/performance-
 
 The default CI publishes an `evidence-only` report from **one Web and one Android run**; it does not invent multi-run performance PASS. External baseline/candidate cohort manifests require SHA-256-pinned authority artifacts and independent runtime identities. See [TL02-P3](docs/development/tl02-p3.md).
 
+## iOS capability preflight (TL03)
+
+iOS is an **unimplemented export target**, not a hidden alias for Android. Check the current host and sample project configuration without building or certifying iOS:
+
+```bash
+node bin/talarion.mjs ios preflight artifacts/ios/ios-preflight.json --json
+```
+
+The output deliberately reports `status: "blocked"` on Linux CI; `ok: true` means the preflight audit ran, **not** that iOS export or simulator/device replay succeeded. The tool checks Apple Xcode/SDK prerequisites, bundle/team/preset and simulator renderer constraints. See [TL03-P0](docs/development/tl03-p0.md).
+
 ## TL00 automated acceptance
 
 The CI baseline requires real exported Web/Android replay, state and visual parity, valid engine telemetry and source fingerprints. It does **not** grade emulator FPS against physical-device targets. Reproduce the final acceptance result after capturing both runtimes:

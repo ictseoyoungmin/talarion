@@ -182,6 +182,10 @@ jobs:
         run: |
           node bin/talarion.mjs gate tl00 .evidence/web .evidence/android artifacts/parity/visual/result.json artifacts/parity/tl00-acceptance.json --json
 
+      - name: TL02-P0 measured-versus-declared evidence authority
+        run: |
+          node bin/talarion.mjs budget authority .evidence/web .evidence/android artifacts/parity/performance-authority.json --json
+
       - name: Generate parity report
         if: always()
         run: |

@@ -187,7 +187,7 @@ test("TL00 system status-bar contamination rejects OS pixels without cropping", 
 
 test("canonical TL00 Android export explicitly requests immersive fullscreen", async () => {
   const preset=await fs.readFile("examples/ruins-lite/export_presets.cfg","utf8");
-  const android=preset.split("name=\\"Android\\"")[1].split("[preset.2]")[0];
+  const android=preset.split('name="Android"')[1].split("[preset.2]")[0];
   assert.match(android,/screen\/immersive_mode=true/);
   assert.match(android,/screen\/edge_to_edge=false/);
   const main=await fs.readFile("examples/ruins-lite/main.gd","utf8");

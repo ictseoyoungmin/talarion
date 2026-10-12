@@ -16,8 +16,8 @@ Five [architecture decision records](adr/README.md) lock product direction, inde
 
 ## Prioritized Web-first route
 
-1. **WF01 IN PROGRESS — Web-native game & interactive development QA.** Three.js Signal Garden implementation and isolated browser evidence added in WF01-P0; exact-head real Chromium CI must pass before declaring browser proof. Godot reference gates unchanged.
-2. **WF02 — Android Debug APK using runtime preservation.** Real installed Android WebView game, safe native bridge, lifecycle/input/visual/state proof.
+1. **WF01-P0 CLOSED — Web-native game & interactive development QA.** Original Three.js Signal Garden game, dev server and observed Chromium replay evidence merged PR #24. Exact-head CI #38285851400 and final main #38286257646 both 7/7 PASS; Web-native gameplay 10 snapshots, 3 screenshot checkpoints, 3/3 collection victory. Godot TL00 gates unchanged. This is proof for **one game**, not all Web-native libraries.
+2. **WF02 NEXT — Android Debug APK using runtime preservation.** Package the same independent Three.js game source with secure offline WebView, actual install/run and game-specific lifecycle/input/visual/state proof.
 3. **WF03 — Release AAB and Play readiness.** Separate signed artifact, bundle inspection, current Play policy and user-controlled credentials; no claim of Play listing without actual publication.
 4. **WF04 RESEARCH — Cross-engine portable subset.** Tested limited behavior semantics across providers; do not require IR for WF01–03.
 5. **TL05-P1/P2 BACKLOG:** independent Godot-game adoption remains valuable after the highest Web-native developer workflow risk is addressed.

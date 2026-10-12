@@ -37,7 +37,7 @@ Available in the repository:
 - machine-readable `--json` output
 - a minimal Godot 3D sample project
 
-The [Web-first architecture decisions](docs/development/adr/README.md) and [implementation plan](docs/development/next-slice.md) separate Web-native source, runtime provider, Android APK/AAB packaging and release gates. **Web-native-to-Android packaging and Play-ready AAB generation are not implemented yet.** They are documented design targets, not current CLI capabilities.
+The [Web-first architecture decisions](docs/development/adr/README.md) and [implementation plan](docs/development/next-slice.md) separate Web-native source, runtime provider, Android APK/AAB packaging and release gates. **An original Three.js Web-native playable reference and real Chromium QA are implemented. Web-native-to-Android packaging and Play-ready AAB generation are not implemented yet.** They are documented design targets, not current CLI capabilities.
 
 The first Web/Android vertical slice is CI-verified using exported Godot Web and Android emulator runtimes. Physical Android hardware is **not required for baseline portability QA**; hardware performance and device compatibility claims require a separate [release certification](docs/development/release-certification.md). The runners require a working Godot toolchain and an authorized Android device **or emulator**.
 

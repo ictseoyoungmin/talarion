@@ -14,6 +14,7 @@ import { visualCommand } from "../src/commands/visual.mjs";
 import { tl00AcceptanceCommand } from "../src/runtime/gates.mjs";
 import { performanceAuthorityCommand } from "../src/runtime/budget-authority.mjs";
 import { performanceReportCommand } from "../src/runtime/performance-report.mjs";
+import { iosPreflightCommand } from "../src/ios/preflight.mjs";
 
 const argv = process.argv.slice(2);
 const jsonMode = argv.includes("--json");
@@ -28,6 +29,7 @@ Usage:
   talarion doctor report <output-dir> [--json]
   talarion plan [--json]
   talarion build <web|android> [--json]
+  talarion ios preflight <out.json> [--json]
   talarion test <web|android> [--json]
   talarion replay validate <file> [--json]
   talarion compare <left.jsonl> <right.jsonl> [--json]
@@ -52,6 +54,12 @@ try {
         if (args[1]) fail("Usage: talarion doctor [--json]");
         result = await doctor(config);
       }
+      break;
+    case "ios":
+      if (args[1] !== "preflight" || !args[2] || args[3]) {
+        fail("Usage: talarion ios preflight <out.json>");
+      }
+      result = await iosPreflightCommand(config,args[2]);
       break;
     case "plan":
       result = await plan(config);

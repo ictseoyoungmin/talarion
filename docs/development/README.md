@@ -11,6 +11,7 @@ This directory contains the engineering specification for Talarion.
 - [Engine Strategy](engine-strategy.md) — Godot-first backend scope and future adapter model.
 - [TL00](tl00.md) — emulator-backed Web/Android automated-acceptance contract and closure criteria.
 - [Release Certification](release-certification.md) — optional separate physical-device hardware/compatibility gate.
+- [TL01-P0](tl01-p0.md) — Portability Doctor rule classes, findings and fixture contract.
 - [Next Slice](next-slice.md) — immediate implementation target.
 - [Roadmap](roadmap.md) — TL00 through adapter ecosystem milestones.
 - [OSS Strategy](oss-strategy.md) — repository positioning, local-first requirements, and contributor-facing product constraints.

@@ -12,6 +12,9 @@
 
 ### Added
 
+- TL01-P0 stable Portability Doctor catalog (talarion.doctor/v1) with capability/target/severity/remediation metadata, deterministic source coordinates and warning/error contract.
+- Fixture-backed detection tests that ignore comments, strings and generated .godot content, plus bounded lexical-scanner limitations.
+
 - TL00-R2 real Android/Web spatial visual parity closed: 16×9 regional tile gate, stabilized screenshots and action-state evidence
 - TL00-R3 observational FPS/frame-time/memory telemetry in both runtime runners and machine-readable evidence summaries
 - Observed performance in the optional HTML parity report (not a physical-device pass)

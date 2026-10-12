@@ -14,7 +14,7 @@ Extend static and project-level portability checks without inventing target-spec
 
 ### Candidate vertical-slice order
 
-1. **TL01-P0:** define portable Android/Web capability classes and severity, with fixture-backed positive/negative cases.
+1. **TL01-P0:** define portable Android/Web capability classes and severity, with fixture-backed positive/negative cases. Implemented on the P0 development branch; awaiting exact-head CI to close. See [TL01-P0 contract](tl01-p0.md).
 2. **TL01-P1:** detect direct target-only APIs, lifecycle/storage/audio/input assumptions, and missing adapters at the code/project boundary.
 3. **TL01-P2:** validate asset/mobile quality-profile constraints separately from actual hardware performance, including explicit unknowns.
 4. **TL01-P3:** integrate doctor findings into CLI JSON and human-facing reports with reproducible file/rule identifiers.

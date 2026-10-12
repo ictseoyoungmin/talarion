@@ -46,6 +46,7 @@ Raw keyboard, pointer, touch, and controller emulation belongs to a separate end
 
 ## Doctor rule classes
 
+- `PF0xx` — project/toolchain foundation
 - `PF1xx` — code/API portability
 - `PF2xx` — asset and mobile budget
 - `PF3xx` — renderer/shader capability
@@ -53,7 +54,7 @@ Raw keyboard, pointer, touch, and controller emulation belongs to a separate end
 - `PF5xx` — build/export environment
 - `PF6xx` — replay/parity contract
 
-Initial implemented examples include direct browser storage, direct browser haptics, and raw-key polling warnings.
+Initial implemented examples include direct browser storage, direct browser haptics, and raw-key polling warnings. The stable [TL01-P0 diagnostic catalog](tl01-p0.md) adds capabilities, severity, target scope, remediation and source locations.
 
 ## Replay v1
 

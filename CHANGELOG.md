@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Changed
+
+- TL00 runtime acceptance now requires full exported Web/Android emulator evidence, not physical Android hardware; added machine-verifiable `talarion gate tl00` result and CI check.
+- Physical device performance, thermal, compatibility and lifecycle certification moved into a separate optional release gate; emulator FPS is explicitly observational only.
+- TL01 Portability Doctor becomes the next development slice after TL00 acceptance.
+
 ### Added
 
 - TL00-R2 real Android/Web spatial visual parity closed: 16×9 regional tile gate, stabilized screenshots and action-state evidence

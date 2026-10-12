@@ -24,7 +24,7 @@ export async function verifyCommand(config) {
       `fixture parity: ${parity.ok ? "PASS" : "FAIL"} (${(parity.parity*100).toFixed(2)}%)`,
       "",
       ok ? "TL00 STATIC/HARNESS GATE PASS" : "TL00 STATIC/HARNESS GATE FAIL",
-      "Note: real Web+Android runtime gate is intentionally still OPEN."
+      "Note: static/fixture verification is not TL00 acceptance. Run exported Web + Android emulator CI and `talarion gate tl00`."
     ].join("\n")
   };
 }

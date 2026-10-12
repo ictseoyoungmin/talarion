@@ -65,18 +65,18 @@ visual similarity    0.96
 
 ## QA cadence
 
-Web QA is expected to run more frequently because it is cheap and automatable. Physical-device QA remains mandatory.
+Web QA is expected to run more frequently because it is cheap and automatable. Physical-device QA is required **only for release claims about real device compatibility or hardware performance**, not for the baseline TL00 feature gate.
 
 ```text
 every commit        → Web automated QA
 major feature       → Web full QA + Android smoke build
-vertical slice end  → physical Android/iOS QA
-release candidate   → supported-target parity gate
+vertical slice end  → exported Web + Android emulator CI state/visual gate
+release candidate   → physical-device certification if claiming device compatibility/performance
 ```
 
 ## Mobile-specific checks
 
-Browser success does not prove mobile readiness. Physical-device gates should eventually cover:
+Browser success does not prove mobile readiness. For device-specific release certification, real hardware checks should cover:
 
 - thermal throttling
 - tile-based GPU behavior

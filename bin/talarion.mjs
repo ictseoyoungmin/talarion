@@ -10,6 +10,7 @@ import { reportCommand } from "../src/commands/report.mjs";
 import { verifyCommand } from "../src/commands/verify.mjs";
 import { testTargetCommand } from "../src/commands/test-target.mjs";
 import { visualCommand } from "../src/commands/visual.mjs";
+import { tl00AcceptanceCommand } from "../src/runtime/gates.mjs";
 
 const argv = process.argv.slice(2);
 const jsonMode = argv.includes("--json");
@@ -29,6 +30,7 @@ Usage:
   talarion visual compare <web-dir> <android-dir> <out-dir> [--json]
   talarion report <left.jsonl> <right.jsonl> <out.html> [visual-result.json] [web-runner.json] [android-runner.json] [--json]
   talarion verify [--json]
+  talarion gate tl00 <web-dir> <android-dir> <visual-result.json> <out.json> [--json]
 `;
 
 try {
@@ -61,6 +63,10 @@ try {
     case "report":
       if (!args[1] || !args[2] || !args[3]) fail("Usage: talarion report <left> <right> <out.html>");
       result = await reportCommand(config, args[1], args[2], args[3], args[4], args[5], args[6]);
+      break;
+    case "gate":
+      if (args[1] !== "tl00") fail("Usage: talarion gate tl00 <web-dir> <android-dir> <visual-result.json> <out.json>");
+      result = await tl00AcceptanceCommand(config, args[2], args[3], args[4], args[5]);
       break;
     case "verify":
       result = await verifyCommand(config);

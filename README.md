@@ -37,7 +37,7 @@ Available in the repository:
 - machine-readable `--json` output
 - a minimal Godot 3D sample project
 
-The physical cross-runtime parity gate is still open. The runner implementations require a working local Godot toolchain and, for Android, an authorized device or emulator.
+The first Web/Android vertical slice is CI-verified using exported Godot Web and Android emulator runtimes. Physical Android hardware is **not required for baseline portability QA**; hardware performance and device compatibility claims require a separate [release certification](docs/development/release-certification.md). The runners require a working Godot toolchain and an authorized Android device **or emulator**.
 
 ## Quick start
 
@@ -128,6 +128,19 @@ node bin/talarion.mjs doctor --json
 node bin/talarion.mjs verify --json
 node bin/talarion.mjs test web --json
 ```
+
+## TL00 automated acceptance
+
+The CI baseline requires real exported Web/Android replay, state and visual parity, valid engine telemetry and source fingerprints. It does **not** grade emulator FPS against physical-device targets. Reproduce the final acceptance result after capturing both runtimes:
+
+```bash
+node bin/talarion.mjs gate tl00 \
+  artifacts/run/web artifacts/run/android \
+  artifacts/parity/visual/result.json \
+  artifacts/parity/tl00-acceptance.json
+```
+
+This writes a machine-readable acceptance decision. Hardware certification is a separate process; an emulator PASS never counts as a device certification.
 
 ## Configuration
 

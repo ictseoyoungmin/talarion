@@ -99,7 +99,7 @@ A reproducible graph resolves canonical project + target profile + adapter + evi
 ## Design constraints
 
 1. Portability is checked continuously rather than after feature completion.
-2. Web is the primary fast iteration surface, not a substitute for physical-device QA.
+2. Web is the primary fast iteration surface; exported Android emulator runtime QA validates TL00 infrastructure, while physical-device testing certifies hardware-specific release claims separately.
 3. Runtime runners return evidence, not only exit codes.
 4. Structured output is a first-class interface for CI and coding agents.
 5. Backend expansion follows contract stability; engine count is not an early success metric.

@@ -74,3 +74,26 @@ test("runtime-parity gate fails closed on cross-project and stale evidence",asyn
     assert.equal(report.releaseCertified,false);
   }finally{await fs.rm(root,{recursive:true,force:true})}
 });
+
+
+test("WF02-P1 interaction and Activity lifecycle use original game, never a synthetic native gameplay bridge",async()=>{
+  const game=await fs.readFile("examples/web-native/game.mjs","utf8");
+  const java=await fs.readFile("src/android-webview/java/dev/talarion/signalgarden/GameActivity.java","utf8");
+  const runner=await fs.readFile("src/android-webview/interactive.mjs","utf8");
+  assert.match(game,/protocol\("TOUCH",\{direction:d,accepted,trusted:event\.isTrusted,state:snapshot\(state\)\}\)/);
+  assert.match(game,/protocol\("INTERACTIVE_READY"/);
+  assert.match(java,/TALARION_LIFECYCLE/);
+  assert.match(java,/game\.onPause\(\)/);
+  assert.match(java,/game\.onResume\(\)/);
+  assert.doesNotMatch(java,/addJavascriptInterface/);
+  assert.match(runner,/adb\("shell","input","tap"/);
+  assert.match(runner,/adb\("shell","input","keyevent","3"\)/);
+  assert.match(runner,/WI012/);
+  assert.match(runner,/WI013/);
+  assert.match(runner,/WI015/);
+  assert.match(runner,/physicalDeviceCertified:false/);
+  assert.match(runner,/releaseCertified:false/);
+  const cli=spawnSync(process.execPath,["bin/talarion.mjs","web-native","android","smoke","examples/ruins-lite","--json"],{encoding:"utf8"});
+  assert.equal(cli.status,1,cli.stderr);
+  assert.match(JSON.parse(cli.stdout).error,/WI000|preflight|Signal Garden/);
+});

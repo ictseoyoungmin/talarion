@@ -4,6 +4,8 @@
 
 ### Changed
 
+- TL00 foundation merged into `main` after Web/Android emulator, state, visual, telemetry, provenance and 9/9 acceptance checks passed (October 12, 2026). Physical-device certification remains independent.
+
 - TL00 runtime acceptance now requires full exported Web/Android emulator evidence, not physical Android hardware; added machine-verifiable `talarion gate tl00` result and CI check.
 - Physical device performance, thermal, compatibility and lifecycle certification moved into a separate optional release gate; emulator FPS is explicitly observational only.
 - TL01 Portability Doctor becomes the next development slice after TL00 acceptance.

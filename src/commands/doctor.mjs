@@ -5,6 +5,7 @@ import { resolveFromRoot } from "../core/config.mjs";
 import { exists } from "../core/io.mjs";
 import { DOCTOR_SCHEMA, DOCTOR_RULES, diagnosticFor } from "../doctor/rules.mjs";
 import { scanPortabilitySource } from "../doctor/scanner.mjs";
+import { inspectAdapterRegistry, missingAdapterDiagnostics } from "../doctor/adapters.mjs";
 
 const IGNORE_DIRS = new Set([
   ".git", ".godot", ".import", ".talarion",
@@ -45,12 +46,15 @@ export async function doctor(config) {
     message: godot.ok ? "Godot found: " + godot.version : item.message });
 
   const projectDir = resolveFromRoot(config, config.project.path);
+  const registry = await inspectAdapterRegistry(config, projectDir);
   for (const file of await sourceFiles(projectDir)) {
+    if (registry.files.has(file)) continue;
     const relative = path.relative(config.root, file).split(path.sep).join("/");
     const source = await fs.readFile(file, "utf8");
     checks.push(...scanPortabilitySource({ file: relative, source }));
   }
 
+  checks.push(...missingAdapterDiagnostics(checks, registry));
   const diagnostics = checks.filter(c => c.severity !== "pass");
   const errors = diagnostics.filter(c => c.severity === "error").length;
   const warnings = diagnostics.filter(c => c.severity === "warning").length;

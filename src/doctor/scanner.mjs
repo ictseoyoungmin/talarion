@@ -78,7 +78,7 @@ export function scanPortabilitySource({ file, source }) {
   // directly quoted first argument. Computed event names remain unknown.
   const firstStringArgument = start => {
     const rest = source.slice(start);
-    const literal = /^\\s*(['"])([^'"\\\\\\r\\n]*)\\1\\s*(?=[,)])/.exec(rest);
+    const literal = /^\s*(['"])([^'"\\\r\n]*)\1\s*(?=[,)])/.exec(rest);
     return literal ? literal[2] : null;
   };
   for (const rule of MATCH_RULES) {

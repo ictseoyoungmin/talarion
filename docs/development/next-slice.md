@@ -14,7 +14,7 @@ The present proof uses the canonical `examples/ruins-lite` reference project. A 
 
 **Proposed TL05 — External Godot Project Adoption** (not implemented or certified):
 
-1. **P0 — Sample-coupling inventory:** trace project-specific paths and assumptions in runtime contract checks, `verify`, capture/replay staging, runners, target presets and parity CLI. Specify opt-in, non-destructive installation/validation for an independent project.
+1. **P0 — implementation review:** repository-coupling inventory, read-only `project inspect --json`, stable TA prerequisite diagnostics and negative tests. This does not claim second-game runtime success. [P0 contract](tl05-p0.md).
 2. **P1 — Independent Godot vertical slice:** onboard a second deliberately different small Godot game without editing core Talarion engine or runner code. Prove actual Web/Android exported replay and evidence.
 3. **P2 — Reproducible onboarding and agent diagnostics:** generalize only demonstrated integration boundaries, publish an executable project-adoption example and focused failures, and maintain TL00 acceptance regression.
 

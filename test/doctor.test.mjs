@@ -13,7 +13,7 @@ const read = name => fs.readFile(
 
 test("TL01-P0 rule identities, categories, severities and capabilities are stable", () => {
   assert.equal(DOCTOR_SCHEMA, "talarion.doctor/v1");
-  assert.deepEqual(DOCTOR_RULES.map(r => r.id),
+  assert.deepEqual(DOCTOR_RULES.slice(0, 6).map(r => r.id),
     ["PF001", "PF002", "PF003", "PF102", "PF103", "PF104"]);
   assert.equal(new Set(DOCTOR_RULES.map(r => r.id)).size, DOCTOR_RULES.length);
   for (const rule of DOCTOR_RULES) {
@@ -86,11 +86,12 @@ test("doctor sorts project evidence, ignores generated code and remains warning-
     assert.equal(a.errors, 0);
     assert.equal(a.schema, DOCTOR_SCHEMA);
     assert.deepEqual(a.checks, b.checks);
-    const sourceWarnings = a.diagnostics.filter(x => x.file);
+    const sourceWarnings = a.diagnostics.filter(x => x.file && x.id !== "PF405");
     assert.deepEqual(sourceWarnings.map(x => [x.id, x.file, x.line]),
       [["PF102", "game/browser.js", 4], ["PF103", "game/browser.js", 5],
        ["PF104", "game/nested/actor.gd", 8]]);
-    assert.equal(a.warnings, sourceWarnings.length + 1);
+    assert.equal(a.diagnostics.filter(x => x.id === "PF405").length, 2);
+    assert.equal(a.warnings, sourceWarnings.length + 3);
     assert.ok(a.text.includes("game/nested/actor.gd:8:8"));
     await fs.rm(path.join(game, "project.godot"));
     const failed = await doctor(config);

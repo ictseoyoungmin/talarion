@@ -1,4 +1,4 @@
-# Next Slice — Runtime-preserving Android Debug APK (WF02)
+# Next Slice — Android Touch & Lifecycle QA (WF02-P1)
 
 ## Accepted baseline
 
@@ -12,7 +12,7 @@
 
 [ADR-001–005](adr/README.md) specify the forward architecture: source-owned Web-first development; source/runtime/artifact independence; single game-state authority and optional limited IR; separate build/runtime/parity/store proof; isolated external projects and provenance-aware graph.
 
-**ADR acceptance is not implementation evidence.** The existing Godot `talarion.config.json` stays v1. A separate `web-native dev/test` runner now exists for one Three.js reference project; no generic Babylon.js adapter, Android WebView APK builder, Play release AAB or cross-engine IR exists.
+**ADR acceptance is not implementation evidence.** The existing Godot `talarion.config.json` stays v1. A separate `web-native dev/test` runner now exists for one Three.js reference project; no general-purpose Babylon.js adapter, Play release AAB or cross-engine IR exists. The original Signal Garden Web-native game now has a constrained offline Android WebView Debug APK builder and emulator-tested replay/parity.
 
 ## New prioritized implementation slices
 
@@ -23,11 +23,11 @@
 - Persist project-source/build/replay/runtime hashes and separate run outputs. Negative test untrusted projects, missing capabilities and invalid evidence.
 - **Exit:** executable original browser game and independent runtime evidence **from that game**, plus unchanged Godot exported Web/Android CI and TL00 QA.
 
-### WF02 — Runtime-preserving Android Debug APK (P0 in implementation)
+### WF02 — Runtime-preserving Android Debug APK (P0 CLOSED; P1 NEXT)
 
-- WF02-P0: implement offline Android WebView host and debug APK builder with per-game runtime evidence; verify on emulator and compare original browser game state/checkpoints. [Implementation contract](wf02-p0.md).
-- Test Android emulator installation, launch, native container identity, state replay and named screenshots against the browser run. Record exact artifact/source provenance and portability class `same-runtime`.
-- **Exit:** independently produced Debug APK and Android runtime proof; do not claim native GPU engine or physical-device certification.
+- **WF02-P0 CLOSED:** independently built/installable offline Android WebView Debug APK hosting exactly the same Three.js source. Browser and emulator Replay each supply 10 authoritative snapshots, 3 PNG checkpoints, exact source/vendor/replay hashes and 3/3 victory HUD image assertions. Browser↔WebView `WP001–WP007` PASS, verified on PR #26 exact head CI #38293231318, after QA #4 mitigation PR #27 exact head CI #38297356791 and main CI #38297831598, each 8/8 PASS. [Implementation contract](wf02-p0.md).
+- **WF02-P1 NEXT — interactive touch and lifecycle QA:** install the already-built APK in an emulator, exercise real touch controls, HOME/resume and storage/rotation/foreground behavior, and capture independent before/after screenshots and observed gameplay state. The successful automated replay is **not** evidence that manual touch or lifecycle transitions are verified.
+- **P1 exit:** real installed app interaction/lifecycle evidence, source/build provenance and explicit limits, without altering or weakening the existing WF02-P0 and legacy Godot runtime/parity gates. No physical-device certification.
 
 ### WF03 — Google Play Release AAB preflight
 
@@ -45,5 +45,5 @@
 1. **Do not add code to implementation simply to satisfy accepted ADRs.** Deliver one visible, tested slice at a time; do not weaken Godot reference CI.
 2. Keep TL05-P1 in the backlog rather than deleting it or falsely marking it complete; reassess its priority against WF01–03.
 3. Fail closed for cross-project source mutation, symlink/staging collisions, malicious plugins, stale provenance and unsupported required capabilities.
-4. Issue [#4](https://github.com/ictseoyoungmin/talarion/issues/4) remains open for independent raw screenshot review; lockfile generation needs real dependency resolution, not a fabricated offline lock.
+4. QA issue [#4](https://github.com/ictseoyoungmin/talarion/issues/4) is mitigated by PR #27 with raw before/after review, explicit Godot Android immersive mode and fail-closed OS status-bar PNG detection; it **remains open for multi-run stability monitoring**. Do not weaken the 2% max-tile visual gate. Lockfile generation still needs real dependency resolution, not a fabricated offline lock.
 5. Actual device-class FPS, thermal, memory and certification are separate from emulator CI; iOS is still deferred.

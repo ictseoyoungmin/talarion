@@ -18,7 +18,7 @@ Talarion connects those workflows around three capabilities:
 
 ## Project status
 
-Talarion is in early development. **Godot Web and Android are the currently maintained and CI-verified targets**, backed by exported runtime state, strict visual and telemetry evidence. The Godot adapter manifest, audited Web/Android execution binding and read-only candidate conformance workflow are implemented. A read-only Godot project adoption preflight is available, but fully automated onboarding of a second independent game is **not yet proven**. iOS remains an optional, **deferred experimental export capability**, not a prerequisite for using or developing Talarion. This is not a certification of all Android devices or production-game performance.
+Talarion is in early development. **The Godot Web/native-Android pipeline and the constrained Signal Garden Three.js browser/Android WebView Debug APK path are CI-verified**, backed by exported runtime state, strict visual and telemetry evidence. The Godot adapter manifest, audited Web/Android execution binding and read-only candidate conformance workflow are implemented. A read-only Godot project adoption preflight is available, but fully automated onboarding of a second independent game is **not yet proven**. iOS remains an optional, **deferred experimental export capability**, not a prerequisite for using or developing Talarion. This is not a certification of all Android devices or production-game performance.
 
 Available in the repository:
 
@@ -37,7 +37,7 @@ Available in the repository:
 - machine-readable `--json` output
 - a minimal Godot 3D sample project
 
-The [Web-first architecture decisions](docs/development/adr/README.md) and [implementation plan](docs/development/next-slice.md) separate Web-native source, runtime provider, Android APK/AAB packaging and release gates. **An original Three.js Web-native playable reference and real Chromium QA are implemented. The Android WebView Debug APK route is being validated; Play-ready AAB generation is not implemented yet.** They are documented design targets, not current CLI capabilities.
+The [Web-first architecture decisions](docs/development/adr/README.md) and [implementation plan](docs/development/next-slice.md) separate Web-native source, runtime provider, Android APK/AAB packaging and release gates. **An original Three.js Web-native playable reference and real Chromium QA are implemented. The same source is packaged as a separately verified offline Android WebView Debug APK and exercised on an Android emulator. Play-ready AAB generation is not implemented yet.** An installable WebView APK is not a native renderer conversion, production device certification or Google Play approval.
 
 The first Web/Android vertical slice is CI-verified using exported Godot Web and Android emulator runtimes. Physical Android hardware is **not required for baseline portability QA**; hardware performance and device compatibility claims require a separate [release certification](docs/development/release-certification.md). The runners require a working Godot toolchain and an authorized Android device **or emulator**.
 

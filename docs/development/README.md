@@ -29,6 +29,8 @@ This directory contains the engineering specification for Talarion.
 - [WF01-P0](wf01-p0.md) — original Three.js game, interactive Web loop, read-only project inspection and Chromium replay evidence.
 - [WF02-P0](wf02-p0.md) — runtime-preserving Android WebView Debug APK, source hashes, Android replay and independent browser parity gates.
 - [WF02-P1](wf02-p1.md) — installed APK real ADB touch, HOME/resume lifecycle smoke and original Android before/after screenshots.
-- [Next Slice](next-slice.md) — WF01 completed; WF02 Android Debug APK, WF03 release AAB; TL05-P1/P2 backlog.
+- [WF03-P0](wf03-p0.md) — observed independent API36 signed Release AAB build/verify gate (PR #30 closed).
+- [WF03-P1](wf03-p1.md) — release AAB→APK extraction, signed package provenance, actual WebView emulator replay/touch/HOME and browser parity.
+- [Next Slice](next-slice.md) — WF01 and WF02 complete; WF03-P0 complete, P1 next; TL05-P1/P2 backlog.
 - [Roadmap](roadmap.md) — retained TL00–TL05 history and gated Web-first delivery milestones.
 - [OSS Strategy](oss-strategy.md) — repository positioning, local-first requirements, and contributor-facing product constraints.

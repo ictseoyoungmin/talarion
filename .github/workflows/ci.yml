@@ -207,3 +207,27 @@ jobs:
           name: talarion-runtime-parity
           path: artifacts/parity/
           if-no-files-found: error
+
+  web-native-runtime:
+    name: Web-native Three.js browser replay
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Install pinned Three.js and Playwright
+        run: npm install
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Inspect independent Web-native source
+        run: node bin/talarion.mjs web-native inspect examples/web-native --json
+      - name: Run original Three.js game in Chromium
+        run: node bin/talarion.mjs web-native test examples/web-native --json
+      - name: Upload game-specific runtime evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: talarion-web-native-evidence
+          path: artifacts/run/web-native/
+          if-no-files-found: error

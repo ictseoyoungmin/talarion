@@ -53,5 +53,10 @@
       "minLumaStdDev": 0.012,
       "maxTileError": 0.02
     }
+  },
+  "performanceWindow": {
+    "warmupTicks": 120,
+    "sampleStepTicks": 60,
+    "minSamples": 5
   }
 }

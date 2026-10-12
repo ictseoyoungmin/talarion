@@ -188,7 +188,7 @@ jobs:
       - name: TL02 observed evidence and budget profile coverage
         run: |
           node bin/talarion.mjs budget authority .evidence/web .evidence/android artifacts/parity/performance-authority.json --json
-          node --input-type=module -e 'import fs from "node:fs"; const x=JSON.parse(fs.readFileSync("artifacts/parity/performance-authority.json")); if(!x.ok||x.targets.some(t=>!t.budgetCoverage?.ok||t.budgetCoverage.metrics.some(m=>m.comparisonEvaluated||m.decision!=="not-evaluated"))||x.certification.physicalDevice) process.exit(1);'
+          node --input-type=module -e 'import fs from "node:fs"; const x=JSON.parse(fs.readFileSync("artifacts/parity/performance-authority.json")); if(!x.ok||x.targets.some(t=>!t.budgetCoverage?.ok||t.budgetCoverage.metrics.some(m=>m.comparisonEvaluated||m.decision!=="not-evaluated")||t.performanceWindow?.status!=="complete-window"||!t.performanceWindow.metrics||t.performanceWindow.budgetDecision!=="not-evaluated")||x.certification.physicalDevice) process.exit(1);'
 
       - name: Generate parity report
         if: always()

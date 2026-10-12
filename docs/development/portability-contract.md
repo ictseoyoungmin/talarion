@@ -54,7 +54,7 @@ Raw keyboard, pointer, touch, and controller emulation belongs to a separate end
 - `PF5xx` — build/export environment
 - `PF6xx` — replay/parity contract
 
-Initial implemented examples include direct browser storage, direct browser haptics, and raw-key polling warnings. The stable [TL01-P0 diagnostic catalog](tl01-p0.md) adds capabilities, severity, target scope, remediation and source locations.
+The stable [TL01-P0 diagnostic catalog](tl01-p0.md) defines IDs, capabilities, severity, target scope, remediation and source locations. [TL01-P1](tl01-p1.md) adds platform-native API checks, browser lifecycle and DOM keyboard events, and validation of optional target adapter declarations.
 
 ## Replay v1
 

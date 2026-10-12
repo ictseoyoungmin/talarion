@@ -26,11 +26,12 @@ export async function inspectAdapterRegistry(config, projectDir) {
   const registry = config.portability?.adapters ?? {};
   const valid = new Set();
   const files = new Set();
+  const fileTargets = new Map();
   const invalid = [];
   const errors = new Set();
   const rootReal = await fs.realpath(projectDir).catch(() => null);
   if (!registry || typeof registry !== "object" || Array.isArray(registry)) {
-    return { valid, files, invalid: [record("platform.adapter", "web", "invalid")], errors };
+    return { valid, files, fileTargets, invalid: [record("platform.adapter", "web", "invalid")], errors };
   }
   for (const capability of Object.keys(registry).sort()) {
     const entry = registry[capability];
@@ -59,6 +60,8 @@ export async function inspectAdapterRegistry(config, projectDir) {
       if (accepted) {
         valid.add(key);
         files.add(full);
+        if (!fileTargets.has(full)) fileTargets.set(full, new Set());
+        fileTargets.get(full).add(target);
       } else {
         invalid.push(record(capability, markedTarget, "invalid", null,
           typeof declared === "string" ? declared : undefined));
@@ -66,7 +69,7 @@ export async function inspectAdapterRegistry(config, projectDir) {
       }
     }
   }
-  return { valid, files, invalid, errors };
+  return { valid, files, fileTargets, invalid, errors };
 }
 
 export function missingAdapterDiagnostics(findings, registry) {

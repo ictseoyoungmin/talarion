@@ -48,10 +48,14 @@ export async function doctor(config) {
   const projectDir = resolveFromRoot(config, config.project.path);
   const registry = await inspectAdapterRegistry(config, projectDir);
   for (const file of await sourceFiles(projectDir)) {
-    if (registry.files.has(file)) continue;
+    const adapterTargets = registry.fileTargets.get(file) ?? null;
     const relative = path.relative(config.root, file).split(path.sep).join("/");
     const source = await fs.readFile(file, "utf8");
-    checks.push(...scanPortabilitySource({ file: relative, source }));
+    const findings = scanPortabilitySource({ file: relative, source });
+    // Adapter code may use its own platform API, but wrong-target API calls
+    // still deserve diagnostics (e.g. Java JNI inside a Web adapter).
+    checks.push(...findings.filter(finding =>
+      !adapterTargets || finding.targets.some(target => adapterTargets.has(target))));
   }
 
   checks.push(...missingAdapterDiagnostics(checks, registry));

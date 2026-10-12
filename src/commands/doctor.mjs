@@ -6,6 +6,7 @@ import { exists } from "../core/io.mjs";
 import { DOCTOR_SCHEMA, DOCTOR_RULES, diagnosticFor } from "../doctor/rules.mjs";
 import { scanPortabilitySource } from "../doctor/scanner.mjs";
 import { inspectAdapterRegistry, missingAdapterDiagnostics } from "../doctor/adapters.mjs";
+import { auditStaticAssets } from "../doctor/assets.mjs";
 
 const IGNORE_DIRS = new Set([
   ".git", ".godot", ".import", ".talarion",
@@ -59,6 +60,8 @@ export async function doctor(config) {
   }
 
   checks.push(...missingAdapterDiagnostics(checks, registry));
+  const assetBudget = await auditStaticAssets(config, projectDir);
+  checks.push(...assetBudget.diagnostics);
   const diagnostics = checks.filter(c => c.severity !== "pass");
   const errors = diagnostics.filter(c => c.severity === "error").length;
   const warnings = diagnostics.filter(c => c.severity === "warning").length;
@@ -77,7 +80,7 @@ export async function doctor(config) {
   ];
   return {
     schema: DOCTOR_SCHEMA, ok, warnings, errors, infos,
-    checks, diagnostics, rulesEvaluated: DOCTOR_RULES.map(r => r.id),
+    checks, diagnostics, assetBudget, rulesEvaluated: DOCTOR_RULES.map(r => r.id),
     text: lines.join("\n")
   };
 }

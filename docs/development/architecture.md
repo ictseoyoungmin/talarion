@@ -19,14 +19,14 @@ gameplay/core       world/content       game schema
                           |
        +------------------+----------------+
        |                  |                |
-      Web              Android            iOS
+      Web              Android       iOS (deferred)
 ```
 
 Target-specific differences must not create independent gameplay implementations.
 
 ## Portability layer
 
-Portable gameplay uses explicit platform interfaces instead of direct target APIs:
+Portable gameplay is designed to use explicit platform interfaces instead of direct target APIs. The following are **interface domains**, not a claim that all implementations already exist:
 
 ```text
 platform.input
@@ -92,9 +92,9 @@ Static and project-level checks that detect non-portable APIs, unsupported capab
 
 A semantic action stream is replayed against multiple runtimes. Authoritative state, visual checkpoints, events, and performance evidence are compared under explicit tolerances.
 
-### Build Graph
+### Build planning and orchestration
 
-A reproducible graph resolves canonical project + target profile + adapter + evidence steps into target artifacts and parity reports.
+Currently `talarion plan` lists configured target/profile/export outputs, and `talarion build` / `test` invoke the existing Godot Web/Android paths. A dependency-resolving build/evidence graph is an **architectural direction**, not yet an implemented executable DAG.
 
 ## Design constraints
 

@@ -20,9 +20,9 @@ iOS is outside the currently supported and validated Web/Android scope. P0 macOS
 
 P0 [versioned reference manifest and source-only inspection](tl04-p0.md), P1 [allowlisted Godot Web/Android execution binding](tl04-p1.md), and P2 [candidate JSON conformance and extension guidance](tl04-p2.md) merged in PR #17–#19. Every PR passed actual exported Web/Android runtime replay and the unchanged 15/15 state, 3/3 strict spatial visual and TL00 9/9 acceptance. SDK source binding cannot self-certify a device, engine runtime or unsupported platform.
 
-## TL05 — External Godot Project Adoption — PROPOSED
+## TL05 — External Godot Project Adoption — ACTIVE (P0 CLOSED)
 
-Demonstrate that an independent Godot game, beyond Ruins Lite, can use the same export/replay/evidence contract without changes to Talarion core. First audit project coupling and add a non-destructive read-only adoption preflight (TL05-P0). Then require a separate genuinely independent Godot game and exported Web/Android proof (P1) before broad adoption claims. [Next implementation slice](next-slice.md). No additional engine or iOS work is assumed.
+Demonstrate that an independent Godot game, beyond Ruins Lite, can use the same export/replay/evidence contract without changes to Talarion core. P0 source-only adoption preflight and Ruins Lite coupling inventory merged via PR #21 (CI 6/6; no independent-game runtime certification). P1 must prove a genuinely different Godot game on exported Web/Android with independent replay/state/visual provenance and no Talarion-core rewrite. P2 generalization must follow proven integration. [Next implementation slice](next-slice.md). No additional engine or iOS work is assumed.
 
 ## Release Certification (separate gate)
 

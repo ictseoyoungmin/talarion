@@ -33,7 +33,9 @@ export function buildDoctorReport(doctor) {
     (a.line ?? 0) - (b.line ?? 0) ||
     (a.column ?? 0) - (b.column ?? 0) ||
     a.ruleId.localeCompare(b.ruleId, "en") ||
-    issueKey(a).localeCompare(issueKey(b), "en")
+    issueKey(a).localeCompare(issueKey(b), "en") ||
+    norm(a.message).localeCompare(norm(b.message), "en") ||
+    norm(a.remediation).localeCompare(norm(b.remediation), "en")
   );
   const seen = new Map();
   const findings = list.map(item => {

@@ -2,6 +2,7 @@
 import { loadConfig } from "../src/core/config.mjs";
 import { printJson, fail } from "../src/core/io.mjs";
 import { doctor } from "../src/commands/doctor.mjs";
+import { doctorReportCommand } from "../src/commands/doctor-report.mjs";
 import { plan } from "../src/commands/plan.mjs";
 import { build } from "../src/commands/build.mjs";
 import { validateReplayCommand } from "../src/commands/replay.mjs";
@@ -22,6 +23,7 @@ Talarion 0.0.1
 
 Usage:
   talarion doctor [--json]
+  talarion doctor report <output-dir> [--json]
   talarion plan [--json]
   talarion build <web|android> [--json]
   talarion test <web|android> [--json]
@@ -38,7 +40,13 @@ try {
   let result;
   switch (command) {
     case "doctor":
-      result = await doctor(config);
+      if (args[1] === "report") {
+        if (!args[2] || args[3]) fail("Usage: talarion doctor report <output-dir> [--json]");
+        result = await doctorReportCommand(config, args[2]);
+      } else {
+        if (args[1]) fail("Usage: talarion doctor [--json]");
+        result = await doctor(config);
+      }
       break;
     case "plan":
       result = await plan(config);

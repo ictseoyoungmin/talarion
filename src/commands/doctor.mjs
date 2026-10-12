@@ -7,6 +7,7 @@ import { DOCTOR_SCHEMA, DOCTOR_RULES, diagnosticFor } from "../doctor/rules.mjs"
 import { scanPortabilitySource } from "../doctor/scanner.mjs";
 import { inspectAdapterRegistry, missingAdapterDiagnostics } from "../doctor/adapters.mjs";
 import { auditStaticAssets } from "../doctor/assets.mjs";
+import { buildDoctorReport, formatDoctorText } from "../doctor/diagnostic-report.mjs";
 
 const IGNORE_DIRS = new Set([
   ".git", ".godot", ".import", ".talarion",
@@ -67,20 +68,11 @@ export async function doctor(config) {
   const warnings = diagnostics.filter(c => c.severity === "warning").length;
   const infos = diagnostics.filter(c => c.severity === "info").length;
   const ok = errors === 0;
-  const lines = [
-    "TALARION DOCTOR",
-    ...checks.map(c => (c.severity === "pass" ? "✓" :
-      c.severity === "warning" ? "△" : c.severity === "info" ? "i" : "✗") +
-      " " + c.id + " " + c.message +
-      (c.file ? " (" + c.file +
-        (c.line ? ":" + c.line + ":" + c.column : "") + ")" : "")),
-    "",
-    (ok ? "PASS" : "FAIL") + " — " + warnings + " warning(s), " +
-      errors + " error(s), " + infos + " info notice(s)"
-  ];
-  return {
+  const result = {
     schema: DOCTOR_SCHEMA, ok, warnings, errors, infos,
-    checks, diagnostics, assetBudget, rulesEvaluated: DOCTOR_RULES.map(r => r.id),
-    text: lines.join("\n")
+    checks, diagnostics, assetBudget, rulesEvaluated: DOCTOR_RULES.map(r => r.id)
   };
+  result.report = buildDoctorReport(result);
+  result.text = formatDoctorText(result.report);
+  return result;
 }

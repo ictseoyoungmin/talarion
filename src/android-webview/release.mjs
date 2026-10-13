@@ -278,7 +278,10 @@ export async function testReleaseAab(project){
     interactive.sourceAabSha256!==verified.artifactSha256||
     interactive.actions?.length!==3||interactive.captures?.length!==5||
     !Array.isArray(interactive.orientationObservations)||
-    !interactive.orientationObservations.slice(-2).every(x=>x.width===2340&&x.height===1080&&x.landscape===true)||
+    !interactive.orientationObservations.slice(-2).every(x=>
+      x.width===interactive.environment?.screenSize?.[0]&&
+      x.height===interactive.environment?.screenSize?.[1]&&
+      x.width>x.height&&x.landscape===true)||
     !Array.isArray(interactive.inputProbeObservations)||
     interactive.inputProbeObservations.length<2||
     !interactive.inputProbeObservations.slice(-2).every(x=>x.observed===true&&x.valid===true&&

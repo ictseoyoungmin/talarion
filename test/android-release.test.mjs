@@ -154,3 +154,19 @@ test("WF03-P1 probe uses real ADB input only, never moves game or blindly retrie
   assert.equal((runner.match(/await adb\("shell","input","tap",String\(xDown\),String\(yDown\)\)/g)||[]).length,1);
   assert.doesNotMatch(game,/protocol\("INPUT_PROBE"[^;]+applyMovement/s);
 });
+
+test("WF03-P1 mobile arrow authority is pointerdown with a single movement per physical input",async()=>{
+  const game=await fs.readFile("examples/web-native/game.mjs","utf8");
+  const interactive=await fs.readFile("src/android-webview/interactive.mjs","utf8");
+  const release=await fs.readFile("src/android-webview/release.mjs","utf8");
+  assert.match(game,/el\.addEventListener\("pointerdown",event=>/);
+  assert.match(game,/recentPointer\.set\(el,performanceNow\(\)\)/);
+  assert.match(game,/inputMove\(el,event,"pointerdown"\)/);
+  assert.match(game,/event\.detail>0&&performanceNow\(\)-last<1500/);
+  assert.match(game,/inputMove\(el,event,"click"\)/);
+  assert.match(game,/protocol\("CONTROL_ROUTE",\{via,direction:d,trusted:event\.isTrusted/);
+  assert.match(interactive,/TALARION_\(INTERACTIVE_READY\|INPUT_PROBE\|CONTROL_ROUTE/);
+  assert.match(interactive,/assert\("WI019",routes\.length===3/);
+  assert.match(release,/\["WI017","WI018","WI019"\]/);
+  assert.equal((game.match(/const accepted=applyMovement\(\.\.\.d\)/g)||[]).length,1);
+});

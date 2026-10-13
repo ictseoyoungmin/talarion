@@ -80,6 +80,14 @@ function applyMovement(dx,dz){
  if(move(state,dx,dz)) {updateHud();return true}return false;
 }
 if(!replayMode){
+ // Observational only: a trusted tap on the non-interactive WebGL canvas
+ // proves that Android input reached this live page after HOME/resume.
+ // It never invokes movement, focuses gameplay controls or mutates state.
+ canvas.addEventListener("pointerdown",event=>{
+  protocol("INPUT_PROBE",{trusted:event.isTrusted,stage:event.target===canvas,
+    hidden:document.hidden,viewport:[window.innerWidth,window.innerHeight],
+    state:snapshot(state)});
+ });
  const keys={KeyW:[0,-1],ArrowUp:[0,-1],KeyS:[0,1],ArrowDown:[0,1],KeyA:[-1,0],ArrowLeft:[-1,0],KeyD:[1,0],ArrowRight:[1,0]};
  window.addEventListener("keydown",event=>{const d=keys[event.code];if(d&&!event.repeat){event.preventDefault();applyMovement(...d)}});
  document.querySelectorAll("[data-dir]").forEach(el=>el.addEventListener("click",event=>{

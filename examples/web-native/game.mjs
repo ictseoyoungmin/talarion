@@ -90,12 +90,34 @@ if(!replayMode){
  });
  const keys={KeyW:[0,-1],ArrowUp:[0,-1],KeyS:[0,1],ArrowDown:[0,1],KeyA:[-1,0],ArrowLeft:[-1,0],KeyD:[1,0],ArrowRight:[1,0]};
  window.addEventListener("keydown",event=>{const d=keys[event.code];if(d&&!event.repeat){event.preventDefault();applyMovement(...d)}});
- document.querySelectorAll("[data-dir]").forEach(el=>el.addEventListener("click",event=>{
+ // Pointerdown is authoritative for physical mobile button input. Android
+ // WebView can deliver a trusted pointerdown before synthesizing its click,
+ // especially just after HOME/Activity resume. Never wait for click to move.
+ // Click remains a fallback for keyboard activation and older pointer providers.
+ const recentPointer=new WeakMap();
+ const inputMove=(el,event,via)=>{
   const d=el.dataset.dir.split(",").map(Number);
+  protocol("CONTROL_ROUTE",{via,direction:d,trusted:event.isTrusted,
+    stateBefore:snapshot(state)});
   const accepted=applyMovement(...d);
-  // Observational protocol only: never let the QA runner move the game directly.
+  // Observational protocol only: the runner cannot mutate original gameplay.
   protocol("TOUCH",{direction:d,accepted,trusted:event.isTrusted,state:snapshot(state)});
- }));
+ };
+ document.querySelectorAll("[data-dir]").forEach(el=>{
+  el.addEventListener("pointerdown",event=>{
+   if(!event.isPrimary||event.button!==0)return;
+   recentPointer.set(el,performanceNow());
+   inputMove(el,event,"pointerdown");
+  });
+  el.addEventListener("click",event=>{
+   const last=recentPointer.get(el);
+   recentPointer.delete(el);
+   // A physical pointerdown already moved the game. Drop only the paired
+   // compatibility click; keyboard click (detail=0) stays accepted.
+   if(last!==undefined&&event.detail>0&&performanceNow()-last<1500)return;
+   inputMove(el,event,"click");
+  });
+ });
  document.addEventListener("visibilitychange",()=>protocol("VISIBILITY",{
   hidden:document.hidden,state:snapshot(state)
  }));

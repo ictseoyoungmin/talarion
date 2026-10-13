@@ -286,7 +286,7 @@ export async function testReleaseAab(project){
     interactive.inputProbeObservations.length<2||
     !interactive.inputProbeObservations.slice(-2).every(x=>x.observed===true&&x.valid===true&&
       x.trusted===true&&x.stage===true&&x.state?.moves===2&&x.state?.collected===1)||
-    !["WI017","WI018"].every(id=>interactive.checks?.some(x=>x.id===id&&x.passed===true))||
+    !["WI017","WI018","WI019"].every(id=>interactive.checks?.some(x=>x.id===id&&x.passed===true))||
     interactive.checks?.some(x=>x.passed!==true)||
     !interactive.environment?.observedInAndroidEmulator||
     interactive.lifecycle?.filter(e=>e.kind==="LIFECYCLE"&&e.value?.phase==="resume").length<2)

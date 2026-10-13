@@ -6,7 +6,7 @@ import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { planReleaseAab,buildReleaseAab,verifyReleaseAab,testReleaseAab } from "../src/android-webview/release.mjs";
 import { testWebView } from "../src/android-webview/runtime.mjs";
-import { smokeInteractiveWebView, landscapeResumeEvidence } from "../src/android-webview/interactive.mjs";
+import { smokeInteractiveWebView, landscapeResumeEvidence, neutralInputEvidence } from "../src/android-webview/interactive.mjs";
 
 const project=path.resolve("examples/web-native");
 const env=["TALARION_RELEASE_KEYSTORE","TALARION_RELEASE_ALIAS",
@@ -124,4 +124,33 @@ test("WF03-P1 retains raw portrait evidence and fails closed if no real landscap
   assert.match(src,/awaitLandscapeResume\(dir,orientationObservations\)/);
   assert.match(src,/assert\("WI017",false/);
   assert.doesNotMatch(src,/sleep\(\d+\).*post-resume trusted tap/);
+});
+
+test("WF03-P1 post-HOME gate accepts only trusted neutral canvas input without state mutation",()=>{
+  const valid={kind:"INPUT_PROBE",value:{trusted:true,stage:true,hidden:false,
+    viewport:[851,392],state:{moves:2,collected:1,position:[-1,0,-3]}}};
+  assert.equal(neutralInputEvidence(valid),true);
+  for(const bad of [
+    null,{...valid,kind:"TOUCH"},
+    {kind:"INPUT_PROBE",value:{...valid.value,trusted:false}},
+    {kind:"INPUT_PROBE",value:{...valid.value,stage:false}},
+    {kind:"INPUT_PROBE",value:{...valid.value,hidden:true}},
+    {kind:"INPUT_PROBE",value:{...valid.value,viewport:[392,851]}},
+    {kind:"INPUT_PROBE",value:{...valid.value,state:{...valid.value.state,moves:3}}},
+    {kind:"INPUT_PROBE",value:{...valid.value,state:{...valid.value.state,collected:0}}},
+    {kind:"INPUT_PROBE",value:{...valid.value,state:{...valid.value.state,position:[0,0,0]}}}
+  ])assert.equal(neutralInputEvidence(bad),false);
+});
+test("WF03-P1 probe uses real ADB input only, never moves game or blindly retries move",async()=>{
+  const game=await fs.readFile("examples/web-native/game.mjs","utf8");
+  const runner=await fs.readFile("src/android-webview/interactive.mjs","utf8");
+  assert.match(game,/canvas\.addEventListener\("pointerdown"/);
+  assert.match(game,/protocol\("INPUT_PROBE"/);
+  assert.match(runner,/awaitWebViewInputReady\(resumed,inputProbeObservations\)/);
+  assert.match(runner,/inputProbeObservations/);
+  assert.match(runner,/failure-observed-events\.jsonl/);
+  assert.match(runner,/Two trusted, state-preserving real Android canvas probes/);
+  assert.match(runner,/await adb\("shell","input","tap",String\(xDown\),String\(yDown\)\)/);
+  assert.equal((runner.match(/await adb\("shell","input","tap",String\(xDown\),String\(yDown\)\)/g)||[]).length,1);
+  assert.doesNotMatch(game,/protocol\("INPUT_PROBE"[^;]+applyMovement/s);
 });

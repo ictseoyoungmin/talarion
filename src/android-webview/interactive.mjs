@@ -30,7 +30,7 @@ async function logPackets(){
   const entries=[],errors=[];
   for(const line of stdout.split(/\r?\n/)){
     if(line.includes("JS_ERROR")||line.includes("ASSET_NOT_FOUND"))errors.push(line.slice(0,260));
-    const m=/TALARION_(INTERACTIVE_READY|INPUT_PROBE|TOUCH|LIFECYCLE|VISIBILITY)\s+(\{[^\r\n]*\})/.exec(line);
+    const m=/TALARION_(INTERACTIVE_READY|INPUT_PROBE|CONTROL_ROUTE|TOUCH|LIFECYCLE|VISIBILITY)\s+(\{[^\r\n]*\})/.exec(line);
     if(!m)continue;
     try{entries.push({kind:m[1],value:JSON.parse(m[2])});}catch{errors.push("Unparseable runtime evidence: "+m[1]);}
   }
@@ -269,6 +269,11 @@ export async function smokeInteractiveWebView(project,{releaseBuild=null}={}){
       v.state.collected===1,
       "Original game must preserve authoritative gameplay across HOME/resume");
     const finalPackets=await logPackets();
+    const routes=finalPackets.filter(e=>e.kind==="CONTROL_ROUTE"&&e.value?.via==="pointerdown");
+    assert("WI019",routes.length===3&&routes.every(e=>e.value?.trusted===true)&&
+      routes.at(-1)?.value?.stateBefore?.moves===2&&
+      JSON.stringify(routes.at(-1)?.value?.direction)===JSON.stringify([0,1]),
+      "Exactly three trusted button pointerdown actions, including post-HOME movement; no duplicate synthesized clicks");
     assert("WI013",finalPackets.filter(e=>e.kind==="INTERACTIVE_READY").length===1,
       "No hidden page reload/state reset occurred on Android resume");
     assert("WI014",finalPackets.some(e=>e.kind==="LIFECYCLE"&&e.value?.phase==="pause")&&

@@ -30,7 +30,7 @@ async function logPackets(){
   const entries=[],errors=[];
   for(const line of stdout.split(/\r?\n/)){
     if(line.includes("JS_ERROR")||line.includes("ASSET_NOT_FOUND"))errors.push(line.slice(0,260));
-    const m=/TALARION_(INTERACTIVE_READY|TOUCH|LIFECYCLE|VISIBILITY)\s+(\{[^\r\n]*\})/.exec(line);
+    const m=/TALARION_(INTERACTIVE_READY|INPUT_PROBE|TOUCH|LIFECYCLE|VISIBILITY)\s+(\{[^\r\n]*\})/.exec(line);
     if(!m)continue;
     try{entries.push({kind:m[1],value:JSON.parse(m[2])});}catch{errors.push("Unparseable runtime evidence: "+m[1]);}
   }
@@ -76,6 +76,85 @@ async function capture(file,requireGame=true){
   return {name:path.basename(file),file,bytes:bytes.length,
     width:im.width,height:im.height,sha256:sha(bytes)};
 }
+export function landscapeResumeEvidence(observations){
+  return Array.isArray(observations)&&observations.length>=2&&
+    observations.slice(-2).every(x=>Number.isInteger(x.width)&&Number.isInteger(x.height)&&
+      x.width>=320&&x.height>=180&&x.width>x.height);
+}
+
+// Activity.onResume precedes the surface's physical orientation transition.
+// Observe real Android screenshot dimensions before sending a coordinate input;
+// never silently treat a portrait game frame as a successful landscape resume.
+async function awaitLandscapeResume(dir,observations,{limitMs=14000}={}){
+  const probe=path.join(dir,"04-resume-orientation-probe.png");
+  const final=path.join(dir,"04-resumed.png");
+  const started=Date.now();
+  let last=null;
+  while(Date.now()-started<limitMs){
+    last=await capture(probe);
+    const landscape=last.width>last.height;
+    observations.push({width:last.width,height:last.height,sha256:last.sha256,landscape});
+    if(landscapeResumeEvidence(observations)){
+      await fs.rename(probe,final);
+      assert("WI017",true,"Two consecutive real Android frames are landscape after HOME/resume");
+      return {name:path.basename(final),file:final,bytes:last.bytes,
+        width:last.width,height:last.height,sha256:last.sha256};
+    }
+    await pause(300);
+  }
+  assert("WI017",false,"Resume surface failed to return to stable landscape. Physical frame sequence: "+
+    JSON.stringify(observations.map(x=>[x.width,x.height])));
+}
+
+
+export function neutralInputEvidence(event){
+  const p=event?.value,st=p?.state,vp=p?.viewport;
+  return event?.kind==="INPUT_PROBE"&&p.trusted===true&&p.stage===true&&
+    p.hidden===false&&Array.isArray(vp)&&vp.length===2&&
+    vp.every(n=>Number.isFinite(n)&&n>0)&&vp[0]>vp[1]&&
+    st?.moves===2&&st?.collected===1&&
+    JSON.stringify(st?.position)===JSON.stringify([-1,0,-3]);
+}
+// Neutral stage taps are not gameplay inputs. A bounded series of independent
+// trusted DOM acknowledgements proves the resumed WebView actually accepts
+// Android input, beyond screenshot orientation and Activity.onResume.
+// Never resend a game movement to make an unobserved movement appear to pass.
+async function awaitWebViewInputReady(first,observations){
+  const x=Math.round(first.width*.12),y=Math.round(first.height*.13);
+  let lastCount=(await logPackets()).filter(e=>e.kind==="INPUT_PROBE").length;
+  let accepted=0;
+  for(let attempt=1;attempt<=6;attempt++){
+    // The upstream orientation gate already required two physical landscape frames.
+    await adb("shell","input","tap",String(x),String(y));
+    const start=Date.now();
+    let response=null;
+    while(Date.now()-start<1700){
+      const events=await logPackets();
+      const all=events.filter(e=>e.kind==="INPUT_PROBE");
+      if(all.length>lastCount){
+        response=all.at(-1);
+        lastCount=all.length;
+        break;
+      }
+      await pause(220);
+    }
+    const valid=neutralInputEvidence(response);
+    observations.push({attempt,input:[x,y],observed:!!response,valid,
+      trusted:response?.value?.trusted??false,stage:response?.value?.stage??false,
+      viewport:response?.value?.viewport??null,
+      state:response?.value?.state??null});
+    if(response&&!valid)throw new Error("WI018: neutral Android input reached the wrong page/state");
+    accepted=valid?accepted+1:0;
+    if(accepted>=2){
+      assert("WI018",true,"Two trusted, state-preserving real Android canvas probes received by resumed WebView");
+      return;
+    }
+    await pause(350);
+  }
+  assert("WI018",false,"After landscape resume, original WebView never acknowledged two independent neutral input probes: "+
+    JSON.stringify(observations.map(x=>[x.attempt,x.observed,x.valid])));
+}
+
 async function verifyBuild(inspected,releaseBuild=null){
   const dir=path.join(ROOT,"artifacts/build/android-webview");
   const build=releaseBuild??JSON.parse(await fs.readFile(path.join(dir,"build-evidence.json"),"utf8"));
@@ -122,7 +201,7 @@ export async function smokeInteractiveWebView(project,{releaseBuild=null}={}){
   const outRoot=path.join(ROOT,releaseBuild?"artifacts/run/android-webview-release-interactive":"artifacts/run/android-webview-interactive");
   await fs.mkdir(outRoot,{recursive:true});
   const dir=await fs.mkdtemp(path.join(outRoot,"signal-garden-"));
-  const captures=[],actions=[];
+  const captures=[],actions=[],orientationObservations=[],inputProbeObservations=[];
   let error=null;
   try{
     await adb("install","-r",apk);
@@ -172,10 +251,15 @@ export async function smokeInteractiveWebView(project,{releaseBuild=null}={}){
     captures.push(await capture(path.join(dir,"03-home.png"),false));
     await adb("shell","am","start","-n",ACTIVITY);
     await until("Android game resumed",p=>p.filter(e=>e.kind==="LIFECYCLE"&&e.value?.phase==="resume").length>=2);
-    await pause(500);
-    captures.push(await capture(path.join(dir,"04-resumed.png")));
-    const xDown=first.width-Math.round(109*ratio);
-    await adb("shell","input","tap",String(xDown),String(y));
+    // The Android launcher is portrait; the resumed Activity may be focused
+    // while its surface still shows a portrait/warped game for several frames.
+    // Gate only on actually observed stable landscape, not a fixed sleep.
+    const resumed=await awaitLandscapeResume(dir,orientationObservations);
+    captures.push(resumed);
+    await awaitWebViewInputReady(resumed,inputProbeObservations);
+    const xDown=resumed.width-Math.round(109*ratio);
+    const yDown=resumed.height-Math.round(50*ratio);
+    await adb("shell","input","tap",String(xDown),String(yDown));
     const after=await until("post-resume trusted tap",p=>
       p.filter(e=>e.kind==="TOUCH").find(e=>e.value?.state?.moves===3));
     const v=after.match.value;
@@ -190,7 +274,7 @@ export async function smokeInteractiveWebView(project,{releaseBuild=null}={}){
     assert("WI014",finalPackets.some(e=>e.kind==="LIFECYCLE"&&e.value?.phase==="pause")&&
       finalPackets.filter(e=>e.kind==="LIFECYCLE"&&e.value?.phase==="resume").length>=2,
       "Actual Activity.pause and resume must be observed independently");
-    actions.push({step:3,input:{x:xDown,y},observation:v});
+    actions.push({step:3,input:{x:xDown,y:yDown},observation:v});
     await pause(600);
     captures.push(await capture(path.join(dir,"05-after-resume-tap.png")));
     assert("WI015",new Set(captures.map(x=>x.sha256)).size>=4,
@@ -202,7 +286,7 @@ export async function smokeInteractiveWebView(project,{releaseBuild=null}={}){
       provenance:{apkSha256:build.artifactSha256,sourceSha256:build.identity.sourceSha256,
         hostSha256:build.hostSha256,replaySha256:build.identity.replaySha256},
       environment:{observedInAndroidEmulator:emulator,deviceClass:emulator?"emulator":"unverified-device",screenSize:[first.width,first.height]},
-      actions,captures,checks:[...checks],lifecycle:finalPackets.filter(e=>
+      actions,captures,orientationObservations,inputProbeObservations,checks:[...checks],lifecycle:finalPackets.filter(e=>
         e.kind==="LIFECYCLE"||e.kind==="VISIBILITY"),runtimeObserved:true,
       humanTouchEquivalentViaAdb:true,physicalDeviceCertified:false,
       releaseCertified:false,visualParityCertified:false,
@@ -212,10 +296,13 @@ export async function smokeInteractiveWebView(project,{releaseBuild=null}={}){
     return report;
   }catch(e){
     error=e;
+    const finalEvents=await logPackets().catch(()=>[]);
+    await writeJsonl(path.join(dir,"failure-observed-events.jsonl"),finalEvents);
     await writeJson(path.join(dir,"runner-result.json"),{
       schema:"talarion.android-webview-interactive/v1",ok:false,projectId:"signal-garden",
       artifactSha256:build.artifactSha256,artifactKind:releaseBuild?"release-apk":"debug-apk",
       sourceAabSha256:releaseBuild?.sourceAabSha256??null,checks:[...checks],actions,captures,
+      orientationObservations,inputProbeObservations,
       error:String(e?.stack||e),humanTouchEquivalentViaAdb:false,
       physicalDeviceCertified:false,releaseCertified:false
     });

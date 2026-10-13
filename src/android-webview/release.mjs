@@ -277,6 +277,16 @@ export async function testReleaseAab(project){
     interactive.provenance?.apkSha256!==apkSha256||
     interactive.sourceAabSha256!==verified.artifactSha256||
     interactive.actions?.length!==3||interactive.captures?.length!==5||
+    !Array.isArray(interactive.orientationObservations)||
+    !interactive.orientationObservations.slice(-2).every(x=>
+      x.width===interactive.environment?.screenSize?.[0]&&
+      x.height===interactive.environment?.screenSize?.[1]&&
+      x.width>x.height&&x.landscape===true)||
+    !Array.isArray(interactive.inputProbeObservations)||
+    interactive.inputProbeObservations.length<2||
+    !interactive.inputProbeObservations.slice(-2).every(x=>x.observed===true&&x.valid===true&&
+      x.trusted===true&&x.stage===true&&x.state?.moves===2&&x.state?.collected===1)||
+    !["WI017","WI018"].every(id=>interactive.checks?.some(x=>x.id===id&&x.passed===true))||
     interactive.checks?.some(x=>x.passed!==true)||
     !interactive.environment?.observedInAndroidEmulator||
     interactive.lifecycle?.filter(e=>e.kind==="LIFECYCLE"&&e.value?.phase==="resume").length<2)
@@ -289,6 +299,8 @@ export async function testReleaseAab(project){
     replayScreenshots:replay.observed.captureCount,
     trustedTouchActions:interactive.actions.length,touchScreenshots:interactive.captures.length,
     homeResumeStatePreserved:true,
+    postResumeLandscapeFrames:interactive.orientationObservations.length,
+    observedNeutralProbes:interactive.inputProbeObservations.length,
     provenance:{...identity,sourceAabSha256:verified.artifactSha256,apkSha256},
     evidence:{replay:replay.evidence?.stateFile,
       replayResult:path.join(path.dirname(replay.evidence.stateFile),"runner-result.json"),

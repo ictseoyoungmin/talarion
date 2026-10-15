@@ -148,7 +148,15 @@ node bin/talarion.mjs web-native android release verify examples/web-native --js
 node bin/talarion.mjs web-native android release test examples/web-native --json
 ~~~
 
-The release target is API36, separate from the existing API35 Debug APK. Secrets never belong in the repository. See [WF03-P0](docs/development/wf03-p0.md), [WF03-P1](docs/development/wf03-p1.md) and [WF03-P2 planned release preflight](docs/development/wf03-p2.md); an AAB build or emulator PASS is not Play Store approval or physical-device certification.
+The release target is API36, separate from the existing API35 Debug APK. Secrets never belong in the repository.
+
+For a game-independent, **read-only** Google Play metadata/policy static audit:
+
+~~~bash
+node bin/talarion.mjs play preflight examples/play-submission.mobile.json --json
+~~~
+
+This P2-0 command validates a versioned contract, mobile API36 policy snapshot, version monotonicity and declaration inventory, but **never certifies actual package ownership, signed artifact, Play account or store acceptance**. A passing static contract remains `blocked-by-external-account`. See [WF03-P2-0](docs/development/wf03-p2-p0.md). See [WF03-P0](docs/development/wf03-p0.md), [WF03-P1](docs/development/wf03-p1.md) and [WF03-P2 planned release preflight](docs/development/wf03-p2.md); an AAB build or emulator PASS is not Play Store approval or physical-device certification.
 
 Build target exports:
 

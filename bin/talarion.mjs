@@ -23,6 +23,7 @@ import { inspectWebNative, devWebNative, testWebNative, defaultWebNativeProject 
 import { planWebView, buildWebView, testWebView } from "../src/android-webview/runtime.mjs";
 import { smokeInteractiveWebView } from "../src/android-webview/interactive.mjs";
 import { planReleaseAab, buildReleaseAab, verifyReleaseAab, testReleaseAab } from "../src/android-webview/release.mjs";
+import { playStaticPreflight } from "../src/play/preflight.mjs";
 
 const argv = process.argv.slice(2);
 const jsonMode = argv.includes("--json");
@@ -42,6 +43,7 @@ Usage:
   talarion web-native test [project-directory] [--json]
   talarion web-native android <plan|build|test|smoke> [project-directory] [--json]
   talarion web-native android release <plan|build|verify|test> [project-directory] [--json]
+  talarion play preflight <contract.json> [report.json] [--json]
   talarion adapter inspect [web|android|ios] [--json]
   talarion adapter validate <candidate.json> [target] [--json]
   talarion build <web|android> [--json]
@@ -87,6 +89,12 @@ try {
         fail("Usage: talarion adapter inspect [target] | adapter validate <candidate.json> [target]");
       }
       break;
+    case "play": {
+      if(args[1]!=="preflight"||!args[2]||args[4])
+        fail("Usage: talarion play preflight <contract.json> [report.json] [--json]");
+      result=await playStaticPreflight(args[2],args[3]??null);
+      break;
+    }
     case "web-native": {
       if (args[1] === "android") {
         if (args[2] === "release") {

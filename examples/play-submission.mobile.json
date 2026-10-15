@@ -1,0 +1,8 @@
+{
+  "schema": "talarion.play-submission-contract/v1",
+  "platform": "google-play",
+  "submission": "new-app",
+  "application": {"packageId":"dev.talarion.signalgarden","deviceCategory":"mobile","versionCode":2,"versionName":"0.2.0","previousPublishedVersionCode":null,"targetSdk":36,"minSdk":26,"requestedPermissions":[]},
+  "artifact": {"format":"aab","signerClass":"ci-disposable","sha256":null,"signerCertificateSha256":null},
+  "declarations": {"privacyPolicy":"pending","dataSafety":"pending","contentRating":"pending","targetAudience":"pending","ads":"pending","storeListing":"pending","accountTesting":"pending","developerVerification":"pending"}
+}

@@ -404,3 +404,22 @@ jobs:
             artifacts/run/android-webview-release-interactive/
             artifacts/parity/wf03/
           if-no-files-found: error
+
+  play-static-preflight:
+    name: WF03-P2-0 generic Google Play static contract (not Play certified)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Run independent static Play contract and external-authority checks
+        run: |
+          node bin/talarion.mjs play preflight examples/play-submission.mobile.json artifacts/play/static-preflight.json --json
+          node --input-type=module -e 'import fs from "node:fs";const r=JSON.parse(fs.readFileSync("artifacts/play/static-preflight.json"));if(!r.ok||r.checks.length!==12||r.checks.some(x=>x.status!=="pass")||r.status!=="blocked-by-external-account"||r.submissionReady||r.playApproved||r.playPublished||r.externalRequired.length<5)process.exit(1)'
+      - name: Publish noncertifying static contract only
+        uses: actions/upload-artifact@v4
+        with:
+          name: talarion-play-static-preflight
+          path: artifacts/play/static-preflight.json
+          if-no-files-found: error

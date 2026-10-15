@@ -30,7 +30,7 @@ This directory contains the engineering specification for Talarion.
 - [WF02-P0](wf02-p0.md) — runtime-preserving Android WebView Debug APK, source hashes, Android replay and independent browser parity gates.
 - [WF02-P1](wf02-p1.md) — installed APK real ADB touch, HOME/resume lifecycle smoke and original Android before/after screenshots.
 - [WF03-P0](wf03-p0.md) — observed independent API36 signed Release AAB build/verify gate (PR #30 closed).
-- [WF03-P2-0](wf03-p2-p0.md) — game-independent Play target-API, package/version, permissions and declarations audit; always external-account blocked.
+- [WF03-P2-0](wf03-p2-p0.md) — CLOSED PR #36 with 10/10 exact-head and main CI; game-independent Play target-API, package/version, permissions and declarations audit; external-account blocked.
 - [WF03-P1](wf03-p1.md) — release AAB→APK extraction, signed package provenance, actual WebView emulator replay/touch/HOME and browser parity.
 - [WF03-P2](wf03-p2.md) — proposed Google Play submission-readiness and user-owned signing boundaries (not implemented).
 - [Next Slice](next-slice.md) — WF01/WF02 and WF03-P0/P1 completed for constrained references; WF03-P2 next; TL05-P1/P2 backlog.
